@@ -233,9 +233,8 @@ std::string Render(const MonitorState& m, const Snapshot& s, const AppConfig& cf
   return out;
 }
 
-}  // namespace
-
-int RunMonitor(const AppConfig& cfg, StateCache& cache) {
+// 본문은 익명 네임스페이스 안에 둔다 (SDK 헤더의 같은 이름과 모호해지지 않도록)
+int RunMonitorImpl(const AppConfig& cfg, StateCache& cache) {
   term::RawMode raw;
   term::Print(std::string(term::kClearScreen) + term::kHideCursor);
 
@@ -263,3 +262,7 @@ int RunMonitor(const AppConfig& cfg, StateCache& cache) {
   term::Print("\n");
   return 0;
 }
+
+}  // namespace
+
+int RunMonitor(const AppConfig& cfg, StateCache& cache) { return RunMonitorImpl(cfg, cache); }

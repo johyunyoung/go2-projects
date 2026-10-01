@@ -67,7 +67,7 @@ void EndStatus() { term::Print(std::string("\r") + kClearEol); }
 
 double Secs(Clock::duration d) { return std::chrono::duration<double>(d).count(); }
 
-void Header(const std::string& t) {
+void SectionHeader(const std::string& t) {
   Say("");
   Say(C(kBold, "==================== " + t + " ===================="));
 }
@@ -122,7 +122,7 @@ bool WaitForLowState(StateCache& cache, const AppConfig& cfg) {
 // 단계 시작 안내. Enter=시작, s=단계 건너뛰기, q=중단
 Key StepIntro(StateCache& cache, const AppConfig& cfg, const std::string& title,
               const std::vector<std::string>& lines) {
-  Header(title);
+  SectionHeader(title);
   for (const auto& l : lines) Say(l);
   Say(C(kCyan, "[Enter] 이 단계 시작   s: 이 단계 건너뛰기   q: 중단"));
   return WaitKey(cache, cfg, false, true);
@@ -690,7 +690,7 @@ void CheckDuplicateButtons(CalibrationData& d) {
 // =====================================================================
 
 void PrintSummary(const CalibrationData& d) {
-  Header("결과 요약");
+  SectionHeader("결과 요약");
   Say(C(kCyan, "관절            가설idx  측정idx  sign  변화[deg]"));
   for (const auto& j : d.joints) {
     if (!j.measured) {
@@ -734,11 +734,11 @@ void PrintSummary(const CalibrationData& d) {
   for (const auto& w : d.warnings) Say(C(kYellow, "경고: " + w));
 }
 
-}  // namespace
-
 // =====================================================================
+// 본문은 익명 네임스페이스 안에 둔다: 전역 스코프에서 호출하면
+// SDK 헤더가 들여오는 같은 이름(예: Header)과 모호해질 수 있음.
 
-int RunGuided(const AppConfig& cfg, StateCache& cache) {
+int RunGuidedImpl(const AppConfig& cfg, StateCache& cache) {
   if (!isatty(STDIN_FILENO)) {
     term::Print("안내형 모드는 대화형 터미널에서 실행해야 합니다.\n");
     return 1;
@@ -771,7 +771,7 @@ int RunGuided(const AppConfig& cfg, StateCache& cache) {
     d.buttons.push_back(b);
   }
 
-  Header("go2_inspect 안내형 확인 모드   READ-ONLY (no publishers)");
+  SectionHeader("go2_inspect 안내형 확인 모드   READ-ONLY (no publishers)");
   Say("이 프로그램은 상태만 읽으며 로봇에 어떤 명령도 보내지 않습니다.");
   Say(C(kBoldRed, "측정 전 확인: 로봇을 바닥에 엎드린 댐핑 상태로 두세요. (서 있거나 보행 중인 상태에서 절대 사용 금지)"));
   Say("  - 관절은 손으로 천천히 움직이세요. 댐핑 상태에서는 빠르게 움직일수록 저항이 큽니다.");
@@ -893,3 +893,7 @@ int RunGuided(const AppConfig& cfg, StateCache& cache) {
   }
   return 0;
 }
+
+}  // namespace
+
+int RunGuided(const AppConfig& cfg, StateCache& cache) { return RunGuidedImpl(cfg, cache); }
