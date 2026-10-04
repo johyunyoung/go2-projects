@@ -12,6 +12,25 @@ Isaac Lab 학습  →  policy.onnx  →  go2_ctrl (C++)  →  MuJoCo      ← si
 sim2sim은 정책 성능이 아니라 **번역 과정**을 검증합니다 — 조인트 순서 매핑, PD 게인,
 관측 조립 순서, 제어 주기, ONNX 추론. 여기서 어긋나면 실기에서 로봇이 즉시 넘어집니다.
 
+## 0. 어디서부터 읽을지
+
+목적에 따라 읽을 곳이 다릅니다. 각 단계 끝에 **`✅ 확인`** 블록이 있고, 거기 적힌 출력이
+나오면 그 단계는 통과입니다.
+
+| 하려는 것 | 읽을 장 | 필요한 것 | 대략 소요 |
+|---|---|---|---|
+| **이미 있는 정책을 sim2sim으로 검증** | 2 → 3 → 4 | Docker + GPU | 10~20분 |
+| **학습부터 전부** | 2 → 3 → 5 → 4 | 위 + NGC 계정 + 30 GB | 1~2시간 (+ 학습 시간) |
+| 실기 배포 | 위 + 6 | 실제 Go2 | — |
+
+막히면 **12장 문제 해결**을 먼저 보세요. 겪었던 실패가 증상별로 정리돼 있습니다.
+
+> **이 문서의 검증 범위.** 3~5장의 모든 명령은 깨끗한 clone에서 글자 그대로 실행해
+> 확인했습니다 (clone → 빌드 → 학습 → ONNX → sim2sim 전체 루프). 다만 두 가지는
+> 검증되지 않았습니다: **2-2·2-3절의 Docker/toolkit 설치 절차**(이미 설치된 장비에서
+> 작성해 실행해볼 수 없었음)와 **Isaac Sim base 이미지 15 GB를 NGC에서 실제로 받는
+> 경로**(로컬 캐시를 재사용했음). 둘 다 표준 경로지만 확인한 사실은 아닙니다.
+
 ---
 
 ## 1. 이미지 구성
@@ -95,6 +114,12 @@ cd go2-projects/go2-docker
 이 디렉토리에는 Dockerfile, 패치, 설정만 있습니다 (100 KB 남짓). 실제 소스는 빌드할 때
 각 업스트림 저장소에서 **커밋 단위로 고정해서** 받아옵니다.
 
+**✅ 확인**
+```bash
+ls deploy/Dockerfile isaaclab/Dockerfile build.sh && ls isaaclab/patches/ deploy/patches/
+```
+Dockerfile 2개, `build.sh`, 그리고 패치 4개(`isaaclab/` 3개 + `deploy/` 1개)가 보여야 합니다.
+
 ---
 
 ## 4. sim2sim 실행 — MuJoCo
@@ -106,6 +131,12 @@ Isaac Sim도 NGC 계정도 필요 없습니다.
 ```bash
 docker pull johyunyoung/go2-deploy:latest
 ```
+
+**✅ 확인**
+```bash
+docker run --rm johyunyoung/go2-deploy:latest
+```
+`sim / ctrl / jstest / shell` 사용법과 키 조작표가 출력됩니다.
 
 ### 4-2. 정책 준비
 
@@ -120,6 +151,22 @@ docker pull johyunyoung/go2-deploy:latest
 
 학습된 정책 폴더를 준비하세요. 중간 체크포인트를 빼면 **6 MB** 정도라 복사가 간단합니다.
 아직 없으면 5장(학습)을 먼저 하시거나, 기존 학습 결과에서 저 두 파일만 가져오시면 됩니다.
+
+아래 명령들은 이 변수를 씁니다. 자기 환경에 맞게 한 번만 잡아두세요.
+
+```bash
+# 5장으로 학습했다면 가장 최근 run 이 잡힙니다
+POLICY=$(ls -dt $HOME/go2-policies/rsl_rl/unitree_go2_velocity/*/ 2>/dev/null | head -1)
+# 다른 곳에서 가져왔다면 직접 지정
+# POLICY=$HOME/내려받은_정책폴더
+echo "$POLICY"
+```
+
+**✅ 확인**
+```bash
+ls "$POLICY/params/deploy.yaml" "$POLICY/exported/policy.onnx"
+```
+두 파일이 모두 있어야 합니다. `exported/` 가 없으면 **5-4절(ONNX 내보내기)** 을 아직 안 한 것입니다.
 
 ### 4-3. 실행
 
@@ -137,9 +184,10 @@ docker run --rm --network host --gpus all \
 **터미널 2 — 컨트롤러 (실기에 올라가는 바로 그 바이너리)**
 ```bash
 docker run --rm -it --network host \
-  -v /정책/폴더/경로:/policy:ro \
+  -v "$POLICY:/policy:ro" \
   johyunyoung/go2-deploy:latest ctrl
 ```
+(`$POLICY` 는 4-2절에서 잡은 변수입니다. 새 터미널이면 거기서 다시 설정하세요.)
 
 또는 `.env`의 `POLICY_DIR`만 고치고:
 ```bash
@@ -150,12 +198,19 @@ docker compose run --rm ctrl   # 터미널 2
 > **`--network host`는 필수입니다.** 두 프로세스는 DDS로 loopback(`lo`)의 도메인 0에서
 > 만납니다. 컨테이너 네트워크를 따로 쓰면 서로를 찾지 못합니다.
 
-컨트롤러에 이렇게 뜨면 연결된 것입니다:
+**✅ 확인** — 컨트롤러에 이 세 줄이 떠야 합니다.
 ```
-Connected to robot.
-Policy directory: /policy
+Connected to robot.                ← DDS 링크 성립
+Policy directory: /policy          ← 마운트한 정책을 찾음
 FSM: Start Passive
 ```
+그리고 **MuJoCo 창이 떠서 Go2가 바닥에 엎드려 있어야** 합니다. 창이 안 보이면 12장 참고.
+
+안 되는 경우:
+- `Waiting for connection to robot...` 에서 멈춤 → 시뮬레이터가 안 떴거나 `--network host` 누락
+- `No policy on /policy` → 4-2절의 두 파일 확인
+- `The other process is using the lowcmd channel` → 이전 컨테이너가 살아있습니다.
+  `docker ps` 로 확인하고 `docker kill <ID>`
 
 ### 4-4. 조작
 
@@ -212,6 +267,20 @@ docker login nvcr.io
 ```
 Isaac Sim base 이미지 15 GB를 받고 그 위에 올리므로 **수십 분** 걸립니다.
 
+빌드 중에 의존성 검사가 들어 있어서, 조용히 깨진 설치는 여기서 걸립니다 (9장 3~5번 참고).
+다음 줄이 지나가면 통과입니다.
+```
+installed: {'isaaclab': '0.54.2', 'isaaclab_tasks': ..., 'isaaclab_rl': ..., 'isaaclab_assets': ...}
+deps ok 2.7.0+cu128 /workspace/isaaclab/source/isaaclab/isaaclab/__init__.py
+```
+
+**✅ 확인**
+```bash
+docker run --rm go2-isaaclab:latest /workspace/isaaclab/isaaclab.sh -p -c "print('ok')"
+```
+`ok` 가 출력돼야 합니다. Isaac Sim 로그가 쏟아지거나 아무 출력도 없으면
+`ENTRYPOINT` 가 안 비워진 것입니다 (9장 7번).
+
 ### 5-3. 학습
 
 ```bash
@@ -242,6 +311,16 @@ conda는 없습니다). 결과는 호스트의 `$HOME/go2-policies/` 에 쌓입�
 
 100 iteration마다 체크포인트가 저장되므로 중간에 끊어도 됩니다.
 
+**✅ 확인** — 다음 두 줄이 보이면 학습 경로가 정상입니다.
+```
+[INFO][AppLauncher]: Loading experience file: /workspace/isaaclab/apps/isaaclab.python.headless.kit
+                        Learning iteration 0/50000
+```
+`headless.kit` 대신 `Isaac Sim Full Streaming App is loaded` 가 나오면 9장 6~7번 상황입니다.
+
+먼저 짧게 돌려 경로만 확인하고 싶으면 `--num_envs 256 --max_iterations 3` 으로 바꿔
+실행하세요. 1~2분 안에 끝납니다.
+
 ### 5-4. ONNX 내보내기 (sim2sim에 필수)
 
 ```bash
@@ -266,8 +345,9 @@ docker run --rm --gpus all \
 위 경로를 그대로 4장의 `/policy` 로 마운트하면 됩니다.
 
 ```bash
+POLICY=$(ls -dt $HOME/go2-policies/rsl_rl/unitree_go2_velocity/*/ | head -1)
 docker run --rm -it --network host \
-  -v $HOME/go2-policies/rsl_rl/unitree_go2_velocity/<타임스탬프>:/policy:ro \
+  -v "$POLICY:/policy:ro" \
   johyunyoung/go2-deploy:latest ctrl
 ```
 
@@ -418,7 +498,69 @@ docker run --rm -it --network host \
 
 ---
 
-## 11. 문제 해결
+## 11. 검증 체크리스트
+
+위를 다 따라왔다면, 아래가 전부 통과해야 "내가 하던 것과 동일한 환경"입니다.
+순서대로 실행하면 됩니다.
+
+```bash
+# [1] 사전 조건
+nvidia-smi --query-gpu=driver_version --format=csv,noheader      # >= 570.169
+docker run --rm --gpus all nvidia/cuda:12.8.0-base-ubuntu22.04 nvidia-smi
+
+# [2] 저장소
+ls deploy/Dockerfile isaaclab/Dockerfile build.sh
+
+# [3] deploy 이미지
+docker pull johyunyoung/go2-deploy:latest
+docker run --rm johyunyoung/go2-deploy:latest                    # 사용법 출력
+docker run --rm --entrypoint bash johyunyoung/go2-deploy:latest -c \
+  'ldd /opt/unitree_rl_lab/deploy/robots/go2/build/go2_ctrl | grep "not found" \
+   || echo "libs all resolved"'                                  # libs all resolved
+
+# [4] 학습 이미지 (학습까지 할 경우)
+docker run --rm go2-isaaclab:latest /workspace/isaaclab/isaaclab.sh -p -c "print('ok')"
+docker run --rm go2-isaaclab:latest bash -c \
+  '/workspace/isaaclab/isaaclab.sh -p -c "import torch; print(torch.__version__)"'   # 2.7.0+cu128
+
+# [5] 짧은 학습 (1~2분)
+docker run --rm --gpus all -e PYTHONUNBUFFERED=1 \
+  -v $HOME/go2-policies:/workspace/unitree_rl_lab/logs \
+  go2-isaaclab:latest /workspace/isaaclab/isaaclab.sh -p scripts/rsl_rl/train.py \
+    --headless --task Unitree-Go2-Velocity --num_envs 256 --max_iterations 3
+
+# [6] ONNX 내보내기 — 아래 두 파일이 생기면 Ctrl+C
+docker run --rm --gpus all -v $HOME/go2-policies:/workspace/unitree_rl_lab/logs \
+  go2-isaaclab:latest /workspace/isaaclab/isaaclab.sh -p scripts/rsl_rl/play.py \
+    --task Unitree-Go2-Velocity --num_envs 8 --headless
+ls $HOME/go2-policies/rsl_rl/unitree_go2_velocity/*/exported/policy.onnx
+ls $HOME/go2-policies/rsl_rl/unitree_go2_velocity/*/params/deploy.yaml
+
+# [7] sim2sim — 터미널 2개로 4-3절 실행 후, 컨트롤러에 다음이 떠야 합니다
+#     Connected to robot. / Policy directory: /policy / FSM: Start Passive
+#     MuJoCo 창에서 1 → 2 → W 를 누르면 FSM 전환 로그가 찍히고 로봇이 걷습니다
+```
+
+**[7]까지 통과하면 끝입니다.** clone → 빌드 → 학습 → ONNX → sim2sim 이 이어진 것이고,
+이 문서를 만들 때 검증한 범위와 같습니다.
+
+사람이 눈으로 확인할 항목이 하나 남습니다 — **보행 품질**. 숫자로는 안 잡히고 실기에서
+문제가 되는 것들이니 4-5절을 보세요.
+
+### 참고: 정책만 다른 PC로 옮기기
+
+학습한 정책을 다른 컴퓨터에서 쓰려면 6 MB만 복사하면 됩니다.
+
+```bash
+POLICY=$(ls -dt $HOME/go2-policies/rsl_rl/unitree_go2_velocity/*/ | head -1)
+tar czf go2-policy.tgz -C "$POLICY" params exported
+```
+받는 쪽에서 풀고 그 디렉토리를 `/policy` 로 마운트하면 됩니다. 체크포인트(`model_*.pt`)는
+sim2sim에 필요 없으니 제외합니다.
+
+---
+
+## 12. 문제 해결
 
 **MuJoCo 창이 안 뜸**
 `xhost +local:` 을 했는지, `-e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix` 를
