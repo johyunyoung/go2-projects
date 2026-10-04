@@ -1,0 +1,196 @@
+diff --git a/simulate/src/main.cc b/simulate/src/main.cc
+index db38cb2..0ecdf01 100755
+--- a/simulate/src/main.cc
++++ b/simulate/src/main.cc
+@@ -629,6 +629,26 @@ __attribute__((used, visibility("default"))) extern "C" void _mj_rosettaError(co
+ 
+ // user keyboard callback
+ void user_key_cb(GLFWwindow* window, int key, int scancode, int act, int mods) {
++  // Keyboard-driven wireless remote (joystick_type: "keyboard"). Tracks press and
++  // release so KeyboardJoystick can ramp axis targets while a key is held.
++  if (act==GLFW_PRESS || act==GLFW_RELEASE)
++  {
++    const bool v = (act==GLFW_PRESS);
++    switch (key) {
++      // Everything latches on key-down; see KeyboardState in physics_joystick.h.
++      case GLFW_KEY_W: if (v) ++keyboard_state.step_x;   break;
++      case GLFW_KEY_S: if (v) --keyboard_state.step_x;   break;
++      case GLFW_KEY_A: if (v) --keyboard_state.step_y;   break;
++      case GLFW_KEY_D: if (v) ++keyboard_state.step_y;   break;
++      case GLFW_KEY_Q: if (v) --keyboard_state.step_yaw; break;
++      case GLFW_KEY_E: if (v) ++keyboard_state.step_yaw; break;
++      case GLFW_KEY_X: if (v) keyboard_state.req_zero  = true; break;
++      case GLFW_KEY_1: if (v) keyboard_state.req_stand = true; break;
++      case GLFW_KEY_2: if (v) keyboard_state.req_run   = true; break;
++      case GLFW_KEY_0: if (v) keyboard_state.req_stop  = true; break;
++      default: break;
++    }
++  }
+   if (act==GLFW_PRESS)
+   {
+     if(param::config.enable_elastic_band == 1) {
+diff --git a/simulate/src/physics_joystick.h b/simulate/src/physics_joystick.h
+index 39a900b..9402479 100644
+--- a/simulate/src/physics_joystick.h
++++ b/simulate/src/physics_joystick.h
+@@ -4,6 +4,8 @@
+ #include <unitree/dds_wrapper/common/unitree_joystick.hpp>
+ #include "joystick/joystick.h"
+ #include <memory>
++#include <atomic>
++#include <algorithm>
+ 
+ 
+ class XBoxJoystick : public unitree::common::UnitreeJoystick
+@@ -87,4 +89,136 @@ public:
+ private:
+ 	std::unique_ptr<Joystick> js_;
+ 	int max_value_;
+-};
+\ No newline at end of file
++};
++
++// ***************************** Keyboard Joystick ***************************** //
++// Drives the simulated wireless remote from the MuJoCo window's keyboard, for
++// setups with no gamepad (e.g. operating over a remote desktop, which forwards
++// key events but not HID devices).
++//
++// Everything is latched on key-down rather than sampled from a held-key flag.
++// GLFW delivers callbacks from glfwPollEvents() in the ~60 Hz render loop, and a
++// remote desktop may hand X a press and its release in the same batch, so a held
++// flag can be true for microseconds -- the 1 kHz bridge thread reads it as never
++// pressed. Latches are immune to that, and stepped setpoints also let an exact
++// speed be dialled in and held while gait is observed.
++//
++// One more timing detail: the controller rebuilds its own UnitreeJoystick from
++// the DDS bits (LowState::update -> extract), restoring the default Axis
++// smoothing we cannot reach from here. LT/RT arrive as Axis values thresholded
++// at 0.5 to act as buttons, while A/B are Buttons that latch instantly, so a
++// chord like "LT + A" fails if both are asserted on the same tick: A's rising
++// edge fires while LT is still near 0.03. A human holds LT before tapping A; we
++// reproduce that by asserting LT for kChordLeadTicks before pulsing the button.
++
++struct KeyboardState
++{
++    // Velocity setpoint steps, accumulated per key-down.
++    std::atomic<int> step_x{0};   // W / S  -> forward / back
++    std::atomic<int> step_y{0};   // A / D  -> strafe left / right
++    std::atomic<int> step_yaw{0}; // Q / E  -> turn left / right
++    std::atomic<bool> req_zero{false};    // X -> all setpoints to zero
++
++    // FSM chord requests.
++    std::atomic<bool> req_stand{false};   // 1 -> LT + A
++    std::atomic<bool> req_run{false};     // 2 -> start
++    std::atomic<bool> req_stop{false};    // 0 -> LT + B
++};
++
++inline KeyboardState keyboard_state;
++
++class KeyboardJoystick : public unitree::common::UnitreeJoystick
++{
++public:
++    KeyboardJoystick() : unitree::common::UnitreeJoystick()
++    {
++        std::cout << "[KeyboardJoystick] W/S +-fwd  A/D +-strafe  Q/E +-turn  X zero"
++                  << "  |  1 stand  2 run  0 passive  (each press steps by "
++                  << kStep << ")" << std::endl;
++    }
++
++    void update() override
++    {
++        auto & k = keyboard_state;
++
++        // --- velocity setpoints ---
++        if (k.req_zero.exchange(false)) {
++            x_cmd_ = y_cmd_ = yaw_cmd_ = 0.0f;
++            report();
++        } else {
++            const int dx = k.step_x.exchange(0);
++            const int dy = k.step_y.exchange(0);
++            const int dyaw = k.step_yaw.exchange(0);
++            if (dx || dy || dyaw) {
++                x_cmd_   = clamp1(x_cmd_   + kStep * dx);
++                y_cmd_   = clamp1(y_cmd_   + kStep * dy);
++                yaw_cmd_ = clamp1(yaw_cmd_ + kStep * dyaw);
++                report();
++            }
++        }
++
++        // Ramp toward the setpoint so commands never step discontinuously.
++        ramp(ly_, x_cmd_);
++        ramp(lx_, y_cmd_);
++        ramp(rx_, yaw_cmd_);
++
++        ly(ly_);
++        lx(lx_);
++        rx(rx_);
++        ry(0.0f);
++
++        // --- FSM chords ---
++        if (k.req_stand.exchange(false)) { stand_seq_ = 0; std::cout << "[kjoy] stand" << std::endl; }
++        else advance(stand_seq_);
++        if (k.req_stop.exchange(false))  { stop_seq_ = 0;  std::cout << "[kjoy] stop"  << std::endl; }
++        else advance(stop_seq_);
++        if (k.req_run.exchange(false))   { run_seq_ = 0;   std::cout << "[kjoy] run"   << std::endl; }
++        else advance(run_seq_);
++
++        // Per deploy/robots/go2/config/config.yaml:
++        //   Passive -> FixStand : "LT + A"
++        //   FixStand -> Velocity: "start"
++        //   any -> Passive      : "LT + B"
++        LT((stand_seq_ >= 0 || stop_seq_ >= 0) ? 1.0f : 0.0f);
++        A(stand_seq_ >= kChordLeadTicks ? 1 : 0);
++        B(stop_seq_  >= kChordLeadTicks ? 1 : 0);
++        start(run_seq_ >= 0 ? 1 : 0);
++
++        RT(0.0f);
++        back(0); LB(0); RB(0); X(0); Y(0);
++        up(0); down(0); left(0); right(0);
++    }
++
++private:
++    static constexpr float kStep = 0.1f;        // setpoint change per key press
++    static constexpr float kRampStep = 0.002f;  // per 1 ms tick -> 0.1 in 50 ms
++    static constexpr int kChordLeadTicks  = 150; // hold LT this long before the button
++    static constexpr int kChordPulseTicks = 100; // then hold the button this long
++
++    static float clamp1(float v) { return std::max(-1.0f, std::min(1.0f, v)); }
++
++    static void ramp(float & value, float target)
++    {
++        if (value < target)      value = std::min(target, value + kRampStep);
++        else if (value > target) value = std::max(target, value - kRampStep);
++    }
++
++    // seq is -1 when idle, otherwise the tick count since the request was latched.
++    static void advance(int & seq)
++    {
++        if (seq >= 0) seq = (seq < kChordLeadTicks + kChordPulseTicks) ? seq + 1 : -1;
++    }
++
++    void report() const
++    {
++        // ly/lx/rx map to lin_vel_x / -lin_vel_y / -ang_vel_z in the controller's
++        // observation assembly, then get clamped to the policy's command ranges.
++        std::cout << "[kjoy] cmd  fwd=" << x_cmd_
++                  << "  strafe=" << -y_cmd_
++                  << "  turn=" << -yaw_cmd_ << std::endl;
++    }
++
++    float x_cmd_{0.0f}, y_cmd_{0.0f}, yaw_cmd_{0.0f};
++    float ly_{0.0f}, lx_{0.0f}, rx_{0.0f};
++    int stand_seq_{-1}, stop_seq_{-1}, run_seq_{-1};
++};
+diff --git a/simulate/src/unitree_sdk2_bridge.h b/simulate/src/unitree_sdk2_bridge.h
+index 7c13289..284d659 100644
+--- a/simulate/src/unitree_sdk2_bridge.h
++++ b/simulate/src/unitree_sdk2_bridge.h
+@@ -31,6 +31,8 @@ public:
+                 joystick = std::make_shared<XBoxJoystick>(param::config.joystick_device, param::config.joystick_bits);
+             } else if(param::config.joystick_type == "switch") {
+                 joystick  = std::make_shared<SwitchJoystick>(param::config.joystick_device, param::config.joystick_bits);
++            } else if(param::config.joystick_type == "keyboard") {
++                joystick = std::make_shared<KeyboardJoystick>();
+             } else {
+                 std::cerr << "Unsupported joystick type: " << param::config.joystick_type << std::endl;
+                 exit(EXIT_FAILURE);

@@ -1,0 +1,15 @@
+robot: "go2"
+robot_scene: "scene_flat.xml"   # flat ground; the velocity policy has no height scanner
+
+domain_id: 0    # must match go2_ctrl, which hardcodes ChannelFactory::Init(0, ...)
+interface: "lo" # both simulator and controller run in the same network namespace
+idl_type: -1
+
+use_joystick: 1          # required: FSM transitions and velocity commands both come
+joystick_type: "keyboard" # from the wireless-remote bytes, keyboard-driven here
+joystick_device: "/dev/input/js0"
+joystick_bits: 16
+
+print_scene_information: 1
+
+enable_elastic_band: 0 # h1/g1 only

@@ -1,0 +1,70 @@
+# Two services that together reproduce the sim2sim setup.
+#
+# Both join the host network namespace on purpose: the controller and the simulator
+# find each other over DDS on loopback at domain 0, which does not work across
+# separate container networks.
+services:
+  sim:
+    image: ${DEPLOY_IMAGE}:${DEPLOY_TAG}
+    build:
+      context: ./deploy
+      dockerfile: Dockerfile
+    command: ["sim"]
+    network_mode: host
+    environment:
+      DISPLAY: ${DISPLAY}
+      NVIDIA_DRIVER_CAPABILITIES: graphics,display,utility,compute
+    volumes:
+      # X11 socket for the MuJoCo window. Run `xhost +local:` once on the host if the
+      # container is refused by the X server.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  ctrl:
+    image: ${DEPLOY_IMAGE}:${DEPLOY_TAG}
+    build:
+      context: ./deploy
+      dockerfile: Dockerfile
+    command: ["ctrl"]
+    network_mode: host
+    environment:
+      DDS_INTERFACE: ${DDS_INTERFACE}
+    volumes:
+      # The policy is data, not part of the image.
+      - ${POLICY_DIR}:/policy:ro
+    stdin_open: true
+    tty: true
+    depends_on:
+      - sim
+
+  # Training. Built locally only -- see isaaclab/Dockerfile for why it is not pushed.
+  train:
+    image: ${ISAACLAB_IMAGE}:${ISAACLAB_TAG}
+    build:
+      context: ./isaaclab
+      dockerfile: Dockerfile
+      args:
+        ISAACSIM_BASE_IMAGE: ${ISAACSIM_BASE_IMAGE}
+        ISAACSIM_VERSION: ${ISAACSIM_VERSION}
+    environment:
+      DISPLAY: ${DISPLAY}
+      ACCEPT_EULA: ${ACCEPT_EULA}
+      NVIDIA_DRIVER_CAPABILITIES: all
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${POLICY_DIR}:/workspace/unitree_rl_lab/logs:rw
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
