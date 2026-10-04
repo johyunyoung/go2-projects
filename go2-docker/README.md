@@ -225,6 +225,12 @@ docker run --rm --gpus all -e PYTHONUNBUFFERED=1 \
 `isaaclab.sh -p` 가 호스트 설치의 `conda activate && python` 역할을 합니다 (컨테이너에
 conda는 없습니다). 결과는 호스트의 `$HOME/go2-policies/` 에 쌓입니다.
 
+> 컨테이너가 root로 돌기 때문에 **생성된 파일도 root 소유**가 됩니다. 호스트에서 지우거나
+> 옮기려면 sudo가 필요합니다. 거슬리면 학습이 끝난 뒤 한 번 넘겨주세요:
+> ```bash
+> sudo chown -R $(id -u):$(id -g) $HOME/go2-policies
+> ```
+
 **언제 멈춰야 하나.** 기본 설정은 `max_iterations = 50000`이지만 그렇게까지 돌릴
 필요가 없습니다. RTX 4090에서 4096 envs 기준 약 145,000 steps/s가 나오고,
 **2000~3000 iteration이면 수렴**합니다. 판단 기준은 보상 단독이 아니라:
@@ -248,6 +254,12 @@ docker run --rm --gpus all \
 
 `$HOME/go2-policies/rsl_rl/unitree_go2_velocity/<타임스탬프>/exported/policy.onnx` 가
 생성됩니다. `params/deploy.yaml` 은 학습 때 이미 만들어져 있습니다.
+
+> **이 명령은 스스로 끝나지 않습니다.** `play.py` 는 ONNX를 내보낸 직후 무한 시뮬레이션
+> 루프로 들어갑니다. 위 두 파일이 생긴 것을 확인했으면 **Ctrl+C 로 끊으면 됩니다.**
+> ```bash
+> ls $HOME/go2-policies/rsl_rl/unitree_go2_velocity/*/exported/
+> ```
 
 ### 5-5. 전체 루프 닫기
 
