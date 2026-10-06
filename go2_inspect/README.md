@@ -6,6 +6,10 @@ Unitree Go2 EDU의 **상태만 읽어서** 다음을 확인하는 C++ 도구입�
 - IMU 쿼터니언 순서 규칙 (wxyz / xyzw)
 - 리모컨 버튼별 비트 배정
 
+> **관절 순서·부호와 쿼터니언 순서(wxyz)는 2026-10-06 에 실기 보행으로 확인되었습니다.**
+> 남은 미검증 항목은 일부 리모컨 버튼 비트입니다. 자세한 근거는
+> [가설 (검증 대상)](#가설-검증-대상) 을 보세요.
+
 > **READ-ONLY: no publishers**
 > 이 프로그램은 `rt/lowstate`, `rt/wirelesscontroller`를 `ChannelSubscriber`로 **구독만** 합니다.
 > - 발행 채널(`ChannelPublisher`)을 하나도 만들지 않습니다.
@@ -165,8 +169,26 @@ remote_keys_detail: ...
 
 `src/hypothesis.hpp`에 모아 두었습니다. 화면에서는 `*`나 "가설"로 표시합니다.
 
-- **관절 순서**: 0 FR_hip, 1 FR_thigh, 2 FR_calf, 3 FL_hip, 4 FL_thigh, 5 FL_calf, 6 RR_hip, 7 RR_thigh, 8 RR_calf, 9 RL_hip, 10 RL_thigh, 11 RL_calf
-- **쿼터니언 순서**: wxyz
+> ### 2026-10-06 갱신 — 관절 순서와 쿼터니언 순서는 확인됨
+>
+> 이 도구로 측정한 것이 아니라, **실기 보행이 성립함으로써** 간접 확인되었습니다.
+> Isaac Lab 에서 학습한 정책을 `unitree_rl_lab` 의 `go2_ctrl` 로 실제 Go2 에서
+> 구동했고 (`go2-policies` 브랜치 참고), 정상적으로 기립·보행했습니다.
+>
+> | 가설 | 상태 | 근거 |
+> |---|---|---|
+> | 관절 순서 (아래 12개) | **확인** | `deploy.yaml` 의 `joint_sdk_names` 가 아래 목록과 **글자 그대로 동일**하고, `go2_ctrl` 이 그 순서로 `motor_cmd[]` 를 쓰고 `motor_state[]` 를 읽습니다. 순서가 틀렸다면 FixStand 기립 단계에서 다리가 엉켰을 것입니다. |
+> | 관절 부호 | **확인** | 정책이 내보내는 관절 위치가 시뮬과 같은 부호로 동작했습니다. 한 관절이라도 반대였다면 그 다리가 역방향으로 움직여 즉시 넘어집니다. |
+> | 쿼터니언 순서 `wxyz` | **확인** | `projected_gravity` 가 IMU 쿼터니언에서 계산됩니다. 순서가 `xyzw` 였다면 중력 방향이 틀려 균형을 잡지 못합니다. SDK 브리지 코드도 `w=q[0], x=q[1], y=q[2], z=q[3]` 로 읽습니다. |
+> | 버튼 비트 | **일부 확인** | `L2`(5), `start`(2), `A`(8), `B`(9) 만 실제로 눌러 동작을 확인했습니다 (`LT+A` → 기립, `start` → 정책 가동, `LT+B` → 정지). 나머지 `R1 R2 X Y select F1 F2 up down left right` 는 **미검증**입니다. |
+> | `wireless_remote[2..3]` == keys | **확인** | `go2_sub.h` 가 `wireless_remote[0..39]` 를 `REMOTE_DATA_RX` 로 `memcpy` 하고, 위 네 버튼이 정상 동작했습니다. |
+>
+> **다만 이 도구 자체는 아직 실기에서 돌려보지 않았습니다.** 확인된 것은 *가설의
+> 내용*이고, `go2_inspect` 의 구현(특히 `imu_math.hpp` 의 두 해석 판정 로직)이
+> 올바른지는 별개입니다. 안내형 모드를 돌리면 미검증 버튼들까지 한 번에 정리됩니다.
+
+- **관절 순서**: 0 FR_hip, 1 FR_thigh, 2 FR_calf, 3 FL_hip, 4 FL_thigh, 5 FL_calf, 6 RR_hip, 7 RR_thigh, 8 RR_calf, 9 RL_hip, 10 RL_thigh, 11 RL_calf — **확인됨** (위 참고)
+- **쿼터니언 순서**: wxyz — **확인됨** (위 참고)
 - **버튼 비트**: R1=0, L1=1, start=2, select=3, R2=4, L2=5, F1=6, F2=7, A=8, B=9, X=10, Y=11, up=12, right=13, down=14, left=15
   - 출처: unitree_sdk2 `example/wireless_controller/advanced_gamepad.hpp`의 `xKeySwitchUnion` 비트필드 순서
 - **`lowstate.wireless_remote[2..3]`이 keys와 같은 필드라는 가정**: 비교용 참고 정보입니다.
