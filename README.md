@@ -7,7 +7,7 @@
 ─────────────────────────────────────────────────────────────────
 Isaac Lab 학습                         go2_ctrl  (한 번 빌드, 계속 실행)
   ↓ play.py                                ↑ 읽음
-policy.onnx + deploy.yaml  ── git ──→  ~/go2-policy/current
+policy.onnx + deploy.yaml  ── git ──→  ~/go2-policies/current
                                            ↓
                                        실제 Go2 보행
 ```
@@ -39,15 +39,38 @@ jetson/cmakelists-arch-select.patch     제어기를 arm64 로 빌드하기 위�
 
 ## 2. 젯슨 최초 설정 (한 번만)
 
+젯슨에 SSH 로 접속해서 진행합니다. 먼저 홈 경로를 확인해두세요 — 뒤에서 절대경로로 씁니다.
+
+```bash
+echo $HOME        # 예: /home/unitree
+```
+
 ### 2-1. 의존성
 
 ```bash
 sudo apt update && sudo apt install -y \
-  build-essential cmake git curl python3-yaml \
+  build-essential cmake git curl \
+  python3-pip python3-yaml \
   libyaml-cpp-dev libboost-all-dev libeigen3-dev libspdlog-dev libfmt-dev
+pip3 install onnx
 ```
 
-### 2-2. unitree_sdk2 설치
+`onnx` 는 `verify.sh` 가 **ONNX 입력 차원과 `deploy.yaml` 관측 합이 일치하는지**
+교차 검증하는 데 씁니다. 없으면 그 검사만 조용히 건너뛰므로 꼭 넣으세요 — 정책을
+바꿀 때 가장 중요한 점검입니다.
+
+### 2-2. 이 저장소 받기 (정책 + arm64 패치)
+
+뒤에서 쓰는 패치 파일이 여기 들어 있으니 **먼저** 받습니다.
+
+```bash
+cd ~
+git clone -b go2-policies --depth 1 \
+  https://github.com/johyunyoung/go2-projects.git go2-policies
+ls ~/go2-policies        # current, policies/, verify.sh, jetson/
+```
+
+### 2-3. unitree_sdk2 설치
 
 ```bash
 cd ~
@@ -58,11 +81,19 @@ cmake --build build -j$(nproc)
 sudo cmake --install build && sudo ldconfig
 ```
 
+**`/usr/local` 에 설치해야 합니다** (위 명령의 기본값). go2 제어기의 CMakeLists 가
+`/usr/local/include/ddscxx` 를 하드코딩하기 때문입니다. unitree_mujoco 문서는
+`-DCMAKE_INSTALL_PREFIX=/opt/unitree_robotics` 를 쓰라고 하는데, 그렇게 하면 제어기
+빌드가 헤더를 못 찾습니다.
+
 아키텍처는 자동 선택됩니다 — SDK 의 CMakeLists 가 `lib/${CMAKE_SYSTEM_PROCESSOR}` 를
 보므로 젯슨에서는 `lib/aarch64/libunitree_sdk2.a` 를 집습니다. 설정 로그에
 `aarch64` 경로가 찍히는지 확인하세요.
 
-### 2-3. 보행 제어기 소스
+`sudo ldconfig` 를 빼먹으면 나중에 `libddsc.so.0: cannot open shared object file` 로
+실행이 실패합니다.
+
+### 2-4. 보행 제어기 소스
 
 ```bash
 cd ~
@@ -80,7 +111,7 @@ deploy/include/FSM/                     Passive / FixStand / Velocity
 deploy/include/isaaclab/                관측 조립, 액션 스케일, ONNX 래퍼
 ```
 
-### 2-4. onnxruntime arm64 넣기
+### 2-5. onnxruntime arm64 넣기
 
 리포에는 **x64 버전만** 번들돼 있습니다. 같은 버전의 aarch64 배포본을 받습니다.
 
@@ -91,6 +122,7 @@ curl -fsSL -o ort.tgz \
 tar xzf ort.tgz && rm ort.tgz
 ln -sf libonnxruntime.so.1.22.0 \
   onnxruntime-linux-aarch64-1.22.0/lib/libonnxruntime.so
+ls -l onnxruntime-linux-aarch64-1.22.0/lib/
 ```
 
 마지막 심링크가 필요한 이유: CMakeLists 가 버전 없는 `libonnxruntime.so` 를 링크하는데
@@ -99,38 +131,44 @@ ln -sf libonnxruntime.so.1.22.0 \
 > CPU 빌드로 충분합니다. 관측 45차원 → 256 → 128 → 액션 12 의 작은 MLP(758 KB)이고
 > 50 Hz 추론에 여유가 큽니다. aarch64 는 CPU 빌드만 제공됩니다.
 
-### 2-5. CMakeLists 를 아키텍처에 따라 고르게 패치
+### 2-6. CMakeLists 를 아키텍처에 따라 고르게 패치
 
 ```bash
-cd ~/go2-policy   # 이 브랜치를 먼저 clone 했다면 (2-6 참고). 아니면 패치 파일만 복사
 cd ~/unitree_rl_lab
-git apply ~/go2-policy/jetson/cmakelists-arch-select.patch
+git apply ~/go2-policies/jetson/cmakelists-arch-select.patch
 ```
 
 패치 내용은 `CMAKE_SYSTEM_PROCESSOR` 로 `aarch64` / `x64` 디렉토리를 고르게 하는
 것뿐입니다. x86 에서도 그대로 빌드됩니다.
 
-### 2-6. 정책 받기
-
-```bash
-cd ~
-git clone -b go2-policies --depth 1 \
-  https://github.com/johyunyoung/go2-projects.git go2-policy
-```
+> **이미 적용했다면 두 번째 실행은 실패합니다** (`patch does not apply`). 재시도 전에
+> 확인하세요:
+> ```bash
+> git -C ~/unitree_rl_lab apply --check ~/go2-policies/jetson/cmakelists-arch-select.patch \
+>   && echo "아직 미적용 — 적용하세요" || echo "이미 적용됨 — 넘어가세요"
+> ```
+> 처음부터 다시 하려면 `git -C ~/unitree_rl_lab checkout deploy/robots/go2/CMakeLists.txt`.
 
 ### 2-7. 제어기가 정책을 보게 설정
 
 ```bash
 vi ~/unitree_rl_lab/deploy/robots/go2/config/config.yaml
 ```
+
+`Velocity` 항목의 `policy_dir` 을 **2-2 에서 clone 한 경로의 `current`** 로 바꿉니다.
+
 ```yaml
   Velocity:
     transitions:
       Passive: LT + B.on_pressed
-    policy_dir: /home/unitree/go2-policy/current     # ← 절대경로
+    policy_dir: /home/unitree/go2-policies/current
 ```
 
-> 절대경로를 쓰세요. 상대경로는 `param.h` 가 **실행 파일의 상위 2단계**
+> `/home/unitree` 부분은 **앞에서 `echo $HOME` 으로 확인한 값**으로 바꾸세요.
+> 젯슨 사용자명이 `unitree` 가 아닐 수 있습니다.
+>
+> YAML 은 `~` 나 `$HOME` 을 전개하지 않으므로 **절대경로를 직접 적어야 합니다.**
+> 상대경로도 쓰지 마세요 — `param.h` 가 실행 파일의 상위 2단계
 > (`bin_path.parent_path().parent_path()`) 기준으로 해석해서 혼란스럽습니다.
 >
 > `current` 는 심링크이므로, 쓰는 정책을 바꾸는 것은 심링크를 옮기는 것입니다.
@@ -151,6 +189,9 @@ ldd deploy/robots/go2/build/go2_ctrl | grep "not found" || echo "링크 OK"
 ./deploy/robots/go2/build/go2_ctrl --help
 ```
 
+> cmake 설정 단계에서 실패하면 캐시를 지우고 다시 하세요:
+> `rm -rf deploy/robots/go2/build`
+
 ---
 
 ## 3. 실행
@@ -169,7 +210,7 @@ ldd deploy/robots/go2/build/go2_ctrl | grep "not found" || echo "링크 OK"
 ### 3-2. 정책 점검 (로봇 움직이기 전)
 
 ```bash
-cd ~/go2-policy && ./verify.sh current
+cd ~/go2-policies && ./verify.sh current
 ```
 
 ### 3-3. 기동
@@ -184,7 +225,7 @@ cd ~/unitree_rl_lab/deploy/robots/go2/build
 
 ```
 Connected to robot.
-Policy directory: /home/unitree/go2-policy/current
+Policy directory: /home/unitree/go2-policies/current
 FSM: Start Passive
 ```
 
@@ -224,13 +265,22 @@ FSM: Start Passive
 
 한 번 세팅한 뒤에는 이것만 반복합니다. **제어기 재빌드 없음, 설정 수정 없음.**
 
+> 아래 두 블록은 **서로 다른 기계**입니다. 학습 PC 의 `$HOME/go2-policies` 는 학습
+> 로그가 쌓이는 곳이고, 젯슨의 `~/go2-policies` 는 이 저장소 clone 입니다. 이름이
+> 비슷하니 헷갈리지 마세요 — PC 쪽은 `TRAIN_LOGS` 로 분리해 뒀습니다.
+
 **학습 PC에서**
 
 ```bash
 # 1) 학습 → ONNX 내보내기  (go2-docker 브랜치 README 5장)
+
 # 2) 이 브랜치에 커밋
+#    TRAIN_LOGS = 학습할 때 컨테이너의 logs 로 마운트한 호스트 디렉토리
+TRAIN_LOGS=$HOME/go2-policies          # go2-docker README 기준 기본값
+RUN=$(ls -dt "$TRAIN_LOGS"/rsl_rl/unitree_go2_velocity/*/ | head -1)
+echo "$RUN"                            # 올바른 run 인지 확인
+
 cd ~/go2-projects && git checkout go2-policies
-RUN=$(ls -dt $HOME/go2-policies/rsl_rl/unitree_go2_velocity/*/ | head -1)
 NAME=$(date +%Y-%m-%d)_설명            # 예: 2026-11-02_rough-stairs-30k
 
 mkdir -p policies/$NAME/{params,exported}
@@ -246,7 +296,7 @@ git add -A && git commit -m "Add $NAME" && git push
 **젯슨에서**
 
 ```bash
-cd ~/go2-policy && git pull
+cd ~/go2-policies && git pull
 ./verify.sh current
 # go2_ctrl 재시작 (파일은 기동 시 한 번 읽습니다)
 ```
@@ -259,7 +309,7 @@ cd ~/go2-policy && git pull
 없이** 즉시 복귀됩니다 — 새 정책이 실기에서 나쁘게 걸을 때 쓰세요.
 
 ```bash
-cd ~/go2-policy
+cd ~/go2-policies
 ls policies/
 ln -sfn policies/2026-10-01_velocity-flat-50k current
 ./verify.sh current
