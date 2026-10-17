@@ -1,0 +1,21 @@
+# M6 check: velocity steps, 4 s each (2 s to settle + 2 s measured).
+#   go2_mpc config/go2_mpc_sim.yaml --script scripts/m6_velocity.yaml
+- {t: 1.0, event: stand}
+- {t: 4.5, event: run}
+- {t: 6.0, vx: 0.5}                    # forward 0.5
+- {t: 10.0, vx: 1.0}                   # forward 1.0
+- {t: 14.0, vx: 0.0}                   # stop
+- {t: 17.0, vx: -0.3}                  # backward
+- {t: 21.0, vx: 0.0}
+- {t: 24.0, vy: 0.3}                   # left
+- {t: 28.0, vy: -0.3}                  # right (direct reversal)
+- {t: 32.0, vy: 0.0}
+- {t: 35.0, wz: 0.5}                   # turn left
+- {t: 39.0, wz: -0.5}                  # turn right (direct reversal)
+- {t: 43.0, wz: 0.0}
+- {t: 46.0, vx: 0.4, wz: 0.4}          # arc
+- {t: 50.0, vx: 0.5, wz: 0.0}          # straight
+- {t: 54.0, vx: -0.3}                  # forward -> backward
+- {t: 58.0, vx: 0.0}
+- {t: 61.0, event: stand}
+- {t: 64.0, event: passive}

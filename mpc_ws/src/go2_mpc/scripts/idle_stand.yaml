@@ -1,0 +1,15 @@
+# gait.idle = stand check: the robot stands while the command is zero, walks while it
+# is not, and returns to standing after each command.
+#   go2_mpc config/go2_mpc_sim.yaml --script scripts/idle_stand.yaml
+- {t: 1.0, event: stand}
+- {t: 4.5, event: run}        # stands (no command)
+- {t: 7.0, vx: 0.3}           # walk forward
+- {t: 10.0, vx: 0.0}          # -> stand
+- {t: 13.0, vy: 0.2}          # sideways
+- {t: 16.0, vy: 0.0}
+- {t: 19.0, wz: 0.5}          # turn
+- {t: 22.0, wz: 0.0}
+- {t: 25.0, vx: 0.3}          # short tap
+- {t: 25.4, vx: 0.0}
+- {t: 29.0, event: stand}
+- {t: 32.0, event: passive}

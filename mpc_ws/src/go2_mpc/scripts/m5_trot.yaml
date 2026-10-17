@@ -1,0 +1,6 @@
+# M5 check: trot in place (zero velocity command) for 40 s, then stop.
+#   go2_mpc config/go2_mpc_sim.yaml --idle step --script scripts/m5_trot.yaml
+- {t: 1.0, event: stand}
+- {t: 4.5, event: run}        # 1 s 4-leg stance, then trot from t = 5.5
+- {t: 46.0, event: stand}
+- {t: 49.0, event: passive}

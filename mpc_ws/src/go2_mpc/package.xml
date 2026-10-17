@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>go2_mpc</name>
+  <version>0.1.0</version>
+  <description>
+    SRB-MPC controller for Unitree Go2. Plain CMake, links unitree_sdk2 only (no ROS),
+    so the same binary runs against unitree_mujoco and on the robot.
+    package.xml exists only so colcon can build it next to the ROS viewer packages.
+  </description>
+  <maintainer email="parkjinwoo@postech.ac.kr">Jinwoo Park</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>cmake</buildtool_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

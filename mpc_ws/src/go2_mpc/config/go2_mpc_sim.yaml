@@ -1,0 +1,152 @@
+# go2_mpc configuration for unitree_mujoco (simulation).
+# Joint vectors take 3 values (hip, thigh, calf; repeated for every leg) or 12 values
+# in SDK order FR, FL, RR, RL.
+
+robot:
+  network: lo             # DDS interface; the real robot uses its NIC (e.g. eth0)
+  domain_id: 0            # unitree_mujoco publishes on domain 0
+  use_ground_truth: true  # rt/sportmodestate from the simulator
+  estimator: ground_truth # what drives control: ground_truth | kalman (KF always runs)
+
+# IMU + leg kinematics Kalman filter (MIT Cheetah defaults)
+estimator:
+  process_p: 0.02
+  process_v: 0.02
+  process_foot: 0.002
+  meas_p_rel: 0.001
+  meas_v: 0.1
+  meas_z: 0.001
+  untrusted_scale: 100.0  # noise x this for a foot in the air
+  trust_window: 0.2       # trust ramps over the first/last 20 % of stance
+  foot_rolling: true      # ball foot rolls in stance (else odometry reads ~6 % slow)
+
+control:
+  dt: 0.002               # 500 Hz
+  realtime: false         # the container user cannot raise SCHED_FIFO priority
+  cpu: -1
+  priority: 80
+
+model:
+  mass: 15.206            # go2.xml total
+  gravity: 9.81
+
+passive:
+  kd: [3.0, 3.0, 3.0]
+
+# Mode 1 (key 1 / LT+A): joint-space smoothstep through the waypoints, then hold.
+# First tuck the feet under the body (so they do not drag while rising), then stand.
+# Same postures and gains as go2_ctrl's FixStand.
+stand:
+  waypoints:
+    - [0.0, 1.36, -2.65]  # tucked, lying
+    - [0.0, 0.80, -1.50]  # initial pose for the MPC
+  durations: [1.0, 1.5]
+  kp: [60.0, 80.0, 80.0]
+  kd: [5.0, 4.0, 4.0]
+  report_delay: 0.5
+  gravity_compensation: true  # J^T (m g / 4) per leg, faded in while rising
+
+# Mode 2 (key 2 / start, from Stand): SRB-MPC. Sticks = velocity (W/S vx, A/D vy, Q/E wz);
+# what happens at zero command is gait.idle. With stance_only (--stance-only, M3) it never
+# walks and the sticks set the body pose instead (W/S pitch, A/D roll, Q/E yaw).
+mpc:
+  rate_hz: 50
+  dt: 0.02
+  horizon: 15
+  # Composite inertia about the CoM at the stand pose, base frame, row-major
+  # (computed from go2.xml with MuJoCo; legs are 54 % of the mass).
+  inertia: [0.188, 0.0, -0.020,
+            0.0,   0.499, 0.0,
+            -0.020, 0.0, 0.532]
+  com_offset: [-0.0019, 0.0, -0.0246]   # CoM in the base frame at the stand pose
+  mu: 0.35                # simulator floor/foot friction is 0.4
+  fz_min: 10.0
+  fz_max: 150.0
+  #           roll pitch yaw   x    y    z    wx   wy   wz   vx   vy   vz
+  q_weights: [0.25, 0.25, 10,  2,   2,   50,  0,   0,   0.3, 0.2, 0.2, 0.1]
+  r_weight: 1.0e-6
+  max_iter: 30
+  tol: 1.0e-6
+  timeout_cycles: 3       # no fresh solution for 3 periods -> Stand
+  stance_kd: [1.0, 1.0, 1.0]
+  stance_leg_gravity: true  # tau = G_leg(q) - J^T R^T f
+  roll_scale: 0.3         # [rad] at full stick (keyboard: 0.03 rad per press)
+  pitch_scale: 0.3
+  yaw_scale: 0.3
+  max_angle: 0.35
+  dz_min: -0.10
+  dz_max: 0.05
+  angle_rate: 0.5         # [rad/s]
+  height_rate: 0.1        # [m/s]
+  max_pos_error: 0.1      # walking: position target at most this far ahead [m]
+  max_yaw_error: 0.2      # [rad]
+  stance_only: false
+
+# Periodic gait, legs FR, FL, RR, RL. Trot: diagonal pairs FR+RL and FL+RR.
+# period should be a multiple of mpc.dt (0.3 s = 15 steps = the MPC horizon).
+gait:
+  type: trot
+  idle: stand             # zero command: stand (4 feet down) | step (trot in place)
+  stand_before: 1.0       # [s] minimum 4-leg stance after entering Mpc
+  start_speed: 0.05       # [m/s] command that starts walking
+  start_yaw_rate: 0.1     # [rad/s]
+  stop_delay: 0.3         # [s] command near zero this long ...
+  stop_speed: 0.1         # [m/s] ... and measured speed below this -> stop at the next touch-down
+  period: 0.3
+  duty: 0.5
+  offsets: [0.0, 0.5, 0.5, 0.0]
+
+# Swing legs: Bezier (x/y cubic, z two cubic halves to `height` at mid-swing),
+# tracked by joint PD on IK + velocity feed-forward.
+swing:
+  height: 0.08
+  freeze_after: 0.8       # touch-down target fixed after 80 % of the swing
+  kp: [30.0, 30.0, 30.0]
+  kd: [2.0, 2.0, 2.0]
+  gravity_compensation: true  # leg's own weight as feed-forward torque
+  inertia_feedforward: true   # M(q) qdd for the Bezier acceleration
+
+# Raibert foothold: p_hip(td) + v T_st/2 + k_v (v - v_cmd) + 0.5 sqrt(h/g) (v x w_cmd)
+foothold:
+  k_v: 0.03
+  max_step: 0.15          # [m] max offset from the hip
+
+# M4 bench test (--swing-test, with the base welded: sim/scene_fixed.xml).
+swing_test:
+  enable: false
+  speed: 0.5              # [m/s] virtual body speed -> step length speed * stance time
+  ramp: 1.0
+  report_period: 2.0
+
+command:
+  scale: 1.0              # remote axis -> m/s, rad/s (keyboard steps 0.1 per press)
+  vx_max: 1.0
+  vy_max: 0.5
+  wz_max: 1.0
+  lin_accel: 1.0          # command rate limit [m/s^2]
+  ang_accel: 2.0          # [rad/s^2]
+
+safety:
+  tau_max: [23.7, 23.7, 45.43]
+  lowstate_timeout: 0.1
+  max_tilt: 0.8           # [rad] roll/pitch limit in Mpc -> Passive
+
+# Simulation only: sensor noise before estimation, values for a typical MEMS IMU at
+# scale 1 (--sim-noise SCALE overrides scale; 0 = off).
+sim_noise:
+  scale: 0.0
+  seed: 1
+  gyro_std: 0.005             # [rad/s]
+  gyro_bias: [0.01, -0.01, 0.01]
+  acc_std: 0.04               # [m/s^2]
+  acc_bias: [0.1, -0.1, 0.1]
+  attitude_bias: [0.01, -0.01]  # roll, pitch [rad]
+  attitude_std: 0.002         # [rad]
+  dq_std: 0.05                # [rad/s]
+
+debug:
+  enable: true
+  host: 127.0.0.1         # where go2_mpc_viz listens
+  port: 9870
+  decimation: 5           # 500 Hz / 5 = 100 Hz
+  print_period: 2.0
