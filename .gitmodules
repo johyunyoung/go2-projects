@@ -1,0 +1,6 @@
+[submodule "mpc_ws/thirdparty/blasfeo"]
+	path = mpc_ws/thirdparty/blasfeo
+	url = https://github.com/giaf/blasfeo.git
+[submodule "mpc_ws/thirdparty/hpipm"]
+	path = mpc_ws/thirdparty/hpipm
+	url = https://github.com/giaf/hpipm.git
