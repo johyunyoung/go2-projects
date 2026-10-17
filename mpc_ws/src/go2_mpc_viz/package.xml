@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>go2_mpc_viz</name>
+  <version>0.1.0</version>
+  <description>
+    Republishes go2_mpc's UDP debug stream on ROS 2 (joint states, TF, controller status)
+    for RViz2 / PlotJuggler / rosbag2. Development PC only.
+  </description>
+  <maintainer email="parkjinwoo@postech.ac.kr">Jinwoo Park</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>visualization_msgs</depend>
+  <depend>go2_mpc_msgs</depend>
+
+  <exec_depend>go2_description</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

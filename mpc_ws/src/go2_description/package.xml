@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>go2_description</name>
+  <version>0.1.0</version>
+  <description>
+    Go2 URDF and meshes for RViz2, copied from unitreerobotics/unitree_ros
+    (robots/go2_description, commit 5994d4fa, 2026-09-30). Only urdf/ and dae/ are
+    kept; the ROS 1 package files are replaced by this ROS 2 one. Link and joint
+    dimensions match unitree_mujoco's go2.xml.
+  </description>
+  <maintainer email="parkjinwoo@postech.ac.kr">Jinwoo Park</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

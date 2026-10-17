@@ -1,0 +1,98 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Help Height: 0
+    Property Tree Widget:
+      Expanded: ~
+      Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 0.5
+      Plane Cell Count: 20
+      Reference Frame: world
+      Color: 160; 160; 164
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+      Visual Enabled: true
+      Collision Enabled: false
+      Alpha: 1
+    - Class: rviz_default_plugins/MarkerArray
+      Name: GRF
+      Enabled: true
+      Topic:
+        Value: /go2_mpc/grf
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Feet
+      Enabled: true
+      Topic:
+        Value: /go2_mpc/feet
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Show Names: false
+      Show Axes: true
+      Show Arrows: false
+      Marker Scale: 0.3
+      Frames:
+        All Enabled: false
+        world:
+          Value: true
+        base:
+          Value: true
+        FL_foot:
+          Value: true
+        FR_foot:
+          Value: true
+        RL_foot:
+          Value: true
+        RR_foot:
+          Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Name: Current View
+      Target Frame: base
+      Distance: 1.6
+      Pitch: 0.35
+      Yaw: 0.8
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+    Saved: ~
+Window Geometry:
+  Height: 800
+  Width: 1200
+  Displays:
+    collapsed: false
