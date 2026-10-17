@@ -1,0 +1,10 @@
+# Checkout of another branch of this repository (go2-docker: base image sources).
+go2-projects/
+
+# colcon outputs
+mpc_ws/build/
+mpc_ws/install/
+mpc_ws/log/
+
+__pycache__/
+*.pyc
