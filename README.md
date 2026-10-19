@@ -358,19 +358,20 @@ git add -A && git commit -m "Add <날짜_이름>" && git push origin go2-policie
 cd ~/go2-policies-allterrain && git pull && ./verify.sh current    # 그리고 go2_ctrl 재시작
 ```
 
-### 5-5. 스포츠 모드처럼 "서기 → 정책 → 서서 유지 → 천천히 앉기" 로 운용하기 (저자 제어기 사용)
+### 5-5. 스포츠 모드처럼 "서기 → 정책 → 멈춰 서기 → 천천히 앉기" 로 운용하기 (저자 제어기 사용)
 
 기존 `go2_ctrl` 은 Passive / FixStand / Velocity 세 상태가 코드에 고정돼 있어 **정책 중에 바로 Passive(소프트 킬)로 가는 길밖에 없습니다.**
 기울어진 순간에 킬하면 힘이 빠지면서 옆으로 넘어집니다. 저자 배포판 `wty-yy/unitree_cpp_deploy` 는 상태를 YAML 로 선언하고
-`Fix` 타입 상태(현재 자세에서 목표 자세로 보간)를 여러 개 둘 수 있어, 아래 FSM 을 설정 파일만으로 만들 수 있습니다.
-이 브랜치의 `jetson/unitree_cpp_deploy-config.yaml` 이 그 설정이고, 2026-10-19 MuJoCo(go2-docker 시뮬 + 이 제어기)에서 전 과정을 확인했습니다.
+`Fix` 타입 상태(현재 명령 자세에서 목표 자세로 보간)를 여러 개 둘 수 있어, 아래 FSM 을 설정 파일만으로 만들 수 있습니다.
+이 브랜치의 `jetson/unitree_cpp_deploy-config.yaml` 이 그 설정이고, 2026-10-19 MuJoCo(go2-docker 시뮬 + 이 제어기)에서 평지·계단 위·제자리 회전 중 모두 확인했습니다.
 
 ```
 Passive ──L2+A──▶ FixStand (웅크림→기립, 2 s) ──start──▶ Velocity (정책)
                                                      │
-                     Velocity ──L2+A──▶ FixHold (현재 자세→기립 자세, 1 s, 서서 유지)
-                                           │   └──start──▶ Velocity (다시 정책)
-                                           └──L2+A──▶ FixSquat (기립→웅크림, 2 s) ──자동──▶ Passive
+      스틱을 놓으면(또는 L2+Y) 정책이 명령 0 으로 그 자리에서 균형을 잡고 섭니다  ← "서서 유지" 는 이 상태
+                                                     │
+                     Velocity ──L2+A──▶ FixSquat (지금 자세→웅크림, 3 s) ──자동──▶ Passive   ← 평소 앉기
+                     Velocity ──L2+X──▶ FixHold (고정 기립 자세, 평지 전용) ──start──▶ Velocity / ──L2+A──▶ FixSquat
 어디서든 L2+B ──▶ Passive (비상용. 감쇠만 걸려 주저앉음)
 ```
 
@@ -378,12 +379,19 @@ Passive ──L2+A──▶ FixStand (웅크림→기립, 2 s) ──start──
 |---|---|---|
 | `L2 + A` | Passive | FixStand (일어서기) |
 | `start` | FixStand 또는 FixHold | Velocity (정책 시작) |
-| `L2 + A` | Velocity | **FixHold** — 1 초에 걸쳐 기립 자세로 정리하고 kp 60/80 으로 서서 유지 |
-| `L2 + A` | FixHold 또는 FixStand | **FixSquat** — 2 초에 걸쳐 웅크린 뒤 자동으로 Passive |
+| 스틱 놓기 / `L2 + Y` | Velocity | 그대로 Velocity — 정책이 명령 0 으로 제자리에 서서 균형 유지 (`L2+Y` 는 명령을 0 으로 고정하는 토글) |
+| `L2 + A` | Velocity 또는 FixStand/FixHold | **FixSquat** — 지금 자세에서 3 초에 걸쳐 웅크린 뒤 자동으로 Passive |
+| `L2 + X` | Velocity | FixHold — kp 60/80 고정 기립 자세. **평지에서만** (아래 참고) |
 | `L2 + B` | 어디서든 | Passive (비상 정지) |
 
-`Fix` 상태는 **지금 명령된 관절각에서** 목표 자세로 선형 보간하므로, 걷는 중에 `L2+A` 를 눌러도 튀지 않고 1 초 안에 기립 자세로 모입니다.
-sim 에서 Velocity(0.3 m/s 보행) → FixHold → FixSquat → Passive 순서로 넘어가며 마지막에 엎드린 자세로 안정적으로 내려앉는 것을 확인했습니다.
+**왜 "고정 자세로 서기" 가 아니라 "정책으로 서기" 인가.** 처음에는 Velocity → FixHold(고정 기립 자세) → FixSquat 로 만들었는데,
+sim 에서 **앞발은 계단 위·뒷발은 바닥이고 한쪽 발이 단 가장자리에 걸친 자세**에서 FixHold/FixSquat 를 하자 옆으로 넘어졌습니다
+(네 다리를 지형과 무관하게 같은 자세로 끌고 가기 때문). 반면 스틱을 놓아 정책이 제자리에 서게 한 뒤 `L2+A` 로 바로 웅크리면
+같은 자세 3가지(단 가장자리, 2단 걸침, 중간)와 제자리 회전 중에서 모두 엎드린 자세로 안정적으로 내려앉았습니다.
+FixSquat 는 기립 자세를 거치지 않고 **지금 자세에서 곧장** 웅크림으로 3 초 보간합니다.
+
+**실기 순서:** 스틱을 놓고 1–2 초(로봇이 제자리에 섬) → `L2+A`(3 초 뒤 자동 Passive) → 전원/종료.
+평지에서 서 있는 자세를 단단히 고정하고 싶을 때만 `L2+X`(FixHold) 를 쓰세요. 계단·경사 위에서는 쓰지 마세요.
 
 #### 젯슨에 빌드 (한 번)
 
@@ -414,9 +422,10 @@ cd ~/unitree_cpp_deploy/deploy/robots/go2 && ./build/go2_ctrl -n <인터페이�
 - 기존 제어기로 돌아가려면 그냥 기존 `go2_ctrl` 을 실행하면 됩니다. 정책 폴더는 공용입니다.
 
 #### 처음 쓸 때 확인 순서
-1. 들어올린 채 `L2+A`(기립) → `start`(정책) → `L2+A`(FixHold: 다리가 기립 자세로 모이는지) → `L2+A`(FixSquat: 2 초 뒤 힘이 빠지는지).
+1. 들어올린 채 `L2+A`(기립) → `start`(정책, 스틱 중립) → `L2+A`(FixSquat: 3 초에 걸쳐 웅크리고 힘이 빠지는지).
 2. 바닥에 내려놓고 같은 순서. FixSquat 끝에 엎드린 자세로 안정적으로 내려앉는지.
-3. 그다음 보행 중 `L2+A` 로 멈춰 서기 → `start` 로 재개 → `L2+A` 두 번으로 앉기.
+3. 보행 → 스틱 놓기(제자리에 서는지) → `L2+A` 로 앉기. 그다음 낮은 단차 위에 선 상태에서 같은 것을 확인.
+4. `L2+Y` 토글(명령 0 고정)과 `L2+X`(FixHold, 평지) 는 그 뒤에.
 
 ## 6. verify.sh 가 확인하는 것
 
@@ -487,6 +496,6 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 | 랜덤화 포함 MuJoCo | **RoboGauge 로 검증됨** (마찰·질량·지연·레벨) |
 | 기존 go2_ctrl + 새 deploy.yaml (Docker, x86) | **검증됨** — 기립·정책·보행·정지·Passive 전 과정 (7장) |
 | 저자 제어기 x86 빌드·실행 | **검증됨** (CPU onnxruntime 1.22.0) |
-| 서기→정책→FixHold→FixSquat→Passive FSM (5-5) | **sim 검증됨** — MuJoCo go2-docker 시뮬, 보행 중 L2+A 두 번으로 안정 착지 |
+| 정책으로 멈춰 서기 → FixSquat → Passive (5-5) | **sim 검증됨** — 평지, 계단 위 3가지 자세, 제자리 회전 중 모두 안정 착지. 고정 자세 FixHold 경유는 계단 가장자리에서 옆으로 넘어짐(평지 전용으로 격하) |
 | 계단 sim2sim (go2_ctrl 체인) | **부분** — 5·8 cm 세트 통과, 그 뒤 조향 없이 코스 이탈. 사람이 조향하는 시험은 미실시 |
 | 젯슨 빌드 / 실기 | **미실시** — 제어기 변경이 없으므로 go2-policies 때와 같은 바이너리 사용 |
