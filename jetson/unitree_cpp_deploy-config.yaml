@@ -1,14 +1,13 @@
-# Go2 all-terrain policy: sport-mode-like FSM (unitree_cpp_deploy go2 branch, 4f71bf3)
-#   Passive --L2+A--> FixStand (crouch -> stand, 2 s) --start--> Velocity (policy)
-#   Velocity: release sticks (or L2+Y = fixed zero command) -> the policy itself stands still, balancing on the terrain
-#   Velocity --L2+A--> FixSquat (current pose -> crouch over 3 s) --auto--> Passive      <- normal way to sit
-#   Velocity --L2+X--> FixHold (rigid standing pose, flat ground only) --start--> Velocity / --L2+A--> FixSquat
-#   L2+B from anywhere -> Passive (emergency: damping only, robot sinks)
+# Go2 all-terrain policy — sport-mode-like FSM (unitree_cpp_deploy go2 branch, 4f71bf3)
+#   Passive ──L2+A──▶ FixStand (crouch→stand, 2 s) ──start──▶ Velocity (policy, joystick)
+#   Velocity ──L2+A──▶ Stand  (same policy, commands clamped to 0: balances in place on any terrain)
+#   Stand    ──start──▶ Velocity          Stand ──L2+A──▶ FixSquat (current pose→crouch, 3 s) ──auto──▶ Passive
+#   L2+B from anywhere ──▶ Passive (emergency: damping only)
 FSM:
   _:
     Passive:  {id: 1}
     FixStand: {id: 2, type: Fix}
-    FixHold:  {id: 3, type: Fix}
+    Stand:    {id: 3, type: RLBase}
     FixSquat: {id: 4, type: Fix}
     Velocity: {id: 5, type: RLBase}
 
@@ -25,23 +24,19 @@ FSM:
     qs: [[], [0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65],
              [0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5]]
 
-  FixHold:    # rigid standing pose (flat ground only: a fixed pose ignores the terrain)
-    transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}
-    kp: [60, 80, 80, 60, 80, 80, 60, 80, 80, 60, 80, 80]
-    kd: [5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4]
-    ts: [0, 1]
-    qs: [[], [0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5]]
+  Velocity:   # policy with joystick commands
+    transitions: {Stand: LT + A.on_pressed, Passive: LT + B.on_pressed}
+    policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current   # e.g. /home/unitree/go2-policies-allterrain/current
+    logging: {enabled: true, dt: 0.02}
 
-  FixSquat:   # controlled sit: current pose -> crouch over 3 s (no re-standing step), then release to Passive
+  Stand:      # same policy, deploy.yaml with zero command ranges -> stands still, balancing (sticks ignored)
+    transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}
+    policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current/stand
+
+  FixSquat:   # controlled sit: current pose -> crouch over 3 s, then release to Passive
     transitions: {FixStand: LT + A.on_pressed, Passive: LT + B.on_pressed}
     auto_transition: Passive
     kp: [60, 80, 80, 60, 80, 80, 60, 80, 80, 60, 80, 80]
     kd: [5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4]
     ts: [0, 3]
     qs: [[], [0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65]]
-
-  Velocity:
-    transitions: {FixSquat: LT + A.on_pressed, FixHold: LT + X.on_pressed, Passive: LT + B.on_pressed}
-    fixed_command: {enabled: true, lin_vel_x: 0.0, lin_vel_y: 0.0, ang_vel_z: 0.0, duration: 0}   # L2+Y toggles "stand still"
-    policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current   # e.g. /home/unitree/go2-policies-allterrain/current
-    logging: {enabled: true, dt: 0.02}
