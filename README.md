@@ -208,8 +208,8 @@ env -u PYTHONPATH -u LD_LIBRARY_PATH ~/anaconda3/envs/go2_rl_robotlab/bin/python
 
 실행에 영향을 주는 차이는 **넘어짐 판정 임계값뿐**이고, 나머지는 편의 기능입니다. 그래서 두 길이 있습니다.
 
-- **A. 기존 go2_ctrl 그대로 (권장, 이 README 의 기본 절차).** 젯슨에 이미 있는 바이너리를 쓰고 정책 폴더만 바꿉니다.
-- **B. 저자 배포판 빌드.** 걷다가 서서 유지하고 천천히 앉는 스포츠 모드식 FSM, CSV 로깅이 필요할 때. 절차는 5-5. (실기에서 소프트 킬 시 옆으로 넘어지는 문제의 해결책)
+- **A. 기존 go2_ctrl 그대로 (최소 변경, 5-3).** 젯슨에 이미 있는 바이너리를 쓰고 정책 폴더만 바꿉니다. 종료는 `L2+B` 뿐.
+- **B. 저자 배포판 빌드 (권장, 5-4).** 걷다가 서서 유지(Stand)하고 천천히 앉는 스포츠 모드식 FSM, 부드러운 정책 진입 패치, CSV 로깅. 실기에서 소프트 킬 시 옆으로 넘어지는 문제의 해결책.
 
 ### 5-2. deploy.yaml — 무엇이 평지 정책과 다른가
 
@@ -229,7 +229,11 @@ env -u PYTHONPATH -u LD_LIBRARY_PATH ~/anaconda3/envs/go2_rl_robotlab/bin/python
 관절 순서가 다른 이유: unitree_rl_lab 은 Isaac Lab USD 순서(모든 hip → 모든 thigh → 모든 calf), go2_rl_robotlab 은 다리별 순서로
 정책을 학습했기 때문입니다. `joint_ids_map[i]` = 정책 i 번째 관절의 SDK 모터 인덱스(FR,FL,RR,RL 순)이며 `verify.sh` 가 이 매핑을 확인합니다.
 
-### 5-3. 실기 적용 절차 — 처음부터 끝까지
+### 5-3. 실기 적용 절차 A — 기존 go2_ctrl 그대로 (최소 변경, L2+B 로만 종료)
+
+> **지금 권장하는 운용은 5-4(저자 제어기 + 서서 유지/앉기 FSM + 부드러운 진입 패치)입니다.** 5-3 은 젯슨에 손대지 않고 정책 폴더만 바꾸는
+> 최소 경로로, 종료가 `L2+B` 소프트 킬뿐이라 기울어진 채 죽으면 옆으로 넘어질 수 있습니다. 두 경로는 정책 파일을 공유하므로 언제든 오갈 수 있습니다.
+
 
 학습 PC 에서 할 일은 이미 끝났습니다(이 브랜치가 푸시돼 있으면 됨). 아래는 **젯슨과 로봇 앞에서** 순서대로 하는 일입니다.
 `<...>` 만 환경에 맞게 바꾸고 나머지는 그대로 실행하면 됩니다.
@@ -359,7 +363,132 @@ git add -A && git commit -m "Add <날짜_이름>" && git push origin go2-policie
 cd ~/go2-policies-allterrain && git pull && ./verify.sh current    # 그리고 go2_ctrl 재시작
 ```
 
-### 5-5. 스포츠 모드처럼 "서기 → 정책 → 서서 유지 → 천천히 앉기" 로 운용하기 (저자 제어기 사용)
+### 5-4. 실기 적용 절차 B (권장) — 저자 제어기 + "서기 → 정책 → 서서 유지 → 앉기" FSM + 부드러운 진입
+
+5-3 과 **다른 점만** 먼저:
+
+| 항목 | A. 기존 go2_ctrl (5-3) | **B. 저자 제어기 (5-4)** |
+|---|---|---|
+| 젯슨에 새로 빌드 | 없음 | `wty-yy/unitree_cpp_deploy` 클론 + 이 브랜치 패치 1개 + 빌드 (1회, 약 5분) |
+| 설정 파일 | `~/unitree_rl_lab/.../config.yaml` 의 `policy_dir` 한 줄 | 이 브랜치의 `jetson/unitree_cpp_deploy-config.yaml` 복사 후 `policy_dir` 두 줄(`current`, `current/stand`) |
+| 정책 중 `L2+A` | 없음 (Velocity 에서 나가는 길은 `L2+B` 뿐) | **Stand** — 같은 정책이 명령 0 으로 제자리에서 균형 잡고 섬 |
+| Stand 에서 `L2+A` | — | **FixSquat** — 3 초에 걸쳐 웅크리고 자동 Passive (정상 종료) |
+| Stand 에서 `start` | — | 다시 정책(조이스틱) |
+| 정책 진입 시 움찔거림 | 있음 (가속도 피크 ≈ 17–21 m/s²) | 패치로 제거 (≈ 10 m/s², 정지와 동일) |
+| 넘어짐 판정 → Passive | 기울기 57° | 115° (크게 기울어도 정책이 계속 돎 → 위험하면 `L2+B`) |
+| 종료 | `L2+B` → 주저앉음 → Ctrl+C | **`L2+A`(Stand) → `L2+A`(앉기, 자동 Passive) → Ctrl+C**. `L2+B` 는 비상용 |
+| 로그 | 없음 | Velocity 상태 동안 50 Hz CSV (정책 폴더 `logs/`) |
+
+정책 파일(`current/params/deploy.yaml`, `current/exported/policy.onnx`)과 관측·게인·히스토리 처리는 A 와 **완전히 같습니다.**
+B 가 더해지는 것은 FSM 상태 2개(Stand, FixSquat)와 진입 보간뿐입니다. 2026-10-19 MuJoCo(실기와 같은 시뮬 체인)에서 평지·계단 단 가장자리·2단 걸침·제자리 회전 중 모두 확인했고, 실기는 미실시입니다.
+
+#### 1단계. 젯슨에 정책 받기 (5-3 1단계와 동일)
+
+```bash
+ssh unitree@<젯슨 IP>
+cd ~ && git clone -b go2-policies-allterrain --depth 1 https://github.com/johyunyoung/go2-projects.git go2-policies-allterrain
+pip3 install onnx pyyaml
+cd ~/go2-policies-allterrain && ./verify.sh current && ./verify.sh current/stand
+```
+`current/stand` 는 같은 ONNX(심링크)에 속도 범위만 0 인 `deploy.yaml` 입니다. 둘 다 `통과.` 여야 합니다.
+
+#### 2단계. 저자 제어기 빌드 + 패치 (한 번)
+
+```bash
+sudo apt install -y libboost-program-options-dev libyaml-cpp-dev libeigen3-dev libfmt-dev libspdlog-dev   # 대부분 이미 있음
+cd ~ && git clone --branch go2 --single-branch https://github.com/wty-yy/unitree_cpp_deploy.git
+cd unitree_cpp_deploy && git checkout 4f71bf3
+git apply ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-startup-blend.patch     # 부드러운 진입 (5-5 참고)
+cd deploy/robots/go2
+cmake -B build -DONNXRUNTIME_ROOT=$HOME/unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0   # go2-policies 때 받아 둔 것
+cmake --build build -j$(nproc)
+ldd build/go2_ctrl | grep "not found" || echo "링크 OK"
+```
+- unitree_sdk2 는 `/usr/local` 에 설치돼 있어야 합니다 (go2-policies 2-3). ONNX Runtime 은 CPU 1.22.0 으로 충분합니다 (x86 에서 같은 방식으로 빌드·실행 확인).
+- 패치가 이미 적용됐는지: `git apply --check <패치>` 가 실패하면 적용된 것입니다.
+
+#### 3단계. 설정 (policy_dir 두 줄)
+
+```bash
+cp ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-config.yaml ~/unitree_cpp_deploy/deploy/robots/go2/config/config.yaml
+vi ~/unitree_cpp_deploy/deploy/robots/go2/config/config.yaml
+```
+`Velocity:` 와 `Stand:` 아래 `policy_dir` 을 절대경로로 바꿉니다 (`~`, `$HOME` 전개 안 됨):
+```yaml
+  Velocity:
+    policy_dir: /home/unitree/go2-policies-allterrain/current
+    startup_blend_s: 0.5
+    warm_start_actions: true
+    logging: {enabled: true, dt: 0.02}
+  Stand:
+    policy_dir: /home/unitree/go2-policies-allterrain/current/stand
+    startup_blend_s: 0.5
+    warm_start_actions: true
+```
+`logging` 이 필요 없으면 `enabled: false`. `startup_blend_s` 가 길게 느껴지면 0.3.
+
+#### 4단계. 로봇 준비 (5-3 4단계와 동일)
+
+엎드린 자세(`L2+A` 두 번) → sport_mode 끄기 → **로봇 들어올리기** → `ip -o link show` 로 인터페이스 확인.
+
+#### 5단계. 실행
+
+```bash
+cd ~/unitree_cpp_deploy/deploy/robots/go2 && ./build/go2_ctrl -n <인터페이스>
+```
+정상 로그: `Connected to robot.` → `Initializing State_Passive / State_FixStand / State_Stand / State_FixSquat / State_Velocity` → `FSM: Start Passive`.
+`terminate called ... YAML` 이 나오면 config.yaml 들여쓰기가 깨진 것, `Observation term ... not registered` 면 deploy.yaml 문제(1단계 `verify.sh`).
+
+#### 6단계. 리모컨 조작
+
+| 버튼 | 지금 상태 | 다음 상태 |
+|---|---|---|
+| `L2 + A` | Passive | FixStand (웅크림을 거쳐 기립, 2 s) |
+| `start` | FixStand 또는 Stand | **Velocity** — 정책, 왼쪽 스틱 전후/좌우 ±1 m/s, 오른쪽 스틱 회전 ±1 rad/s |
+| `L2 + A` | Velocity | **Stand** — 같은 정책, 스틱 무시, 제자리에서 균형 잡고 섬 (진입 0.5 s 보간) |
+| `L2 + A` | Stand (또는 FixStand) | **FixSquat** — 지금 자세에서 3 s 에 걸쳐 웅크림 → 자동 Passive |
+| `L2 + B` | 어디서든 | Passive — **비상용.** 감쇠만 걸려 바로 주저앉음 |
+
+로그에 `FSM: Change state from ... to ...` 가 찍히므로 어느 상태인지 항상 확인할 수 있습니다.
+
+#### 7단계. 첫 실기 시험 순서
+
+1. **들어올린 채** `L2+A`(기립) → `start`(정책, 스틱 중립. 다리가 부드럽게 정책 자세로 넘어가는지 — 패치 전에는 여기서 움찔했습니다) → `L2+A`(Stand: 스틱을 밀어도 반응 없는지) → `start`(다시 정책) → `L2+A`(Stand) → `L2+A`(FixSquat: 3 초에 걸쳐 웅크리고 힘이 빠지는지).
+2. 바닥에 내려놓고 같은 순서. Stand 에서 가만히 서는지(몸통 약 0.36 m, 떨림 없음), FixSquat 끝에 **엎드린 자세로** 안정적으로 내려앉는지.
+3. 평지 보행 0.3 → 0.5 m/s → 보행 중 `L2+A`(Stand, 제자리에 멈춰 서는지) → `start` 재개 → `L2+A` 두 번으로 앉기.
+4. 낮은 단차(5–10 cm) 위에 선 상태에서 Stand → 앉기. 그다음 계단(5-3 6단계와 같은 순서: 낮은 것부터, 0.5 m/s 이하, 중앙 유지).
+5. 이 제어기는 기울기 115° 까지 정책을 계속 돌립니다. 넘어질 것 같으면 **사람이 `L2+B`** 를 누르세요.
+
+#### 8단계. 종료 — 평소
+
+```
+1. 스틱 놓기 → L2+A        → Stand (제자리에 섬)
+2. L2+A                     → FixSquat (3 s) → 자동 Passive. 로그 "FixSquat to Passive" 확인
+3. Ctrl+C                   → 제어기 종료
+4. 전원 off / 젯슨 종료. sport mode 복구는 재부팅
+```
+`L2+B` 는 5-3 7단계와 같은 비상 절차(주저앉은 뒤 Ctrl+C)로만 쓰세요.
+
+#### 9단계. 롤백
+
+- **정책만 평지 50k 로:** `config.yaml` 의 두 `policy_dir` 을 `~/go2-policies/current` 로 바꾸면 됩니다. 단, 평지 정책용 `stand` 폴더가 없으니 `Stand` 상태의 `policy_dir` 은 같은 경로로 두고 — 이 경우 Stand 는 스틱이 그대로 먹는 일반 정책이 됩니다 — 또는 `Stand` 를 빼고 `Velocity → FixSquat: LT + A` 로 직접 잇습니다.
+- **제어기를 A 로:** 그냥 기존 `~/unitree_rl_lab/.../go2_ctrl` 을 실행하면 됩니다 (5-3). 정책 폴더는 공용.
+- **패치만 되돌리기:** `cd ~/unitree_cpp_deploy && git apply -R <패치>` 후 재빌드. 설정의 두 키는 무시됩니다.
+
+#### 자주 나는 문제 (B 전용)
+
+| 증상 | 원인 / 조치 |
+|---|---|
+| 기동 직후 `YAML::TypedBadConversion` 으로 종료 | config.yaml 의 `_:` 블록(상태 선언) 들여쓰기 깨짐. 브랜치 파일을 다시 복사 |
+| `start` 를 눌러도 Velocity 로 안 감 | FixStand 궤적(2 s)이 끝나기 전에 눌렀거나 Stand/FixStand 가 아닌 상태. 로그의 현재 상태 확인 |
+| Stand 인데 로봇이 걷는다 | `Stand.policy_dir` 이 `current/stand` 가 아니라 `current` 를 가리킴. `./verify.sh current/stand` 의 `cmd ranges` 가 0 인지 |
+| 정책 진입 때 여전히 움찔 | 패치가 안 들어간 바이너리. `git apply --check` 로 확인하고 재빌드 |
+| 앉을 때 옆으로 기움 | 계단 가장자리 등 발 지지가 불안정한 곳. Stand 에서 `start` 로 평평한 곳까지 이동 후 앉기 |
+
+#### 정책을 갱신할 때
+5-3 끝의 절차와 같고, 새 정책 폴더에도 `stand/` (exported 심링크 + 속도 범위 0 deploy.yaml)를 함께 만들어 두면 `policy_dir` 두 줄만 바꾸면 됩니다.
+
+### 5-5. 5-4 의 배경 — FSM 설계, 전환 충격 수정, sim 검증 기록
 
 기존 `go2_ctrl` 은 Passive / FixStand / Velocity 세 상태가 코드에 고정돼 있어 **정책 중에 바로 Passive(소프트 킬)로 가는 길밖에 없습니다.**
 기울어진 순간에 킬하면 힘이 빠지면서 옆으로 넘어집니다. 저자 배포판 `wty-yy/unitree_cpp_deploy` 는 상태를 YAML 로 선언할 수 있어
