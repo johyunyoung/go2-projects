@@ -1,0 +1,10 @@
+# Overlay for the go2-docker branch simulator: up/down staircase course
+# (6 flights, 5 -> 20 cm rise, 0.3 m tread, 1.5 m wide; geometry = go2_rl_robotlab resources/go2/stairs.xml).
+# Paths are absolute on purpose: with several -f files, compose resolves relative paths against the first file.
+#   export ALLTERRAIN_DIR=~/go2-projects-allterrain
+#   docker compose -f ~/go2-docker/docker-compose.yaml -f $ALLTERRAIN_DIR/sim2sim/docker-compose.stairs-updown.yaml up -d sim
+services:
+  sim:
+    volumes:
+      - ${ALLTERRAIN_DIR}/sim2sim/mujoco-config-stairs-updown.yaml:/opt/unitree_mujoco/simulate/config.yaml:ro
+      - ${ALLTERRAIN_DIR}/sim2sim/scene_stairs_updown.xml:/opt/unitree_mujoco/unitree_robots/go2/scene_stairs_updown.xml:ro

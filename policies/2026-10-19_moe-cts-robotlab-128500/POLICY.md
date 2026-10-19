@@ -33,7 +33,7 @@ RoboGauge 최고점 체크포인트 (iteration 128,500).
 `view_keyboard.py --headless_seconds 45`, 전진 1.0 m/s + 방위 유지(yaw만 보정, 옆 위치 보정 없음). 로그: `eval/mujoco_stairs_45s.txt`.
 - **128.5k (이 정책)**: 5·8·11 cm 세트 오르내림 통과. 14 cm 세트 시작(x≈18.5 m)에서 오른쪽으로 1.0 m 밀려 계단 옆으로 내려감,
   이후 공중에 떠 있는 계단판 아래로 들어가 멈춤. 넘어진 것이 아니라 옆 드리프트로 폭 1.5 m 계단을 벗어난 것.
-- **81.5k (`alt/policy_81500.pt`, RoboGauge 0.689)**: 같은 시험에서 5→20 cm 6세트 전부 오르내림, 넘어짐 없음, 평균 0.89 m/s, 옆 드리프트 최대 0.4 m.
+- **81.5k (`alt/81500/`, RoboGauge 0.689)**: 같은 시험에서 5→20 cm 6세트 전부 오르내림, 넘어짐 없음, 평균 0.89 m/s, 옆 드리프트 최대 0.4 m.
 - 결론: 점수 기준 최선은 128.5k, 좁은 계단 단일 시험에서는 81.5k가 나았다. 실기 전에는 둘 다 옆 위치 보정(또는 조이스틱 조향)과 함께 검증 필요.
 
 ## 파일
@@ -42,7 +42,8 @@ RoboGauge 최고점 체크포인트 (iteration 128,500).
 |---|---|
 | `exported/policy.pt` | TorchScript. 입력 1×45 단일 관측, 10스텝 히스토리는 내부 버퍼 (리셋 시 새로 load). 출력 1×12 액션 |
 | `exported/policy.onnx` | ONNX. 입력 `obs` 1×450 (히스토리 10 × 45, 아래 순서), 출력 `actions` 1×12 |
-| `alt/policy_81500.pt` | 대안 TorchScript (MuJoCo 좁은 계단 시험 통과) |
+| `params/deploy.yaml` | **젯슨 go2_ctrl 용** (unitree_rl_lab 4960b84 그대로 사용 가능). 저자 공개 모델의 deploy.yaml 과 동일 값: 다리 순서 joint_ids_map, 히스토리 10 |
+| `alt/81500/` | 대안 체크포인트 81,500 (RoboGauge 0.689, MuJoCo 좁은 계단 20 cm 통과). exported/policy.pt·onnx, params/deploy.yaml·mujoco_deploy.yaml |
 | `params/env.yaml`, `params/agent.yaml` | 학습 당시 전체 설정 |
 | `params/mujoco_deploy.yaml` | go2_rl_robotlab `deploy/deploy_mujoco/configs/go2.yaml` 기반, kp 25로 수정 |
 
@@ -73,8 +74,10 @@ cd ~/refs/RoboGauge && env -u LD_LIBRARY_PATH MUJOCO_GL=egl ./robogauge.sh --tas
 ```
 학습 재개 (필요 시): `~/refs/go2_rl_robotlab`에서 `env -u PYTHONPATH -u LD_LIBRARY_PATH python scripts/rsl_rl/train.py --task=RobotLab-Go2-v0 --headless --num_envs 8192 --resume --load_run 2026-10-12_15-45-02_repro_n8192`
 
-## 배포 관련 주의
+## 배포 (브랜치 README 5·7장)
 
-- 현재 Jetson의 `go2_ctrl`(unitree_rl_lab)은 45차원 단일 입력·관측 스케일이 달라 이 정책을 그대로 못 돌린다.
-  레포 저자의 C++ 배포는 https://github.com/wty-yy/unitree_cpp_deploy (ONNX 450 입력).
-- `verify.sh`, MuJoCo go2_ctrl sim2sim, 실기는 미실시. `current`는 바꾸지 않았다.
+- 젯슨의 기존 `go2_ctrl`(unitree_rl_lab 4960b84)은 관측 히스토리를 `deploy.yaml` 의 `history_length` 로 이미 처리하므로
+  **제어기 수정 없이** `params/deploy.yaml` + `exported/policy.onnx` 로 실행된다. 2026-10-19 x86 Docker(같은 제어기 이미지)에서
+  기립→정책→평지 보행→정지→Passive 확인.
+- 저자 배포판 unitree_cpp_deploy(go2, 4f71bf3)도 x86 빌드·실행 확인 (CSV 로깅용). 설정: 브랜치 `jetson/unitree_cpp_deploy-config.yaml`.
+- 계단 sim2sim(go2_ctrl 체인, 조향 없음): 5·8 cm 세트 통과 후 코스 이탈. 조향 포함 시험과 실기는 미실시.
