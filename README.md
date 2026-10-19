@@ -228,44 +228,135 @@ env -u PYTHONPATH -u LD_LIBRARY_PATH ~/anaconda3/envs/go2_rl_robotlab/bin/python
 관절 순서가 다른 이유: unitree_rl_lab 은 Isaac Lab USD 순서(모든 hip → 모든 thigh → 모든 calf), go2_rl_robotlab 은 다리별 순서로
 정책을 학습했기 때문입니다. `joint_ids_map[i]` = 정책 i 번째 관절의 SDK 모터 인덱스(FR,FL,RR,RL 순)이며 `verify.sh` 가 이 매핑을 확인합니다.
 
-### 5-3. 젯슨 절차 (기존 go2_ctrl)
+### 5-3. 실기 적용 절차 — 처음부터 끝까지
 
-젯슨은 `go2-policies` README 2장을 이미 마친 상태(SDK, 제어기 빌드, arm64 패치)라고 가정합니다. 처음 세팅하는 젯슨이면 그 2장을 먼저
-하세요 (이 브랜치의 `jetson/cmakelists-arch-select.patch` 는 같은 파일입니다).
+학습 PC 에서 할 일은 이미 끝났습니다(이 브랜치가 푸시돼 있으면 됨). 아래는 **젯슨과 로봇 앞에서** 순서대로 하는 일입니다.
+`<...>` 만 환경에 맞게 바꾸고 나머지는 그대로 실행하면 됩니다.
+
+#### 준비물
+- Go2 Edu, 유니트리 리모컨, 로봇을 들어올릴 스탠드(또는 두 사람), 젯슨 SSH 접속
+- 젯슨에 `go2-policies` README 2장이 끝나 있을 것: unitree_sdk2 가 `/usr/local` 에 설치, `~/unitree_rl_lab/deploy/robots/go2/build/go2_ctrl` 빌드됨.
+  확인: `ls ~/unitree_rl_lab/deploy/robots/go2/build/go2_ctrl && ldconfig -p | grep -c ddsc` → 파일이 있고 숫자가 1 이상이면 됩니다.
+  처음 세팅하는 젯슨이면 go2-policies README 2-1 ~ 2-8 을 먼저 하세요(이 브랜치의 `jetson/cmakelists-arch-select.patch` 가 같은 패치입니다).
+
+#### 1단계. 젯슨에 정책 받기
 
 ```bash
-# 1) 이 브랜치 받기 (go2-policies 와 나란히)
+ssh unitree@<젯슨 IP>
+echo $HOME                                   # 뒤에서 절대경로로 씁니다 (예: /home/unitree)
 cd ~ && git clone -b go2-policies-allterrain --depth 1 \
   https://github.com/johyunyoung/go2-projects.git go2-policies-allterrain
-pip3 install onnx pyyaml          # verify.sh 의 ONNX 차원 검사용 (없으면 SKIP 됨)
-
-# 2) 점검
-cd ~/go2-policies-allterrain && ./verify.sh current
-
-# 3) 제어기가 이 정책을 보게: policy_dir 만 바꿈 (절대경로, $HOME 전개 안 됨)
-vi ~/unitree_rl_lab/deploy/robots/go2/config/config.yaml
-#   Velocity:
-#     policy_dir: /home/unitree/go2-policies-allterrain/current
-
-# 4) 실행 (go2-policies README 3장과 동일)
-cd ~/unitree_rl_lab/deploy/robots/go2/build && ./go2_ctrl --network <인터페이스>
+pip3 install onnx pyyaml                     # verify.sh 가 ONNX 입력 차원을 확인하는 데 씁니다
 ```
+`--depth 1` 이라 정책 파일(약 19 MB)만 내려옵니다. 평지 정책의 `~/go2-policies` 는 그대로 두세요 — 롤백용입니다.
 
-리모컨: `LT+A` 기립 → `start` 정책 시작 → 왼쪽 스틱 전후/좌우, 오른쪽 스틱 회전 → `LT+B` 비상 정지(Passive).
-평지 정책으로 돌아가려면 `policy_dir` 을 `~/go2-policies/current` 로 되돌리고 재시작하면 됩니다. 두 폴더가 따로 있으니 롤백에 git 이 필요 없습니다.
+#### 2단계. 점검
 
-### 5-4. 첫 실기 시험 순서 — 평지 정책 때와 다른 점
+```bash
+cd ~/go2-policies-allterrain && ./verify.sh current
+```
+마지막 줄이 `통과.` 여야 합니다. `FAIL` 이 나오면 **로봇을 움직이지 마세요.** 특히 `joint map`, `obs terms`, `onnx` 줄이 OK 인지 보세요 —
+이 셋이 평지 정책과 달라진 부분입니다. `onnx SKIP` 이면 `pip3 install onnx` 가 안 된 것이니 설치 후 다시 돌리세요.
 
-`go2-policies` README 3-5 의 순서(들어올린 상태에서 기립 → 정책 → 내려놓기 → 저속)를 그대로 따르되, 다음을 추가하세요.
+#### 3단계. 제어기가 이 정책을 읽게 설정 (한 줄)
 
-1. **평지에서 먼저.** 정지 → 0.3 m/s → 0.5 m/s → 제자리 회전. sim 과 같은지 확인: 몸통 높이 약 0.36 m, 떨림 없음.
-   sim2sim 에서 이 정책은 명령 0 에서 가만히 서 있고, 0.5 m/s 에서 롤·피치 ±4° 안에서 걸었습니다 (7장).
-2. **방향이 조금씩 틀어집니다.** 전진 명령만 주면 1 m/s 에서 약 0.6°/s 로 요가 돌아갑니다 (sim 에서 25 초에 17°). 실기에서는 오른쪽 스틱으로 잡아주세요.
-   좁은 계단에서는 이것 때문에 옆으로 벗어날 수 있으니 계단 폭 중앙으로 조향하면서 오릅니다.
-3. **계단은 낮은 것부터.** 5–10 cm → 15 cm → 18–20 cm. 명령은 0.5 m/s 이하. RoboGauge 에서 계단 오르기 0.81 / 내리기 0.78 이지만 실기 미검증입니다.
-4. 경사 내려가기가 가장 약한 지형입니다 (0.56). 가파른 내리막은 마지막에.
-5. 이 정책은 **지형을 보지 않습니다.** 계단 끝·낭떠러지를 인식하지 못하므로 사람이 멈춰야 합니다.
-6. 넘어지면 제어기가 Passive 로 바뀝니다(기울기 57°). 다시 `LT+A` → `start`.
+```bash
+vi ~/unitree_rl_lab/deploy/robots/go2/config/config.yaml
+```
+`Velocity:` 아래 `policy_dir` 을 1단계 경로로 바꿉니다. `~` 나 `$HOME` 은 전개되지 않으니 절대경로로 적습니다.
+```yaml
+  Velocity:
+    transitions:
+      Passive: LT + B.on_pressed
+    policy_dir: /home/unitree/go2-policies-allterrain/current
+```
+제어기 재빌드는 없습니다. 이 파일은 기동할 때 한 번 읽습니다.
+
+#### 4단계. 로봇 준비
+
+1. 로봇 전원을 켜고 리모컨으로 **엎드린 자세**로 둡니다 (`L2 + A` 두 번).
+2. 내장 sport_mode 를 끕니다 (앱 또는 유니트리 문서 절차). 끄지 않으면 제어기가 `[critical] The other process is using the lowcmd channel` 을 내고 멈춥니다.
+3. 로봇을 **들어올립니다** — 스탠드에 올리거나 둘이서 몸통을 잡아 발이 바닥에 닿지 않게. 새 정책의 첫 기동은 항상 이렇게 합니다.
+4. 젯슨에서 로봇 쪽 인터페이스 이름을 확인합니다: `ip -o link show` (보통 `eth0`).
+
+#### 5단계. 실행
+
+```bash
+cd ~/unitree_rl_lab/deploy/robots/go2/build
+./go2_ctrl --network <인터페이스>
+```
+정상이면 이렇게 뜹니다.
+```
+Connected to robot.
+Policy directory: /home/unitree/go2-policies-allterrain/current
+FSM: Start Passive
+```
+`Observation term '...' is not registered` 나 ONNX 차원 오류가 나오면 `deploy.yaml` 이 깨진 것입니다 — 2단계로 돌아가세요.
+`libddsc.so.0: cannot open shared object file` 이면 `sudo ldconfig` 를 한 번 실행합니다.
+
+#### 6단계. 리모컨 조작과 첫 시험 순서
+
+| 입력 | 전환 |
+|---|---|
+| `LT + A` | Passive → FixStand (2초에 걸쳐 기립) |
+| `start` | FixStand → Velocity (정책 가동) |
+| `LT + B` | 어디서든 → Passive (**비상 정지**, 힘이 빠지며 천천히 주저앉음) |
+| 왼쪽 스틱 | 전후 ±1.0 m/s, 좌우 ±1.0 m/s (`deploy.yaml` 의 범위로 잘림) |
+| 오른쪽 스틱 ↔ | 회전 ±1.0 rad/s |
+
+`LT + B` 를 손에 익혀두세요. 넘어지면(기울기 57° 초과) 제어기가 스스로 Passive 로 바뀌고 로그에 `Change state from Velocity to Passive` 가 찍힙니다.
+
+1. **들어올린 채** `LT + A`. 웅크렸다가 기립 자세로 갑니다. 이상한 방향으로 꺾이면 즉시 `LT + B`.
+2. **들어올린 채** `start`. 허공에서 걷는 동작이 좌우 대칭이고 떨림이 없는지 봅니다. 평지 정책 때와 같은 느낌이어야 합니다.
+3. 바닥에 내려놓고 **명령 0 으로 가만히 서 있는지** 봅니다. 몸통 높이 약 0.36 m, 떨림 없음. 떨리면 `LT + B` 하고 중단(모터 발열).
+4. 스틱을 살짝 밀어 0.3 m/s → 0.5 m/s → 제자리 회전. sim2sim 에서는 이 속도에서 롤·피치 ±4° 안이었습니다.
+5. **방향이 서서히 틀어집니다** (전진만 주면 약 0.6°/s). 오른쪽 스틱으로 잡아주는 것이 정상 운용입니다.
+6. 계단은 **낮은 것부터**: 5–10 cm → 15 cm → 18–20 cm. 명령 0.5 m/s 이하, 계단 폭 **중앙**을 유지하도록 조향. 내려오기도 같은 순서로.
+7. 경사 내려가기는 가장 약한 지형이니 마지막에, 완만한 것부터.
+8. 이 정책은 **지형을 보지 않습니다.** 계단 끝·낭떠러지·장애물은 사람이 보고 멈춰야 합니다.
+
+#### 7단계. 종료 — 반드시 이 순서로
+
+```
+1. LT + B           → Passive. 로봇이 천천히 주저앉습니다 (정상)
+2. 로그에서 "... to Passive" 확인
+3. 로봇이 바닥에 안정적으로 앉은 뒤
+4. Ctrl + C         → go2_ctrl 종료
+5. 로봇 전원 off / 젯슨 종료
+```
+Velocity 상태에서 바로 Ctrl+C 하면 마지막 모터 명령이 걸린 채 제어기만 사라져 로봇이 넘어질 수 있습니다.
+끝난 뒤 내장 제어기(sport mode)는 로봇 재부팅으로 복구하세요 (go2-policies README 3-7 과 같음).
+
+#### 8단계. 롤백 (평지 정책으로)
+
+```bash
+vi ~/unitree_rl_lab/deploy/robots/go2/config/config.yaml
+#   policy_dir: /home/unitree/go2-policies/current      ← go2-policies 브랜치의 평지 50k
+# go2_ctrl 재시작
+```
+네트워크·git 없이 즉시 됩니다. 대안 체크포인트(81.5k)를 써보려면 `policy_dir` 을 `.../go2-policies-allterrain/current/alt/81500` 으로 바꾸고
+`./verify.sh current/alt/81500` 을 먼저 돌리세요.
+
+#### 자주 나는 문제
+
+| 증상 | 원인 / 조치 |
+|---|---|
+| `verify.sh` 에서 `joint map FAIL` | `deploy.yaml` 이 평지 정책 것으로 바뀜. 이 브랜치의 파일인지 `git -C ~/go2-policies-allterrain status` 로 확인 |
+| 기동 시 `The other process is using the lowcmd channel` | sport_mode 가 켜져 있음. 4단계 2번 |
+| 기동 시 ONNX 입력 차원 오류 | `history_length` 가 10 이 아닌 `deploy.yaml`. `./verify.sh current` 의 `onnx` 줄 확인 |
+| 서 있을 때 다리가 떨림 | `LT + B` 후 중단. 평지 정책과 같은 kp 25 / kd 0.5 인지 `verify.sh` 의 `gains` 줄 확인 |
+| 계단에서 옆으로 벗어남 | 요 드리프트. 오른쪽 스틱으로 중앙 유지. 속도 0.5 m/s 이하 |
+| 걷다가 갑자기 Passive | 기울기 57° 초과 = 넘어짐 판정. 다시 `LT + A` → `start`. 반복되면 그 지형은 중단 |
+
+#### 정책을 갱신할 때 (학습 PC → 젯슨)
+
+```bash
+# 학습 PC: 새 체크포인트를 policies/<날짜_이름>/ 에 같은 구조로 넣고 (exported/policy.onnx + params/deploy.yaml 필수)
+cd ~/go2-projects-allterrain && ln -sfn policies/<날짜_이름> current && ./verify.sh current
+git add -A && git commit -m "Add <날짜_이름>" && git push origin go2-policies-allterrain
+# 젯슨
+cd ~/go2-policies-allterrain && git pull && ./verify.sh current    # 그리고 go2_ctrl 재시작
+```
 
 ### 5-5. (선택) 저자 배포판 unitree_cpp_deploy 로 실행
 
