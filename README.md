@@ -208,7 +208,7 @@ env -u PYTHONPATH -u LD_LIBRARY_PATH ~/anaconda3/envs/go2_rl_robotlab/bin/python
 실행에 영향을 주는 차이는 **넘어짐 판정 임계값뿐**이고, 나머지는 편의 기능입니다. 그래서 두 길이 있습니다.
 
 - **A. 기존 go2_ctrl 그대로 (권장, 이 README 의 기본 절차).** 젯슨에 이미 있는 바이너리를 쓰고 정책 폴더만 바꿉니다.
-- **B. 저자 배포판 빌드 (선택).** CSV 로깅·천천히 앉기·여러 정책 전환이 필요할 때. 절차는 5-5.
+- **B. 저자 배포판 빌드.** 걷다가 서서 유지하고 천천히 앉는 스포츠 모드식 FSM, CSV 로깅이 필요할 때. 절차는 5-5. (실기에서 소프트 킬 시 옆으로 넘어지는 문제의 해결책)
 
 ### 5-2. deploy.yaml — 무엇이 평지 정책과 다른가
 
@@ -358,26 +358,65 @@ git add -A && git commit -m "Add <날짜_이름>" && git push origin go2-policie
 cd ~/go2-policies-allterrain && git pull && ./verify.sh current    # 그리고 go2_ctrl 재시작
 ```
 
-### 5-5. (선택) 저자 배포판 unitree_cpp_deploy 로 실행
+### 5-5. 스포츠 모드처럼 "서기 → 정책 → 서서 유지 → 천천히 앉기" 로 운용하기 (저자 제어기 사용)
 
-CSV 로깅(IMU·관절·명령), `LT+A` 천천히 앉기, 여러 정책 등록이 필요하면 저자 배포판을 씁니다. x86 에서 빌드·실행을 확인했고
-(7장), 젯슨 빌드는 미실시입니다.
+기존 `go2_ctrl` 은 Passive / FixStand / Velocity 세 상태가 코드에 고정돼 있어 **정책 중에 바로 Passive(소프트 킬)로 가는 길밖에 없습니다.**
+기울어진 순간에 킬하면 힘이 빠지면서 옆으로 넘어집니다. 저자 배포판 `wty-yy/unitree_cpp_deploy` 는 상태를 YAML 로 선언하고
+`Fix` 타입 상태(현재 자세에서 목표 자세로 보간)를 여러 개 둘 수 있어, 아래 FSM 을 설정 파일만으로 만들 수 있습니다.
+이 브랜치의 `jetson/unitree_cpp_deploy-config.yaml` 이 그 설정이고, 2026-10-19 MuJoCo(go2-docker 시뮬 + 이 제어기)에서 전 과정을 확인했습니다.
 
-```bash
-git clone --branch go2 --single-branch https://github.com/wty-yy/unitree_cpp_deploy.git
-cd unitree_cpp_deploy && git checkout 4f71bf3
-# ONNX Runtime: 젯슨에 이미 받아 둔 unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0 을 그대로 지정
-cd deploy/robots/go2
-cmake -B build -DONNXRUNTIME_ROOT=$HOME/unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0
-cmake --build build -j$(nproc)
-# 설정: 이 브랜치의 jetson/unitree_cpp_deploy-config.yaml 을 config/config.yaml 로 복사하고 policy_dir 절대경로만 수정
-cp ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-config.yaml config/config.yaml && vi config/config.yaml
-./build/go2_ctrl -n <인터페이스>
+```
+Passive ──L2+A──▶ FixStand (웅크림→기립, 2 s) ──start──▶ Velocity (정책)
+                                                     │
+                     Velocity ──L2+A──▶ FixHold (현재 자세→기립 자세, 1 s, 서서 유지)
+                                           │   └──start──▶ Velocity (다시 정책)
+                                           └──L2+A──▶ FixSquat (기립→웅크림, 2 s) ──자동──▶ Passive
+어디서든 L2+B ──▶ Passive (비상용. 감쇠만 걸려 주저앉음)
 ```
 
-동봉한 설정은 정책 1개(`Velocity`, `start` 로 진입), `LT+A` 로 FixStand↔FixSquat, CSV 로깅 on (정책 폴더 `logs/` 에 저장) 입니다.
-저자 README 는 x64 에 GPU 빌드 1.24.2, Orin 에 1.16.0 을 권하지만 CPU 1.22.0 으로도 빌드·실행됩니다 (작은 MLP 라 CPU 로 충분).
-빌드 시 `/usr/local/include/ddscxx` 를 하드코딩하므로 unitree_sdk2 는 `/usr/local` 에 설치돼 있어야 합니다 (go2-policies 2-3 과 같음).
+| 버튼 | 지금 상태 | 다음 상태 |
+|---|---|---|
+| `L2 + A` | Passive | FixStand (일어서기) |
+| `start` | FixStand 또는 FixHold | Velocity (정책 시작) |
+| `L2 + A` | Velocity | **FixHold** — 1 초에 걸쳐 기립 자세로 정리하고 kp 60/80 으로 서서 유지 |
+| `L2 + A` | FixHold 또는 FixStand | **FixSquat** — 2 초에 걸쳐 웅크린 뒤 자동으로 Passive |
+| `L2 + B` | 어디서든 | Passive (비상 정지) |
+
+`Fix` 상태는 **지금 명령된 관절각에서** 목표 자세로 선형 보간하므로, 걷는 중에 `L2+A` 를 눌러도 튀지 않고 1 초 안에 기립 자세로 모입니다.
+sim 에서 Velocity(0.3 m/s 보행) → FixHold → FixSquat → Passive 순서로 넘어가며 마지막에 엎드린 자세로 안정적으로 내려앉는 것을 확인했습니다.
+
+#### 젯슨에 빌드 (한 번)
+
+```bash
+cd ~ && git clone --branch go2 --single-branch https://github.com/wty-yy/unitree_cpp_deploy.git
+cd unitree_cpp_deploy && git checkout 4f71bf3
+sudo apt install -y libboost-program-options-dev libyaml-cpp-dev libeigen3-dev libfmt-dev libspdlog-dev   # 대부분 이미 있음
+cd deploy/robots/go2
+# ONNX Runtime 은 go2-policies 때 받아 둔 aarch64 1.22.0 을 그대로 지정 (CPU 빌드로 충분)
+cmake -B build -DONNXRUNTIME_ROOT=$HOME/unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0
+cmake --build build -j$(nproc)
+ldd build/go2_ctrl | grep "not found" || echo "링크 OK"
+```
+unitree_sdk2 는 `/usr/local` 에 설치돼 있어야 합니다(`/usr/local/include/ddscxx` 하드코딩, go2-policies 2-3 과 같음).
+x86 에서는 같은 명령에 `onnxruntime-linux-x64-1.22.0` 을 지정하면 빌드됩니다(확인됨). 저자 README 의 GPU 빌드(x64 1.24.2, Orin 1.16.0)는 필수가 아닙니다.
+
+#### 설정과 실행
+
+```bash
+cp ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-config.yaml ~/unitree_cpp_deploy/deploy/robots/go2/config/config.yaml
+vi ~/unitree_cpp_deploy/deploy/robots/go2/config/config.yaml     # Velocity.policy_dir 을 절대경로로 (예: /home/unitree/go2-policies-allterrain/current)
+cd ~/unitree_cpp_deploy/deploy/robots/go2 && ./build/go2_ctrl -n <인터페이스>
+```
+- 정책 파일은 기존과 같은 `current/params/deploy.yaml` + `current/exported/policy.onnx` 를 읽습니다. 관측 조립·히스토리 처리는 기존 제어기와 동일합니다.
+- 설정의 `logging: {enabled: true, dt: 0.02}` 는 Velocity 상태 동안 관절각·토크·IMU·명령을 50 Hz CSV 로 정책 폴더 `logs/` 에 남깁니다
+  (심투리얼 간극 측정용). 필요 없으면 `enabled: false`.
+- 넘어짐 판정이 기존 57° 에서 115° 로 완화돼 있습니다. 크게 기울어도 정책이 계속 돌므로, 위험하면 `L2+B` 를 직접 누르세요.
+- 기존 제어기로 돌아가려면 그냥 기존 `go2_ctrl` 을 실행하면 됩니다. 정책 폴더는 공용입니다.
+
+#### 처음 쓸 때 확인 순서
+1. 들어올린 채 `L2+A`(기립) → `start`(정책) → `L2+A`(FixHold: 다리가 기립 자세로 모이는지) → `L2+A`(FixSquat: 2 초 뒤 힘이 빠지는지).
+2. 바닥에 내려놓고 같은 순서. FixSquat 끝에 엎드린 자세로 안정적으로 내려앉는지.
+3. 그다음 보행 중 `L2+A` 로 멈춰 서기 → `start` 로 재개 → `L2+A` 두 번으로 앉기.
 
 ## 6. verify.sh 가 확인하는 것
 
@@ -448,5 +487,6 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 | 랜덤화 포함 MuJoCo | **RoboGauge 로 검증됨** (마찰·질량·지연·레벨) |
 | 기존 go2_ctrl + 새 deploy.yaml (Docker, x86) | **검증됨** — 기립·정책·보행·정지·Passive 전 과정 (7장) |
 | 저자 제어기 x86 빌드·실행 | **검증됨** (CPU onnxruntime 1.22.0) |
+| 서기→정책→FixHold→FixSquat→Passive FSM (5-5) | **sim 검증됨** — MuJoCo go2-docker 시뮬, 보행 중 L2+A 두 번으로 안정 착지 |
 | 계단 sim2sim (go2_ctrl 체인) | **부분** — 5·8 cm 세트 통과, 그 뒤 조향 없이 코스 이탈. 사람이 조향하는 시험은 미실시 |
 | 젯슨 빌드 / 실기 | **미실시** — 제어기 변경이 없으므로 go2-policies 때와 같은 바이너리 사용 |

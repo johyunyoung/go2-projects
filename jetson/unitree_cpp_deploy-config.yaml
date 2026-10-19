@@ -1,28 +1,46 @@
-# Test config (local): single policy, keyboard-sim friendly transitions, CSV logging on.
+# Go2 all-terrain policy: sport-mode-like FSM (unitree_cpp_deploy go2 branch, 4f71bf3)
+#   Passive --L2+A--> FixStand (crouch -> stand, 2 s) --start--> Velocity (policy)
+#   Velocity --L2+A--> FixHold (stand still, 1 s) --start--> Velocity
+#                                               --L2+A--> FixSquat (stand -> crouch, 2 s) --auto--> Passive
+#   L2+B from anywhere -> Passive (emergency: damping only, robot sinks). Prefer L2+A twice for a controlled sit.
 FSM:
   _:
-    Passive: {id: 1}
+    Passive:  {id: 1}
     FixStand: {id: 2, type: Fix}
-    FixSquat: {id: 3, type: Fix}
-    Velocity: {id: 4, type: RLBase}
+    FixHold:  {id: 3, type: Fix}
+    FixSquat: {id: 4, type: Fix}
+    Velocity: {id: 5, type: RLBase}
+
   Passive:
     transitions: {FixStand: LT + A.on_pressed}
     mode: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     kd: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
-  FixStand:
-    transitions: {Passive: LT + B.on_pressed, FixSquat: LT + A.on_pressed, Velocity: start.on_pressed}
+
+  FixStand:   # from lying: via crouch to standing
+    transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}
     kp: [60, 80, 80, 60, 80, 80, 60, 80, 80, 60, 80, 80]
     kd: [5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4]
     ts: [0, 1, 2]
-    qs: [[], [0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65], [0., 0.8, -1.5, 0., 0.8, -1.5, 0., 0.8, -1.5, 0., 0.8, -1.5]]
-  FixSquat:
-    transitions: {Passive: LT + B.on_pressed, FixStand: LT + A.on_pressed}
+    qs: [[], [0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65],
+             [0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5]]
+
+  FixHold:    # from the policy: settle into the standing pose and hold it
+    transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}
+    kp: [60, 80, 80, 60, 80, 80, 60, 80, 80, 60, 80, 80]
+    kd: [5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4]
+    ts: [0, 1]
+    qs: [[], [0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5]]
+
+  FixSquat:   # controlled sit: standing -> crouch over 2 s, then release to Passive
+    transitions: {FixStand: LT + A.on_pressed, Passive: LT + B.on_pressed}
     auto_transition: Passive
     kp: [60, 80, 80, 60, 80, 80, 60, 80, 80, 60, 80, 80]
     kd: [5, 4, 4, 5, 4, 4, 5, 4, 4, 5, 4, 4]
     ts: [0, 1, 2]
-    qs: [[], [0., 0.8, -1.5, 0., 0.8, -1.5, 0., 0.8, -1.5, 0., 0.8, -1.5], [0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65]]
+    qs: [[], [0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5, 0.0, 0.8, -1.5],
+             [0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65, 0.0, 1.36, -2.65]]
+
   Velocity:
-    transitions: {Passive: LT + B.on_pressed, FixSquat: LT + A.on_pressed}
-    policy_dir: /ABSOLUTE/PATH/TO/go2-projects-allterrain/current
+    transitions: {FixHold: LT + A.on_pressed, Passive: LT + B.on_pressed}
+    policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current   # e.g. /home/unitree/go2-policies-allterrain/current
     logging: {enabled: true, dt: 0.02}
