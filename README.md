@@ -387,6 +387,35 @@ Stand ──start──▶ Velocity              Stand ──L2+A──▶ FixSq
 계단 단 가장자리·2단 걸침 자세에서 Velocity → Stand(전진 키를 눌러도 안 움직임) → FixSquat → Passive 로 엎드린 자세까지 안정적으로 내려앉는 것을 확인했습니다.
 FixSquat 는 기립 자세를 거치지 않고 지금 자세에서 곧장 웅크림으로 보간합니다.
 
+#### 전환 순간 움찔거림과 그 수정 (패치 `jetson/unitree_cpp_deploy-startup-blend.patch`)
+
+정책 상태(Velocity, Stand)에 들어갈 때 로봇이 크게 움찔거리는 원인을 sim 로그로 확인했습니다.
+
+- 제어기는 정책 상태에 들어가는 순간 **게인을 즉시 25/0.5 로 바꾸고**, 정책의 `last_action` 을 0 으로, 관측 히스토리를 현재 프레임으로 초기화한 뒤 바로 첫 출력을 관절 목표로 씁니다.
+- 그 첫 출력이 현재 관절각에서 **최대 0.8 rad** 떨어진 목표를 내서(앞다리 허벅지 0.8 → 0.52 rad 등) 0.1 초 안에 몸이 요동쳤습니다. IMU 가속도 피크가 Velocity 진입 16.8 m/s², Stand 진입 20.9 m/s² (정지 상태 9.9).
+
+수정은 두 가지이고 둘 다 C++ 몇 줄입니다 (패치 적용, 설정 키로 on/off):
+
+| 키 (FSM 상태 아래) | 내용 |
+|---|---|
+| `warm_start_actions: true` | 진입 시 `last_action` 을 0 이 아니라 **현재 관절각에 해당하는 값** `(q − offset)/scale` 로 초기화. 정책이 보는 "직전 행동"과 실제 자세가 일치 |
+| `startup_blend_s: 0.5` | 진입 후 0.5 초 동안 관절 목표와 kp/kd 를 **이전 상태의 명령에서 정책 값으로 선형 보간**. 게인 급변과 첫 출력 튐을 흡수 |
+
+같은 순서(기립 → 정책 → Stand → 정책 → Stand → 앉기)로 재측정한 결과:
+
+| 전환 | 진입 후 0.6 초 IMU 가속도 피크 | 수정 후 |
+|---|---|---|
+| FixStand → Velocity | 16.8 m/s² | **10.6** (정지 9.9) |
+| Velocity → Stand | 20.9 m/s² | **9.8** |
+
+적용:
+```bash
+cd ~/unitree_cpp_deploy && git apply ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-startup-blend.patch
+cd deploy/robots/go2 && cmake --build build -j$(nproc)      # 재빌드
+```
+패치를 안 쓰면 설정의 `startup_blend_s` / `warm_start_actions` 키는 무시되고 원래 동작(즉시 전환)이 됩니다. 0.5 초가 길면 0.3 으로 줄여도 됩니다.
+Fix 상태(FixStand/FixSquat)는 원래부터 현재 명령에서 보간하므로 손대지 않았습니다.
+
 #### 젯슨에 빌드 (한 번)
 
 ```bash
@@ -489,6 +518,7 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 | 랜덤화 포함 MuJoCo | **RoboGauge 로 검증됨** (마찰·질량·지연·레벨) |
 | 기존 go2_ctrl + 새 deploy.yaml (Docker, x86) | **검증됨** — 기립·정책·보행·정지·Passive 전 과정 (7장) |
 | 저자 제어기 x86 빌드·실행 | **검증됨** (CPU onnxruntime 1.22.0) |
+| 정책 진입 시 움찔거림 (5-5 패치) | **sim 검증됨** — 가속도 피크 16.8/20.9 → 10.6/9.8 m/s² |
 | Velocity → Stand(정책, 명령 0 잠금) → FixSquat → Passive (5-5) | **sim 검증됨** — 평지, 계단 단 가장자리·2단 걸침, 제자리 회전 중 모두 안정 착지. 고정 자세로 서는 방식은 계단 가장자리에서 옆으로 넘어져 폐기 |
 | 계단 sim2sim (go2_ctrl 체인) | **부분** — 5·8 cm 세트 통과, 그 뒤 조향 없이 코스 이탈. 사람이 조향하는 시험은 미실시 |
 | 젯슨 빌드 / 실기 | **미실시** — 제어기 변경이 없으므로 go2-policies 때와 같은 바이너리 사용 |

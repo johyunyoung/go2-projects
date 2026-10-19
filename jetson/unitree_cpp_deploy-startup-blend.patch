@@ -1,0 +1,177 @@
+diff --git a/deploy/include/FSM/State_RLBase.h b/deploy/include/FSM/State_RLBase.h
+index 2d9ae40..639f516 100644
+--- a/deploy/include/FSM/State_RLBase.h
++++ b/deploy/include/FSM/State_RLBase.h
+@@ -21,13 +21,16 @@ public:
+             return;
+         }
+ 
+-        // set gain
+-        for (int i = 0; i < env->robot->data.joint_stiffness.size(); ++i)
++        // remember what the previous state was commanding, so run() can blend into the policy
++        enter_time_ = std::chrono::steady_clock::now();
++        const int n = env->robot->data.joint_ids_map.size();
++        q_enter_.assign(n, 0.0f); kp_enter_.assign(n, 0.0f); kd_enter_.assign(n, 0.0f);
++        for (int i = 0; i < n; ++i)
+         {
+-            lowcmd->msg_.motor_cmd()[i].kp() = env->robot->data.joint_stiffness[i];
+-            lowcmd->msg_.motor_cmd()[i].kd() = env->robot->data.joint_damping[i];
+-            lowcmd->msg_.motor_cmd()[i].dq() = 0;
+-            lowcmd->msg_.motor_cmd()[i].tau() = 0;
++            auto & m = lowcmd->msg_.motor_cmd()[i];
++            q_enter_[i] = m.q(); kp_enter_[i] = m.kp(); kd_enter_[i] = m.kd();
++            m.dq() = 0; m.tau() = 0;
++            if (startup_blend_s_ <= 0.0f) { m.kp() = env->robot->data.joint_stiffness[i]; m.kd() = env->robot->data.joint_damping[i]; }
+         }
+ 
+         env->robot->update();
+@@ -73,6 +76,12 @@ private:
+ 
+     std::thread policy_thread;
+     bool policy_thread_running = false;
++
++    // start-up blend (FSM cfg key startup_blend_s, default 0.5 s): gains and joint targets are
++    // interpolated from the previous state's command to the policy's over this time
++    float startup_blend_s_ = 0.5f;
++    std::chrono::steady_clock::time_point enter_time_;
++    std::vector<float> q_enter_, kp_enter_, kd_enter_;
+ };
+ 
+ REGISTER_FSM(State_RLBase)
+\ No newline at end of file
+diff --git a/deploy/include/isaaclab/envs/manager_based_rl_env.h b/deploy/include/isaaclab/envs/manager_based_rl_env.h
+index 991299a..6f6332c 100644
+--- a/deploy/include/isaaclab/envs/manager_based_rl_env.h
++++ b/deploy/include/isaaclab/envs/manager_based_rl_env.h
+@@ -59,6 +59,7 @@ public:
+ 
+         robot->update();
+         velocity_command_damper_.configure(this->policy_cfg, fsm_cfg, robot->data.joystick);
++        if (fsm_cfg && fsm_cfg["warm_start_actions"]) warm_start_actions = fsm_cfg["warm_start_actions"].as<bool>();
+ 
+         // load managers
+         if (policy_cfg["actions"])
+@@ -82,7 +83,12 @@ public:
+             fixed_command_enabled && fixed_command_active,
+             {fixed_lin_vel_x, fixed_lin_vel_y, fixed_ang_vel_z});
+         if (action_manager) action_manager->reset();
+-        if (observation_manager) observation_manager->reset();
++        if (action_manager && warm_start_actions)
++        {
++            std::vector<float> q(robot->data.joint_pos.data(), robot->data.joint_pos.data() + robot->data.joint_pos.size());
++            action_manager->warm_start(q);
++        }
++        if (observation_manager) observation_manager->reset();  // history (incl. last_action) filled with the current frame
+     }
+ 
+     void step()
+@@ -122,6 +128,7 @@ public:
+     }
+ 
+     float step_dt;
++    bool warm_start_actions = true;   // FSM cfg key warm_start_actions (default on)
+     
+     YAML::Node policy_cfg;
+ 
+diff --git a/deploy/include/isaaclab/envs/mdp/actions/joint_actions.h b/deploy/include/isaaclab/envs/mdp/actions/joint_actions.h
+index 876f94a..170bcd4 100644
+--- a/deploy/include/isaaclab/envs/mdp/actions/joint_actions.h
++++ b/deploy/include/isaaclab/envs/mdp/actions/joint_actions.h
+@@ -71,6 +71,17 @@ public:
+         _raw_actions.assign(_action_dim, 0.0f);
+     }
+ 
++    // raw action that would reproduce the given joint targets: (q - offset) / scale
++    std::vector<float> inverse_actions(const std::vector<float>& q) override
++    {
++        std::vector<float> raw(_action_dim, 0.0f);
++        for(int i(0); i<_action_dim && i<(int)q.size(); ++i)
++        {
++            raw[i] = _scale[i] != 0.0f ? (q[i] - _offset[i]) / _scale[i] : 0.0f;
++        }
++        return raw;
++    }
++
+ protected:
+     int _action_dim;
+     std::vector<int> _joint_ids;
+diff --git a/deploy/include/isaaclab/manager/action_manager.h b/deploy/include/isaaclab/manager/action_manager.h
+index 4c1fe10..6376963 100644
+--- a/deploy/include/isaaclab/manager/action_manager.h
++++ b/deploy/include/isaaclab/manager/action_manager.h
+@@ -20,6 +20,7 @@ public:
+     virtual std::vector<float> processed_actions() = 0;
+     virtual void process_actions(std::vector<float> actions) = 0;
+     virtual void reset(){};
++    virtual std::vector<float> inverse_actions(const std::vector<float>& /*q*/) { return std::vector<float>(action_dim(), 0.0f); }
+ 
+ protected:
+     YAML::Node cfg;
+@@ -64,6 +65,22 @@ public:
+         return _action;
+     }
+ 
++    // Initialise last_action / processed targets so they match the current joint positions
++    // (otherwise the policy starts from last_action = 0 while the legs are elsewhere -> start-up kick).
++    void warm_start(const std::vector<float>& joint_pos)
++    {
++        std::vector<float> raw;
++        int idx = 0;
++        for(auto & term : _terms)
++        {
++            std::vector<float> q(joint_pos.begin() + idx, joint_pos.begin() + std::min<int>(joint_pos.size(), idx + term->action_dim()));
++            auto r = term->inverse_actions(q);
++            raw.insert(raw.end(), r.begin(), r.end());
++            idx += term->action_dim();
++        }
++        process_action(raw);
++    }
++
+     std::vector<float> processed_actions()
+     {
+         std::vector<float> actions;
+diff --git a/deploy/robots/go2/src/State_RLBase.cpp b/deploy/robots/go2/src/State_RLBase.cpp
+index 17fc2b4..196f02f 100644
+--- a/deploy/robots/go2/src/State_RLBase.cpp
++++ b/deploy/robots/go2/src/State_RLBase.cpp
+@@ -5,6 +5,7 @@
+ #include "isaaclab/envs/mdp/actions/joint_actions.h"
+ 
+ #include <cstdint>
++#include <algorithm>
+ #include <memory>
+ #include <stdexcept>
+ #include <unordered_map>
+@@ -46,6 +47,7 @@ State_RLBase::State_RLBase(int state_mode, std::string state_string)
+     }
+ 
+     auto policy_dir = param::parser_policy_dir(cfg["policy_dir"].as<std::string>());
++    if (cfg["startup_blend_s"]) startup_blend_s_ = cfg["startup_blend_s"].as<float>();
+ 
+     env = std::make_unique<isaaclab::ManagerBasedRLEnv>(
+         YAML::LoadFile(policy_dir / "params" / "deploy.yaml"),
+@@ -164,8 +166,23 @@ void State_RLBase::run()
+     }
+ 
+     auto action = env->action_manager->processed_actions();
++    float alpha = 1.0f;
++    if (startup_blend_s_ > 0.0f) {
++        float el = std::chrono::duration<float>(std::chrono::steady_clock::now() - enter_time_).count();
++        alpha = std::clamp(el / startup_blend_s_, 0.0f, 1.0f);
++    }
+     for(int i(0); i < env->robot->data.joint_ids_map.size(); i++) {
+-        lowcmd->msg_.motor_cmd()[env->robot->data.joint_ids_map[i]].q() = action[i];
++        const int m = env->robot->data.joint_ids_map[i];
++        auto & cmd = lowcmd->msg_.motor_cmd()[m];
++        if (alpha < 1.0f) {
++            cmd.q()  = (1.0f - alpha) * q_enter_[m]  + alpha * action[i];
++            cmd.kp() = (1.0f - alpha) * kp_enter_[m] + alpha * env->robot->data.joint_stiffness[i];
++            cmd.kd() = (1.0f - alpha) * kd_enter_[m] + alpha * env->robot->data.joint_damping[i];
++        } else {
++            cmd.q() = action[i];
++            cmd.kp() = env->robot->data.joint_stiffness[i];
++            cmd.kd() = env->robot->data.joint_damping[i];
++        }
+     }
+ 
+     auto udp_it = joint_pos_udp_states.find(getState());
