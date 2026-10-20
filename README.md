@@ -3,6 +3,8 @@
 `go2-policies` 브랜치가 unitree_rl_lab 평지 정책을 담는 것과 같은 방식으로, **평지·계단(오르내림)·경사·장애물·물결 지형을 하나의 정책으로 걷도록 RSS 2026 MoE-CTS 레시피를
 그대로 재현 학습한 Go2 계단 보행 정책**을 담습니다. 같은 구조(`policies/<이름>/`, `current`, `verify.sh`)이지만
 정책 입력(45 × 히스토리 10 = 450)과 관절 순서가 달라 `deploy.yaml` 이 다릅니다. **젯슨의 `go2_ctrl` 은 수정 없이 그대로 쓸 수 있습니다** (5장).
+**2026-10-19 실기(Jetson)에서 절차 A(기존 go2_ctrl)로 기동 → FixStand → 정책(Velocity) 진입까지 확인했습니다.**
+실제 Jetson 환경 기준 절차는 [`jetson/RUNBOOK.md`](jetson/RUNBOOK.md), 시험 기록은 [`field-tests/`](field-tests/) 에 있습니다.
 
 ```
 학습 PC (x86, RTX 4090)                  검증
@@ -25,6 +27,12 @@ policies/<이름>/alt/81500/              같은 학습의 대안 체크포인�
 policies/<이름>/stand/                  Stand 상태용: 같은 ONNX(심링크) + 속도 범위 0 인 deploy.yaml (5-5)
 sim2sim/                                계단 코스 씬과 go2-docker 용 compose 오버레이 (7장)
 jetson/                                 arm64 빌드 패치(go2-policies 와 동일), 저자 제어기용 config.yaml
+jetson/RUNBOOK.md                       실제 Jetson(Docker 컨테이너) 기준으로 검증한 실행 절차, README 와 다른 점
+jetson/go2_ctrl-config.yaml             실기에 쓴 기존 go2_ctrl 의 config.yaml 사본
+jetson/unitree_rl_lab-local.diff        실기 젯슨의 unitree_rl_lab(4960b84) 로컬 수정 전체 (arm64 패치 + policy_dir)
+jetson/local.env.example               기기별 값 템플릿 (실제 값 jetson/local.env 는 git 미포함)
+desktop/NOTES.md                        학습 PC 환경 메모
+field-tests/                            실기 시험 기록 (날짜별, 사용한 commit 포함)
 policies/<이름>/params/env.yaml         학습 당시 환경 설정 전체 (지형·보상·랜덤화)
 policies/<이름>/params/agent.yaml       학습 당시 알고리즘·네트워크 설정
 policies/<이름>/params/mujoco_deploy.yaml  MuJoCo 배포 설정 (게인·기본 자세·관절 순서·스케일)
@@ -280,7 +288,9 @@ vi ~/unitree_rl_lab/deploy/robots/go2/config/config.yaml
 #### 4단계. 로봇 준비
 
 1. 로봇 전원을 켜고 리모컨으로 **엎드린 자세**로 둡니다 (`L2 + A` 두 번).
-2. 내장 sport_mode 를 끕니다 (앱 또는 유니트리 문서 절차). 끄지 않으면 제어기가 `[critical] The other process is using the lowcmd channel` 을 내고 멈춥니다.
+2. 내장 sport_mode 는 따로 끄지 않아도 됩니다. 로봇 부팅 후 첫 실행에서 제어기가 `[critical] The other process is using the lowcmd channel` 을 낸 뒤
+   **스스로 sport_mode 를 해제하고 약 3 초 뒤 계속 진행**합니다 (unitree_rl_lab 4960b84 `main.cpp` 의 `unitree::robot::go2::shutdown()`, 2026-10-19 실기 확인).
+   해제 순간에 대비해 로봇은 엎드린 자세로 둡니다. 해제된 sport_mode 는 로봇 재부팅으로 복구됩니다.
 3. 로봇을 **들어올립니다** — 스탠드에 올리거나 둘이서 몸통을 잡아 발이 바닥에 닿지 않게. 새 정책의 첫 기동은 항상 이렇게 합니다.
 4. 젯슨에서 로봇 쪽 인터페이스 이름을 확인합니다: `ip -o link show` (보통 `eth0`).
 
@@ -347,7 +357,8 @@ vi ~/unitree_rl_lab/deploy/robots/go2/config/config.yaml
 | 증상 | 원인 / 조치 |
 |---|---|
 | `verify.sh` 에서 `joint map FAIL` | `deploy.yaml` 이 평지 정책 것으로 바뀜. 이 브랜치의 파일인지 `git -C ~/go2-policies-allterrain status` 로 확인 |
-| 기동 시 `The other process is using the lowcmd channel` | sport_mode 가 켜져 있음. 4단계 2번 |
+| 기동 시 `The other process is using the lowcmd channel` | 로봇 부팅 후 첫 실행이면 정상. 제어기가 sport_mode 를 해제하고 약 3 초 뒤 `Waiting for connection` 으로 진행 (4단계 2번) |
+| `filesystem error: directory iterator cannot open directory ... current` | `config.yaml` 의 `policy_dir` 이 실제 clone 위치와 다름. README 예시 경로가 아니라 실제 경로를 절대경로로 (2026-10-19 실기에서 겪음) |
 | 기동 시 ONNX 입력 차원 오류 | `history_length` 가 10 이 아닌 `deploy.yaml`. `./verify.sh current` 의 `onnx` 줄 확인 |
 | 서 있을 때 다리가 떨림 | `LT + B` 후 중단. 평지 정책과 같은 kp 25 / kd 0.5 인지 `verify.sh` 의 `gains` 줄 확인 |
 | 계단에서 옆으로 벗어남 | 요 드리프트. 오른쪽 스틱으로 중앙 유지. 속도 0.5 m/s 이하 |
@@ -391,6 +402,10 @@ pip3 install onnx pyyaml
 cd ~/go2-policies-allterrain && ./verify.sh current && ./verify.sh current/stand
 ```
 `current/stand` 는 같은 ONNX(심링크)에 속도 범위만 0 인 `deploy.yaml` 입니다. 둘 다 `통과.` 여야 합니다.
+
+> **알려진 문제 (2026-10-20 Jetson 확인):** 현재 `./verify.sh current/stand` 는 `FAIL: current/stand/params/mujoco_deploy.yaml 없음` 으로 끝납니다.
+> `verify.sh` 가 MuJoCo 설정 파일을 필수로 요구하기 때문이며, `stand/` 는 go2_ctrl 전용이라 이 파일이 없습니다.
+> `mujoco_deploy.yaml` 을 임시로 넣으면 go2_ctrl 관련 검사(관측·관절 매핑·게인·ONNX)는 모두 통과하고 속도 범위는 `[0, 0]` 입니다. 수정 방향 미정(verify.sh 에서 SKIP 처리 권장).
 
 #### 2단계. 저자 제어기 빌드 + 패치 (한 번)
 
@@ -628,7 +643,9 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 
 ## 8. 한계와 주의
 
-- **시뮬 전용 검증.** MuJoCo sim2sim 과 RoboGauge 만 통과했고 실기는 미실시.
+- **실기 검증은 초기 단계.** 2026-10-19 절차 A(기존 go2_ctrl)로 기동·정책 진입을 확인했고, 계단·경사 등 지형 실기와 절차 B 실기는 미실시.
+- **정책 진입 순간 충격.** FixStand → Velocity 전환 시 몸체가 튑니다(5-5). 실기에서 이 순간 로봇에 장착한 라우터의 Ethernet 이 빠져 SSH 가 끊긴 것으로 추정되며,
+  제어기는 계속 동작했습니다. 로봇에 붙인 장비와 커넥터는 고정하세요 (`field-tests/2026-10-19_allterrain-128500_procA.md`).
 - **지형을 보지 않는 정책**입니다. 계단 끝·낭떠러지를 인식하지 못하므로 좁은 계단에서는 조향으로 중앙을 유지해야 합니다.
 - **경사 내려가기가 가장 약함** (0.56). 공개 모델(0.60)보다도 낮습니다.
 - 공개 모델은 16384 env 로 학습했고 이 정책은 8192 env 입니다. 같은 iteration 에서 데이터량이 절반이지만 점수는 같은 수준입니다.
@@ -650,4 +667,5 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 | 정책 진입 시 움찔거림 (5-5 패치) | **sim 검증됨** — 가속도 피크 16.8/20.9 → 10.6/9.8 m/s² |
 | Velocity → Stand(정책, 명령 0 잠금) → FixSquat → Passive (5-5) | **sim 검증됨** — 평지, 계단 단 가장자리·2단 걸침, 제자리 회전 중 모두 안정 착지. 고정 자세로 서는 방식은 계단 가장자리에서 옆으로 넘어져 폐기 |
 | 계단 sim2sim (go2_ctrl 체인) | **부분** — 5·8 cm 세트 통과, 그 뒤 조향 없이 코스 이탈. 사람이 조향하는 시험은 미실시 |
-| 젯슨 빌드 / 실기 | **미실시** — 제어기 변경이 없으므로 go2-policies 때와 같은 바이너리 사용 |
+| 젯슨 실기, 절차 A (기존 go2_ctrl) | **검증됨 (기동·정책 진입)** — 2026-10-19, unitree_rl_lab 4960b84, Jetson Docker 컨테이너. 지형 시험은 미실시 (`field-tests/`) |
+| 젯슨 빌드 / 실기, 절차 B (저자 제어기) | **미실시** |
