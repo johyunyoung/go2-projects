@@ -32,18 +32,20 @@ index cbbc2af..4a5962a 100644
  };
 \ No newline at end of file
 diff --git a/deploy/robots/go2/main.cpp b/deploy/robots/go2/main.cpp
-index 03aeac6..543dde4 100644
+index 03aeac6..fe61082 100644
 --- a/deploy/robots/go2/main.cpp
 +++ b/deploy/robots/go2/main.cpp
-@@ -3,10 +3,211 @@
+@@ -3,10 +3,259 @@
  #include "FSM/State_Fix.h"
  #include "FSM/State_RLBase.h"
  
 +#include <algorithm>
 +#include <chrono>
++#include <cmath>
 +#include <cstdlib>
 +#include <fstream>
 +#include <thread>
++#include <unitree/robot/go2/sport/sport_client.hpp>
 +
  std::unique_ptr<LowCmd_t> FSMState::lowcmd = nullptr;
  std::shared_ptr<LowState_t> FSMState::lowstate = nullptr;
@@ -109,6 +111,9 @@ index 03aeac6..543dde4 100644
 + *     boot_window_s: 180      # if the host booted less than this ago, wait for sport mode to appear first,
 + *                             # so it is released instead of starting later and fighting over the motors
 + *     sport_settle_s: 5       # after sport mode appears, let it finish what it does (e.g. stand up) first
++ *     auto_lie_down: true     # if sport mode holds the robot standing still, ask sport mode to lie it down
++ *                             # (SportClient::StandDown) instead of waiting for the remote. Default false.
++ *     still_hold_s: 2.0       # ... only after all joints have been still (|dq| < 0.3 rad/s) this long
 + * Without the key (or enabled: false) the controller behaves as before.
 + */
 +void wait_for_handover()
@@ -121,6 +126,8 @@ index 03aeac6..543dde4 100644
 +    const float lying_hold_s = cfg["lying_hold_s"] ? cfg["lying_hold_s"].as<float>() : 1.0f;
 +    const double boot_window_s = cfg["boot_window_s"] ? cfg["boot_window_s"].as<double>() : 180.0;
 +    const double sport_settle_s = cfg["sport_settle_s"] ? cfg["sport_settle_s"].as<double>() : 5.0;
++    const bool auto_lie_down = cfg["auto_lie_down"] ? cfg["auto_lie_down"].as<bool>() : false;
++    const float still_hold_s = cfg["still_hold_s"] ? cfg["still_hold_s"].as<float>() : 2.0f;
 +    std::function<bool(const unitree::common::UnitreeJoystick&)> combo =
 +        [](const unitree::common::UnitreeJoystick&) { return true; };
 +    if (!keys.empty())
@@ -171,11 +178,25 @@ index 03aeac6..543dde4 100644
 +    }
 +
 +    if (keys.empty())
-+        spdlog::info("Handover: automatic. Taking over once the robot has been lying for {:.1f} s "
-+                     "(if sport mode stood it up: sport mode L2+A twice to lie down).", lying_hold_s);
++        spdlog::info("Handover: automatic. Taking over once the robot has been lying for {:.1f} s ({}).", lying_hold_s,
++                     auto_lie_down ? "if sport mode holds it standing still, it is asked to lie down"
++                                   : "if sport mode stood it up: sport mode L2+A twice to lie down");
 +    else
 +        spdlog::info("Handover: sport mode keeps control. Lay the robot down (sport mode L2+A twice), "
 +                     "then hold [{}] to switch to this controller.", keys);
++
++    // optional: ask sport mode itself to lie the robot down (only while it is the active, standing-still controller)
++    std::unique_ptr<unitree::robot::go2::SportClient> sport;
++    if (auto_lie_down)
++    {
++        sport = std::make_unique<unitree::robot::go2::SportClient>();
++        sport->SetTimeout(5.0f);
++        sport->Init();
++    }
++    int lie_attempts = 0;
++    auto last_lie_cmd = SteadyClock::now() - std::chrono::seconds(60);
++    auto still_since = SteadyClock::now();
++    bool was_still = false;
 +
 +    // 3. robot lying (stable) [+ combo]
 +    last_msg = SteadyClock::now() - std::chrono::seconds(60);
@@ -186,11 +207,38 @@ index 03aeac6..543dde4 100644
 +        state->update();
 +        const auto now = SteadyClock::now();
 +        float calf_max = -10.0f;
++        float dq_max = 0.0f;
 +        for (int i : {2, 5, 8, 11}) calf_max = std::max(calf_max, static_cast<float>(state->msg_.motor_state()[i].q()));
++        for (int i = 0; i < 12; ++i) dq_max = std::max(dq_max, std::abs(static_cast<float>(state->msg_.motor_state()[i].dq())));
 +        const bool lying = calf_max < lying_calf_max;
 +        if (lying && !was_lying) lying_since = now;
 +        was_lying = lying;
 +        const bool lying_stable = lying && std::chrono::duration<float>(now - lying_since).count() >= lying_hold_s;
++
++        const bool still = dq_max < 0.3f;
++        if (still && !was_still) still_since = now;
++        was_still = still;
++        if (sport && !lying && still && std::chrono::duration<float>(now - still_since).count() >= still_hold_s
++            && now - last_lie_cmd > std::chrono::seconds(8))
++        {
++            std::string active;
++            if (lie_attempts < 3 && query_sport_mode(msc, active) && !active.empty())
++            {
++                ++lie_attempts;
++                spdlog::info("Handover: sport mode '{}' holds the robot standing still. Asking it to lie down "
++                             "(StandDown, attempt {}/3).", active, lie_attempts);
++                sport->StopMove();
++                const int32_t ret = sport->StandDown();
++                if (ret != 0) spdlog::warn("Handover: StandDown returned {}.", ret);
++            }
++            else if (lie_attempts == 3)
++            {
++                ++lie_attempts;   // log once
++                spdlog::warn("Handover: automatic lie-down did not work. Lay the robot down with the remote "
++                             "(sport mode L2+A twice).");
++            }
++            last_lie_cmd = now;
++        }
 +
 +        if (combo(state->joystick))
 +        {
@@ -247,7 +295,7 @@ index 03aeac6..543dde4 100644
  void init_fsm_state()
  {
      auto lowcmd_sub = std::make_shared<unitree::robot::go2::subscription::LowCmd>();
-@@ -35,11 +236,13 @@ int main(int argc, char** argv)
+@@ -35,11 +284,13 @@ int main(int argc, char** argv)
      // Unitree DDS Config
      unitree::robot::ChannelFactory::Instance()->Init(0, vm["network"].as<std::string>());
  
@@ -261,7 +309,7 @@ index 03aeac6..543dde4 100644
  
      std::cout << "State transitions:\n";
      std::cout << "  [L2 + A]: Passive -> FixStand, Velocity_* -> FixSquat, FixSquat -> FixStand\n";
-@@ -52,6 +255,6 @@ int main(int argc, char** argv)
+@@ -52,6 +303,6 @@ int main(int argc, char** argv)
      {
          sleep(1);
      }

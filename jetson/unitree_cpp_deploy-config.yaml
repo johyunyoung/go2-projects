@@ -16,6 +16,8 @@ handover:
   lying_hold_s: 1.0
   boot_window_s: 180    # host uptime below this = just booted: wait for sport mode to appear first
   sport_settle_s: 5     # after sport mode appears, let it finish (e.g. stand up) before judging the pose
+  auto_lie_down: true   # sport mode holding the robot standing still -> ask it to lie down (StandDown), up to 3 tries
+  still_hold_s: 2.0     # ... only after all joints have been still (|dq| < 0.3 rad/s) this long
 
 FSM:
   _:

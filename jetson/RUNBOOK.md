@@ -118,7 +118,8 @@ mkdir -p ~/go2_ws/logs
 ## 9. 부팅 자동 실행 (절차 B 제어기를 기본 보행으로)
 
 전원을 켜면 젯슨에서 저자 제어기가 자동 실행되고, 로봇이 **엎드린 자세로 1 초** 있으면 sport mode 를 끄고 넘겨받습니다 (Passive).
-sport mode 가 먼저 로봇을 세웠다면 sport mode L2+A 두 번으로 엎드리게 하면 그때 넘겨받습니다.
+sport mode 가 먼저 로봇을 세웠다면 제어기가 sport mode 에 엎드리기(StandDown)를 요청해 엎드린 뒤 넘겨받습니다 (`auto_lie_down`).
+자동 엎드리기가 3 번 실패하면 리모컨 sport mode L2+A 두 번으로 엎드리게 하면 됩니다.
 서 있는 로봇을 넘겨받아 주저앉히지 않도록 엎드린 자세를 확인하는 구조입니다. 설정은 `config.yaml` 의 `handover`.
 
 넘겨받기 전 모터 명령은 보내지 않고, sport mode 가 **꺼진 것을 motion switcher 로 확인한 다음에만** 명령을 보냅니다.
@@ -178,7 +179,8 @@ tail -f ~/go2_ws/logs/autostart_*.log
 - 제어기가 비정상 종료되면 5초 뒤 다시 대기 상태로 뜹니다. 이미 sport mode 는 꺼져 있으므로 로봇은 힘이 빠진 상태입니다.
 - 로그에 `Guard: sport mode ... became active` 가 나오면 감시가 충돌을 막은 것입니다. 로봇 상태를 확인하고 원인(부팅 순서 등)을 기록하세요.
 - 재부팅 시험의 정상 로그 순서: `waiting for enP8p1s0` (있을 수 있음) → `motion switcher answers` → `host booted N s ago. Waiting for sport mode` →
-  `sport mode '...' is running. Letting it settle` → (서 있으면 엎드리게 함) → `robot is lying` → `Sport mode: off (confirmed ...)` → `FSM: Start Passive`.
+  `sport mode '...' is running. Letting it settle` → (서 있으면) `Asking it to lie down (StandDown, attempt 1/3)` → `robot is lying` →
+  `Sport mode: off (confirmed ...)` → `FSM: Start Passive`.
 - 로그 CSV 는 이전과 같이 정책 폴더 `logs/` 에 쌓입니다. 디스크를 가끔 확인하세요.
 - 검증 범위 (2026-10-21): 수동 실행과 전원 재투입 후 서비스 실행 모두 sport mode('mcf') 감지 → 엎드림 확인 → 해제 확인 → Passive → 기립·정책·앉기 정상.
 - 전원을 켜면 Go2 가 먼저 일어서고, 젯슨·라우터는 1–2 분 더 걸립니다. 그동안 SSH 가 안 되는 것은 정상입니다.
