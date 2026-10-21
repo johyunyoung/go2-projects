@@ -722,5 +722,5 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 | 계단 sim2sim (go2_ctrl 체인) | **부분** — 5·8 cm 세트 통과, 그 뒤 조향 없이 코스 이탈. 사람이 조향하는 시험은 미실시 |
 | 젯슨 실기, 절차 A (기존 go2_ctrl) | **검증됨 (기동·정책 진입)** — 2026-10-19, unitree_rl_lab 4960b84, Jetson Docker 컨테이너. 지형 시험은 미실시 (`field-tests/`) |
 | 젯슨 빌드 / 실기, 절차 B (저자 제어기) | **검증됨** — 2026-10-21, 4f71bf3 + startup-blend 패치. 기립·정책·Stand·앉기, 계단·수풀 20 분 주행 (`field-tests/2026-10-21_…`) |
-| 자동 엎드리기 (5-6, `auto_lie_down`) | **미실시** — SportClient::StandDown 사용, SDK 헤더 기준 컴파일만 확인 |
+| 자동 엎드리기 (5-6, `auto_lie_down`) | **검증됨** — 2026-10-21 전원 재투입, 리모컨 조작 없음: sport mode 'mcf' 기립 → StandDown 1 회에 엎드림(2.3 s) → 해제 확인 → Passive |
 | 부팅 자동 실행 + 자동 인계 (5-6) | **검증됨** — 2026-10-21 수정 버전(motion switcher 확인·감시). 전원 재투입 후 sport mode('mcf') 기립 상태에서 대기 → 엎드리기 → 해제 확인(0.6 s) → Passive → 기립·정책·Stand·앉기, 감시 경고 없음. 첫 버전은 재부팅 시 sport mode 와 충돌(떨림)해 폐기 |

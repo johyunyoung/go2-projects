@@ -183,6 +183,7 @@ tail -f ~/go2_ws/logs/autostart_*.log
   `Sport mode: off (confirmed ...)` → `FSM: Start Passive`.
 - 로그 CSV 는 이전과 같이 정책 폴더 `logs/` 에 쌓입니다. 디스크를 가끔 확인하세요.
 - 검증 범위 (2026-10-21): 수동 실행과 전원 재투입 후 서비스 실행 모두 sport mode('mcf') 감지 → 엎드림 확인 → 해제 확인 → Passive → 기립·정책·앉기 정상.
+  자동 엎드리기도 전원 재투입에서 확인: 리모컨 조작 없이 StandDown 1 회에 엎드린 뒤 인계.
 - 전원을 켜면 Go2 가 먼저 일어서고, 젯슨·라우터는 1–2 분 더 걸립니다. 그동안 SSH 가 안 되는 것은 정상입니다.
 
 ## README와 다른 점
