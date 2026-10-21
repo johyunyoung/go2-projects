@@ -26,6 +26,7 @@ policies/<이름>/params/deploy.yaml      go2_ctrl 이 읽는 설정: 관절 매
 policies/<이름>/alt/81500/              같은 학습의 대안 체크포인트 (같은 구조: exported/ + params/)
 policies/<이름>/stand/                  Stand 상태용: 같은 ONNX(심링크) + 속도 범위 0 인 deploy.yaml (5-5)
 sim2sim/                                계단 코스 씬과 go2-docker 용 compose 오버레이 (7장)
+sim2real/                               실기 로그 분석 도구, 결과(2026-10-21), go2_rl_robotlab 미세조정 패치 (sim2real/README.md)
 jetson/                                 arm64 빌드 패치(go2-policies 와 동일), 저자 제어기용 config.yaml
 jetson/RUNBOOK.md                       실제 Jetson(Docker 컨테이너) 기준으로 검증한 실행 절차, README 와 다른 점
 jetson/go2_ctrl-config.yaml             실기에 쓴 기존 go2_ctrl 의 config.yaml 사본

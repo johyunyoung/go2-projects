@@ -29,13 +29,15 @@ FSM:
     policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current   # e.g. /home/unitree/go2-policies-allterrain/current
     startup_blend_s: 0.5      # patch: blend gains/targets from the previous state over 0.5 s (needs unitree_cpp_deploy-startup-blend.patch)
     warm_start_actions: true  # patch: last_action initialised from the current joint angles
-    logging: {enabled: true, dt: 0.02}
+    logging: {enabled: true, dt: 0.002}   # ~370 Hz in practice (1 kHz FSM loop); 0.02 for long runs if CPU is tight
+    fixed_command: {enabled: true, lin_vel_x: 0.5, lin_vel_y: 0.0, ang_vel_z: 0.0, duration: 10.0}   # L2+Y: repeatable test command
 
   Stand:      # same policy, deploy.yaml with zero command ranges -> stands still, balancing (sticks ignored)
     transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}
     policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current/stand
     startup_blend_s: 0.5
     warm_start_actions: true
+    logging: {enabled: true, dt: 0.002}   # CSV in current/stand/logs
 
   FixSquat:   # controlled sit: current pose -> crouch over 3 s, then release to Passive
     transitions: {FixStand: LT + A.on_pressed, Passive: LT + B.on_pressed}
