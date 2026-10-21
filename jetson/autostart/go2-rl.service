@@ -1,0 +1,20 @@
+# Go2 RL controller autostart (Jetson HOST). Installed by install.sh, which fills in __CONTAINER__.
+# The controller waits in sport mode until the handover combo (config.yaml `handover`) is held
+# while the robot is lying, so starting at boot does not take over a standing robot.
+[Unit]
+Description=Go2 RL controller (unitree_cpp_deploy in docker, remote handover)
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/docker start __CONTAINER__
+ExecStart=/usr/bin/docker exec __CONTAINER__ /home/unitree/go2_ws/go2-projects/jetson/autostart/run_go2_ctrl.sh
+# docker exec does not forward signals to the process in the container: stop it explicitly
+ExecStop=/usr/bin/docker exec __CONTAINER__ pkill -INT -f build/go2_ctrl
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

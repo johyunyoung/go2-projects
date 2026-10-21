@@ -115,6 +115,65 @@ mkdir -p ~/go2_ws/logs
 ```
 `~/go2_ws` 는 host 와 공유되는 폴더로 보입니다 (host 에도 같은 repo 가 있음). `~/go2_logs` 처럼 홈 바로 아래는 컨테이너 안에만 있으니 쓰지 않습니다.
 
+## 9. 부팅 자동 실행 (절차 B 제어기 + 리모컨 인계)
+
+전원을 켜면 Go2 는 평소처럼 sport mode 로 일어섭니다. 동시에 젯슨에서 저자 제어기가 **대기 상태로** 자동 실행됩니다.
+제어기는 로봇이 엎드려 있을 때 리모컨 **L1 + R1 을 2초** 누르면 그때 sport mode 를 끄고 넘겨받습니다 (Passive).
+서 있는 로봇을 갑자기 넘겨받아 주저앉히는 일을 막기 위한 구조입니다. 조합과 판정 각도는 `config.yaml` 의 `handover` 에서 바꿉니다.
+
+```
+전원 ON → sport mode 기립 (평소처럼 사용 가능)
+  → sport mode L2+A 두 번 (엎드리기) → L1+R1 2초 → 내 제어기 Passive
+  → L2+A 기립 → start 정책 → … → L2+A Stand → L2+A 앉기
+sport mode 로 돌아가기: 재부팅 (제어기는 다시 대기 상태로 뜸)
+```
+
+### 설치 (1회)
+
+컨테이너 안 (`unitree@go2-dock`):
+```bash
+cd ~/go2_ws/go2-projects && git pull
+cd ~/go2_ws/unitree_cpp_deploy
+git apply --check ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-autostart-handover.patch && \
+  git apply ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-autostart-handover.patch
+cd deploy/robots/go2 && cmake --build build -j$(nproc)
+cp ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-config.yaml config/config.yaml
+sed -i 's#/ABSOLUTE/PATH/TO/go2-policies-allterrain/current#/home/unitree/go2_ws/go2-projects/current#' config/config.yaml
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH" > ~/go2_ws/go2_ctrl.env     # docker exec 는 .bashrc 를 읽지 않음
+~/go2_ws/go2-projects/jetson/autostart/run_go2_ctrl.sh --check              # binary / config / libs OK 확인
+```
+
+수동으로 인계 동작을 먼저 확인합니다 (로봇은 sport mode 로 서 있는 상태):
+```bash
+./build/go2_ctrl -n enP8p1s0
+```
+1. `Handover: sport mode keeps control ...` 가 나오면 서 있는 상태에서 L1+R1 2초 → `Handover refused: robot is not lying` 이 나와야 정상 (sport mode 유지).
+2. sport mode L2+A 두 번으로 엎드리기 → L1+R1 2초 → `Releasing sport mode` → `FSM: Start Passive`.
+3. 이후는 평소와 같음. 끝나면 앉히고 Ctrl+C.
+
+host 로 나와서 (Ctrl+P → Ctrl+Q) 서비스 등록:
+```bash
+cd ~/go2_ws/go2-projects/jetson/autostart
+./install.sh <컨테이너 이름>          # docker ps -a 의 NAMES. jetson/local.env 에 CONTAINER 가 있으면 생략 가능
+sudo systemctl start go2-rl          # 지금 바로 시작 (다음 부팅부터는 자동)
+systemctl status go2-rl
+tail -f ~/go2_ws/logs/autostart_*.log
+```
+
+### 운영
+
+| 하고 싶은 것 | 명령 (host) |
+|---|---|
+| 상태·로그 | `systemctl status go2-rl`, `ls -t ~/go2_ws/logs/autostart_*.log \| head -1 \| xargs tail -f` |
+| 수동 실행·디버깅 전 | `sudo systemctl stop go2-rl` (두 제어기가 동시에 돌면 안 됨) |
+| 다시 켜기 | `sudo systemctl start go2-rl` |
+| 자동 실행 끄기 | `./install.sh --uninstall` |
+| 정책 교체 | `current` 심링크나 `config.yaml` 의 policy_dir 변경 후 `sudo systemctl restart go2-rl` |
+
+- 제어기가 비정상 종료되면 5초 뒤 다시 대기 상태로 뜹니다. 이미 sport mode 는 꺼져 있으므로 로봇은 힘이 빠진 상태입니다.
+- 로그 CSV 는 이전과 같이 정책 폴더 `logs/` 에 쌓입니다. 디스크를 가끔 확인하세요.
+- 검증 범위: 인계 패치의 리모컨 조합 해석 부분은 실제 SDK 헤더로 컴파일 확인. 전체 빌드와 실기 동작, systemd 서비스는 젯슨에서 처음 확인해야 합니다.
+
 ## README와 다른 점
 
 | 항목 | README | 실제 |

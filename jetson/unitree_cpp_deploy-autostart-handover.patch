@@ -1,0 +1,78 @@
+diff --git a/deploy/robots/go2/main.cpp b/deploy/robots/go2/main.cpp
+index 03aeac6..435edea 100644
+--- a/deploy/robots/go2/main.cpp
++++ b/deploy/robots/go2/main.cpp
+@@ -3,10 +3,65 @@
+ #include "FSM/State_Fix.h"
+ #include "FSM/State_RLBase.h"
+ 
++#include <algorithm>
++#include <chrono>
++
+ std::unique_ptr<LowCmd_t> FSMState::lowcmd = nullptr;
+ std::shared_ptr<LowState_t> FSMState::lowstate = nullptr;
+ std::shared_ptr<Keyboard> FSMState::keyboard = nullptr;
+ 
++/*
++ * Handover gate (config.yaml top-level key `handover`), for starting this controller at boot.
++ * The robot boots in Unitree sport mode and stands up by itself. Taking the lowcmd channel then would drop it,
++ * so we only listen to rt/lowstate here and release sport mode once the operator asks for it:
++ *   handover:
++ *     enabled: true
++ *     keys: "LB(2s) + RB(2s)"     # joystick DSL, same syntax as FSM transitions (LB/RB = L1/R1)
++ *     lying_calf_max: -2.3         # all four calf angles must be below this [rad] (robot lying down)
++ * Without the key (or enabled: false) the controller behaves as before.
++ */
++void wait_for_handover()
++{
++    const auto cfg = param::config["handover"];
++    if (!cfg || !cfg["enabled"] || !cfg["enabled"].as<bool>()) return;
++
++    const std::string keys = cfg["keys"] ? cfg["keys"].as<std::string>() : "LB(2s) + RB(2s)";
++    const float lying_calf_max = cfg["lying_calf_max"] ? cfg["lying_calf_max"].as<float>() : -2.3f;
++    unitree::common::dsl::Parser parser(keys);
++    auto ast = parser.Parse();
++    auto combo = unitree::common::dsl::Compile(*ast);
++
++    auto state = std::make_shared<LowState_t>();
++    spdlog::info("Handover: waiting for robot state...");
++    state->wait_for_connection();
++    spdlog::info("Handover: sport mode keeps control. Lay the robot down (sport mode L2+A twice), "
++                 "then hold [{}] to switch to this controller.", keys);
++
++    auto last_warn = std::chrono::steady_clock::now() - std::chrono::seconds(10);
++    while (true)
++    {
++        state->update();
++        if (combo(state->joystick))
++        {
++            float calf_max = -10.0f;
++            for (int i : {2, 5, 8, 11}) calf_max = std::max(calf_max, state->msg_.motor_state()[i].q());
++            if (calf_max < lying_calf_max)
++            {
++                spdlog::info("Handover: robot is lying (max calf {:.2f} rad). Releasing sport mode.", calf_max);
++                return;
++            }
++            auto now = std::chrono::steady_clock::now();
++            if (now - last_warn > std::chrono::seconds(2))
++            {
++                spdlog::warn("Handover refused: robot is not lying (max calf {:.2f} rad >= {:.2f}). Lay it down first.",
++                             calf_max, lying_calf_max);
++                last_warn = now;
++            }
++        }
++        usleep(20000);
++    }
++}
++
+ void init_fsm_state()
+ {
+     auto lowcmd_sub = std::make_shared<unitree::robot::go2::subscription::LowCmd>();
+@@ -35,6 +90,7 @@ int main(int argc, char** argv)
+     // Unitree DDS Config
+     unitree::robot::ChannelFactory::Instance()->Init(0, vm["network"].as<std::string>());
+ 
++    wait_for_handover();
+     init_fsm_state();
+ 
+     // Initialize FSM from config
