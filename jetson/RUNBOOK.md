@@ -121,6 +121,11 @@ mkdir -p ~/go2_ws/logs
 sport mode 가 먼저 로봇을 세웠다면 sport mode L2+A 두 번으로 엎드리게 하면 그때 넘겨받습니다.
 서 있는 로봇을 넘겨받아 주저앉히지 않도록 엎드린 자세를 확인하는 구조입니다. 설정은 `config.yaml` 의 `handover`.
 
+넘겨받기 전 모터 명령은 보내지 않고, sport mode 가 **꺼진 것을 motion switcher 로 확인한 다음에만** 명령을 보냅니다.
+부팅 직후(젯슨 가동 180 초 이내)에는 sport mode 가 켜질 때까지 기다렸다가 5 초 안정 후 판단합니다.
+넘겨받은 뒤에도 1 초마다 확인해, sport mode 가 다시 켜지면 Passive → 해제 → 종료(서비스가 재시작)합니다.
+2026-10-21 첫 버전은 이 확인이 없어 재부팅 때 늦게 켜진 sport mode 와 모터를 동시에 잡아 떨림이 생겼습니다.
+
 ```
 전원 ON (엎드린 상태) → 제어기 자동 실행 → 엎드림 1 초 확인 → sport mode 해제 → Passive
   → L2+A 기립 → start 정책 → … → L2+A Stand → L2+A 앉기
@@ -133,6 +138,7 @@ sport mode 로 돌아가기: sudo systemctl stop go2-rl (또는 --uninstall) 후
 ```bash
 cd ~/go2_ws/go2-projects && git pull
 cd ~/go2_ws/unitree_cpp_deploy
+git checkout -- deploy/robots/go2/main.cpp deploy/include/FSM/FSMState.h   # 이전 버전 인계 패치를 적용했었다면 되돌림
 git apply --check ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-autostart-handover.patch && \
   git apply ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-autostart-handover.patch
 cd deploy/robots/go2 && cmake --build build -j$(nproc)
@@ -146,8 +152,8 @@ echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH" > ~/go2_ws/go2_ctrl.env     # doc
 ```bash
 ./build/go2_ctrl -n enP8p1s0
 ```
-1. `Handover: automatic ...` 후 서 있는 동안은 `waiting for the robot to lie down` 만 나오고 sport mode 가 유지되어야 정상.
-2. sport mode L2+A 두 번으로 엎드리기 → 약 1 초 뒤 `Releasing sport mode` → `FSM: Start Passive`.
+1. `Handover: motion switcher answers, active mode '...'` → `Handover: automatic ...` 후 서 있는 동안은 `waiting for the robot to lie down` 만 나오고 sport mode 가 유지되어야 정상.
+2. sport mode L2+A 두 번으로 엎드리기 → 약 1 초 뒤 `robot is lying` → `Sport mode: releasing ...` → `Sport mode: off (confirmed ...)` → `FSM: Start Passive`.
 3. 이후는 평소와 같음. 끝나면 앉히고 Ctrl+C.
 
 host 로 나와서 (Ctrl+P → Ctrl+Q) 서비스 등록:
@@ -170,6 +176,9 @@ tail -f ~/go2_ws/logs/autostart_*.log
 | 정책 교체 | `current` 심링크나 `config.yaml` 의 policy_dir 변경 후 `sudo systemctl restart go2-rl` |
 
 - 제어기가 비정상 종료되면 5초 뒤 다시 대기 상태로 뜹니다. 이미 sport mode 는 꺼져 있으므로 로봇은 힘이 빠진 상태입니다.
+- 로그에 `Guard: sport mode ... became active` 가 나오면 감시가 충돌을 막은 것입니다. 로봇 상태를 확인하고 원인(부팅 순서 등)을 기록하세요.
+- 재부팅 시험의 정상 로그 순서: `waiting for enP8p1s0` (있을 수 있음) → `motion switcher answers` → `host booted N s ago. Waiting for sport mode` →
+  `sport mode '...' is running. Letting it settle` → (서 있으면 엎드리게 함) → `robot is lying` → `Sport mode: off (confirmed ...)` → `FSM: Start Passive`.
 - 로그 CSV 는 이전과 같이 정책 폴더 `logs/` 에 쌓입니다. 디스크를 가끔 확인하세요.
 - 검증 범위: 인계 함수는 실제 SDK·DSL 헤더로 컴파일 확인. 전체 빌드와 실기 동작, systemd 서비스는 젯슨에서 처음 확인해야 합니다.
 

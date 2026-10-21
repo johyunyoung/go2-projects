@@ -4,14 +4,18 @@
 #   Stand    ──start──▶ Velocity          Stand ──L2+A──▶ FixSquat (current pose→crouch, 3 s) ──auto──▶ Passive
 #   L2+B from anywhere ──▶ Passive (emergency: damping only)
 # Handover (needs unitree_cpp_deploy-autostart-handover.patch), for boot autostart (jetson/autostart).
-# The controller only listens until the robot has been lying (all calves < lying_calf_max) for lying_hold_s,
-# then releases sport mode -> Passive. keys "" = automatic; or a combo such as "LB(2s) + RB(2s)" (L1+R1 2 s).
-# enabled: false = take over immediately at start as before.
+# The controller only listens (no motor command) until: the motion switcher answers; right after boot, sport mode
+# has started and settled (so it is released, not raced); the robot has been lying (all calves < lying_calf_max)
+# for lying_hold_s. Then sport mode is released and the release is confirmed -> Passive.
+# A guard keeps checking every 1 s: if sport mode comes back, force Passive, release it, exit (service restarts).
+# keys "" = automatic; or a combo such as "LB(2s) + RB(2s)" (L1+R1 2 s). enabled: false = old behaviour.
 handover:
   enabled: true
   keys: ""
   lying_calf_max: -2.3
   lying_hold_s: 1.0
+  boot_window_s: 180    # host uptime below this = just booted: wait for sport mode to appear first
+  sport_settle_s: 5     # after sport mode appears, let it finish (e.g. stand up) before judging the pose
 
 FSM:
   _:

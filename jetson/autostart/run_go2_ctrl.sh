@@ -25,4 +25,15 @@ if [ "${1:-}" = "--check" ]; then
 fi
 
 mkdir -p "$WS/logs"
-exec ./build/go2_ctrl -n "$NET_IF" >> "$WS/logs/autostart_$(date +%F_%H%M%S).log" 2>&1
+LOG="$WS/logs/autostart_$(date +%F_%H%M%S).log"
+# Wait for the DDS interface to be up with an IPv4 address (starting DDS too early crashed once at boot: exit 139)
+for i in $(seq 1 90); do
+    if [ "$(cat /sys/class/net/$NET_IF/operstate 2>/dev/null)" = "up" ] &&        { ! command -v ip >/dev/null || ip -4 addr show dev "$NET_IF" 2>/dev/null | grep -q inet; }; then
+        break
+    fi
+    [ "$i" = 1 ] && echo "$(date '+%F %T') waiting for $NET_IF ..." >> "$LOG"
+    sleep 1
+done
+echo "$(date '+%F %T') $NET_IF $(cat /sys/class/net/$NET_IF/operstate 2>/dev/null), uptime $(cut -d' ' -f1 /proc/uptime) s" >> "$LOG"
+sleep 2
+exec ./build/go2_ctrl -n "$NET_IF" >> "$LOG" 2>&1

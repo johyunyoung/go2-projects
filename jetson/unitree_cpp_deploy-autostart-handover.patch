@@ -1,27 +1,114 @@
+diff --git a/deploy/include/FSM/FSMState.h b/deploy/include/FSM/FSMState.h
+index cbbc2af..4a5962a 100644
+--- a/deploy/include/FSM/FSMState.h
++++ b/deploy/include/FSM/FSMState.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include <atomic>
+ #include "Types.h"
+ #include "param.h"
+ #include "FSM/BaseState.h"
+@@ -14,6 +15,14 @@ public:
+     {
+         spdlog::info("Initializing State_{} ...", state_string);
+ 
++        // highest priority: forced Passive (set by the sport-mode guard in main.cpp); latched until restart
++        registered_checks.emplace_back(
++            std::make_pair(
++                []()->bool{ return force_passive.load(); },
++                FSMStringMap.right.at("Passive")
++            )
++        );
++
+         auto transitions = param::config["FSM"][state_string]["transitions"];
+ 
+         if(transitions)
+@@ -67,4 +76,5 @@ public:
+     static std::unique_ptr<LowCmd_t> lowcmd;
+     static std::shared_ptr<LowState_t> lowstate;
+     static std::shared_ptr<Keyboard> keyboard;
++    inline static std::atomic<bool> force_passive{false};
+ };
+\ No newline at end of file
 diff --git a/deploy/robots/go2/main.cpp b/deploy/robots/go2/main.cpp
-index 03aeac6..a22db9b 100644
+index 03aeac6..543dde4 100644
 --- a/deploy/robots/go2/main.cpp
 +++ b/deploy/robots/go2/main.cpp
-@@ -3,10 +3,88 @@
+@@ -3,10 +3,211 @@
  #include "FSM/State_Fix.h"
  #include "FSM/State_RLBase.h"
  
 +#include <algorithm>
 +#include <chrono>
++#include <cstdlib>
++#include <fstream>
++#include <thread>
 +
  std::unique_ptr<LowCmd_t> FSMState::lowcmd = nullptr;
  std::shared_ptr<LowState_t> FSMState::lowstate = nullptr;
  std::shared_ptr<Keyboard> FSMState::keyboard = nullptr;
  
++using SteadyClock = std::chrono::steady_clock;
++using MotionSwitcher = unitree::robot::b2::MotionSwitcherClient;
++
++/* ---------- sport mode (Unitree high-level controller) helpers ---------- */
++
++// Kernel uptime. Inside the container this is the Jetson host uptime.
++static double host_uptime_s()
++{
++    std::ifstream f("/proc/uptime");
++    double up = 1e9;
++    f >> up;
++    return up;
++}
++
++// Ask the motion switcher which high-level mode is active ("" = none). False if the service did not answer.
++static bool query_sport_mode(MotionSwitcher& msc, std::string& name)
++{
++    std::string form;
++    name.clear();
++    return msc.CheckMode(form, name) == 0;
++}
++
++// Release sport mode and return only once the motion switcher confirms that no mode is active.
++// Never returns with sport mode still active: gives up (exit 4) instead of sharing the motors.
++static void release_sport_mode_confirmed(MotionSwitcher& msc)
++{
++    std::string name;
++    for (int attempt = 1; attempt <= 60; ++attempt)
++    {
++        if (!query_sport_mode(msc, name))
++        {
++            spdlog::warn("Sport mode: motion switcher did not answer (attempt {}), retrying", attempt);
++            usleep(500000);
++            continue;
++        }
++        if (name.empty())
++        {
++            spdlog::info("Sport mode: off (confirmed by motion switcher).");
++            return;
++        }
++        spdlog::info("Sport mode: releasing '{}' (attempt {})", name, attempt);
++        msc.ReleaseMode();
++        usleep(500000);
++    }
++    spdlog::critical("Sport mode: could not confirm release after 60 attempts. Not taking over the motors.");
++    spdlog::default_logger()->flush();
++    std::_Exit(4);
++}
++
 +/*
 + * Handover gate (config.yaml top-level key `handover`), for starting this controller at boot.
-+ * Unitree sport mode may already be standing the robot up. Taking the lowcmd channel then would drop it,
-+ * so we only listen to rt/lowstate here and release sport mode once the robot is lying down:
++ * Only rt/lowstate is read here; no motor command is sent until sport mode is confirmed off.
 + *   handover:
 + *     enabled: true
-+ *     keys: ""                     # "" = take over automatically; or a joystick DSL combo, e.g. "LB(2s) + RB(2s)"
-+ *     lying_calf_max: -2.3         # all four calf angles must be below this [rad] (robot lying down)
-+ *     lying_hold_s: 1.0            # ... continuously for this long (not mid stand-up / lie-down)
++ *     keys: ""                # "" = take over automatically; or a joystick DSL combo, e.g. "LB(2s) + RB(2s)"
++ *     lying_calf_max: -2.3    # all four calf angles must be below this [rad] (robot lying down)
++ *     lying_hold_s: 1.0       # ... continuously for this long (not mid stand-up / lie-down)
++ *     boot_window_s: 180      # if the host booted less than this ago, wait for sport mode to appear first,
++ *                             # so it is released instead of starting later and fighting over the motors
++ *     sport_settle_s: 5       # after sport mode appears, let it finish what it does (e.g. stand up) first
 + * Without the key (or enabled: false) the controller behaves as before.
 + */
 +void wait_for_handover()
@@ -32,6 +119,8 @@ index 03aeac6..a22db9b 100644
 +    const std::string keys = cfg["keys"] ? cfg["keys"].as<std::string>() : "";
 +    const float lying_calf_max = cfg["lying_calf_max"] ? cfg["lying_calf_max"].as<float>() : -2.3f;
 +    const float lying_hold_s = cfg["lying_hold_s"] ? cfg["lying_hold_s"].as<float>() : 1.0f;
++    const double boot_window_s = cfg["boot_window_s"] ? cfg["boot_window_s"].as<double>() : 180.0;
++    const double sport_settle_s = cfg["sport_settle_s"] ? cfg["sport_settle_s"].as<double>() : 5.0;
 +    std::function<bool(const unitree::common::UnitreeJoystick&)> combo =
 +        [](const unitree::common::UnitreeJoystick&) { return true; };
 +    if (!keys.empty())
@@ -44,6 +133,43 @@ index 03aeac6..a22db9b 100644
 +    auto state = std::make_shared<LowState_t>();
 +    spdlog::info("Handover: waiting for robot state...");
 +    state->wait_for_connection();
++
++    // 1. the motion switcher service must answer, otherwise we cannot know whether sport mode runs
++    MotionSwitcher msc;
++    msc.SetTimeout(2.0f);
++    msc.Init();
++    std::string mode;
++    auto last_msg = SteadyClock::now();
++    while (!query_sport_mode(msc, mode))
++    {
++        if (SteadyClock::now() - last_msg > std::chrono::seconds(10))
++        {
++            spdlog::info("Handover: waiting for the motion switcher service to answer...");
++            last_msg = SteadyClock::now();
++        }
++        usleep(500000);
++    }
++    spdlog::info("Handover: motion switcher answers, active mode '{}'.", mode);
++
++    // 2. just after boot sport mode may not be running yet: wait for it instead of racing it
++    if (mode.empty() && host_uptime_s() < boot_window_s)
++    {
++        spdlog::info("Handover: host booted {:.0f} s ago. Waiting for sport mode to start (until {:.0f} s) "
++                     "so it can be released before taking over.", host_uptime_s(), boot_window_s);
++        while (mode.empty() && host_uptime_s() < boot_window_s)
++        {
++            usleep(500000);
++            query_sport_mode(msc, mode);
++        }
++        if (mode.empty())
++            spdlog::warn("Handover: sport mode did not appear within the boot window. Continuing; the guard stays active.");
++    }
++    if (!mode.empty())
++    {
++        spdlog::info("Handover: sport mode '{}' is running. Letting it settle for {:.0f} s.", mode, sport_settle_s);
++        usleep(static_cast<useconds_t>(sport_settle_s * 1e6));
++    }
++
 +    if (keys.empty())
 +        spdlog::info("Handover: automatic. Taking over once the robot has been lying for {:.1f} s "
 +                     "(if sport mode stood it up: sport mode L2+A twice to lie down).", lying_hold_s);
@@ -51,14 +177,14 @@ index 03aeac6..a22db9b 100644
 +        spdlog::info("Handover: sport mode keeps control. Lay the robot down (sport mode L2+A twice), "
 +                     "then hold [{}] to switch to this controller.", keys);
 +
-+    using clock = std::chrono::steady_clock;
-+    auto last_msg = clock::now() - std::chrono::seconds(60);
-+    auto lying_since = clock::now();
++    // 3. robot lying (stable) [+ combo]
++    last_msg = SteadyClock::now() - std::chrono::seconds(60);
++    auto lying_since = SteadyClock::now();
 +    bool was_lying = false;
 +    while (true)
 +    {
 +        state->update();
-+        const auto now = clock::now();
++        const auto now = SteadyClock::now();
 +        float calf_max = -10.0f;
 +        for (int i : {2, 5, 8, 11}) calf_max = std::max(calf_max, static_cast<float>(state->msg_.motor_state()[i].q()));
 +        const bool lying = calf_max < lying_calf_max;
@@ -70,8 +196,8 @@ index 03aeac6..a22db9b 100644
 +        {
 +            if (lying_stable)
 +            {
-+                spdlog::info("Handover: robot is lying (max calf {:.2f} rad). Releasing sport mode.", calf_max);
-+                return;
++                spdlog::info("Handover: robot is lying (max calf {:.2f} rad).", calf_max);
++                break;
 +            }
 +            if (now - last_msg > std::chrono::seconds(keys.empty() ? 10 : 2))
 +            {
@@ -86,12 +212,42 @@ index 03aeac6..a22db9b 100644
 +        }
 +        usleep(20000);
 +    }
++
++    // 4. release sport mode and confirm before any motor command is sent
++    release_sport_mode_confirmed(msc);
++}
++
++/*
++ * Guard: while this controller runs, sport mode must stay off. If it becomes active (e.g. it started late),
++ * both would command the motors. Force Passive (damping), release sport mode, then exit so the service
++ * restarts the controller cleanly through the handover gate.
++ */
++void start_sport_mode_guard()
++{
++    std::thread([] {
++        MotionSwitcher msc;
++        msc.SetTimeout(2.0f);
++        msc.Init();
++        std::string name;
++        while (true)
++        {
++            sleep(1);
++            if (!query_sport_mode(msc, name) || name.empty()) continue;
++            spdlog::critical("Guard: sport mode '{}' became active while this controller runs. Forcing Passive.", name);
++            FSMState::force_passive = true;
++            release_sport_mode_confirmed(msc);
++            spdlog::critical("Guard: sport mode released. Exiting in 2 s; the service restarts the controller.");
++            spdlog::default_logger()->flush();
++            sleep(2);
++            std::_Exit(3);
++        }
++    }).detach();
 +}
 +
  void init_fsm_state()
  {
      auto lowcmd_sub = std::make_shared<unitree::robot::go2::subscription::LowCmd>();
-@@ -35,6 +113,7 @@ int main(int argc, char** argv)
+@@ -35,11 +236,13 @@ int main(int argc, char** argv)
      // Unitree DDS Config
      unitree::robot::ChannelFactory::Instance()->Init(0, vm["network"].as<std::string>());
  
@@ -99,3 +255,17 @@ index 03aeac6..a22db9b 100644
      init_fsm_state();
  
      // Initialize FSM from config
+     auto fsm = std::make_unique<CtrlFSM>(param::config["FSM"]);
+     fsm->start();
++    start_sport_mode_guard();
+ 
+     std::cout << "State transitions:\n";
+     std::cout << "  [L2 + A]: Passive -> FixStand, Velocity_* -> FixSquat, FixSquat -> FixStand\n";
+@@ -52,6 +255,6 @@ int main(int argc, char** argv)
+     {
+         sleep(1);
+     }
+-    
++
+     return 0;
+ }
