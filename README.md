@@ -595,27 +595,30 @@ cd ~/unitree_cpp_deploy/deploy/robots/go2 && ./build/go2_ctrl -n <인터페이�
 2. 바닥에 내려놓고 같은 순서. FixSquat 끝에 엎드린 자세로 안정적으로 내려앉는지.
 3. 보행 중 `L2+A` 로 Stand(제자리에 서는지) → `start` 로 재개 → `L2+A` 두 번으로 앉기. 그다음 낮은 단차 위에서 같은 것을 확인.
 
-### 5-6. 부팅 자동 실행 — 리모컨으로 sport mode 에서 넘겨받기
+### 5-6. 부팅 자동 실행 — 이 정책을 기본 보행으로 (sport mode 에서 자동 인계)
 
-5-4 의 저자 제어기를 젯슨 부팅 때 자동으로 띄웁니다. 제어기를 SSH 로 실행할 필요가 없어집니다.
-Unitree 기본 보행(sport mode)은 로봇 본체 펌웨어라 바꿀 수 없으므로, 부팅 직후에는 sport mode 가 로봇을 세우고
-내 제어기는 **대기만** 합니다. 로봇이 엎드려 있을 때 리모컨으로 신호를 주면 그때 sport mode 를 끄고 넘겨받습니다.
+5-4 의 저자 제어기를 젯슨 부팅 때 자동으로 띄워, Unitree 기본 보행(sport mode) 대신 이 정책을 기본 보행으로 씁니다.
+SSH 로 제어기를 실행할 필요가 없습니다. sport mode 자체는 로봇 본체 펌웨어라 지울 수 없으므로, 제어기가 **로봇이 엎드려 있는 것을 확인한 뒤**
+sport mode 를 끄고 넘겨받습니다.
 
 ```
-전원 ON → sport mode 기립 (평소처럼 사용 가능), 젯슨에서 제어기 자동 실행 (대기)
-  → sport mode L2+A 두 번 (엎드리기) → L1+R1 2초 → 내 제어기 Passive
-  → L2+A 기립 → start 정책 → … → L2+A Stand → L2+A 앉기
-sport mode 로 돌아가기: 재부팅
+전원 ON (로봇 엎드린 상태) → 젯슨 부팅 → 제어기 자동 실행
+  → 엎드린 자세가 1 초 유지되면 자동으로 sport mode 해제 → Passive
+  → L2+A 기립 → start 정책 → … → L2+A Stand → L2+A 앉기 (Passive)
+sport mode 가 먼저 로봇을 세웠다면: sport mode L2+A 두 번으로 엎드리게 하면 그때 넘겨받음
+sport mode 로 돌아가기: sudo systemctl stop go2-rl 후 재부팅 (RUNBOOK 9장)
 ```
 
-- **엎드려 있을 때만 넘겨받습니다.** 네 종아리 각도가 모두 −2.3 rad 보다 작아야 합니다. 서 있을 때 L1+R1 을 누르면 거부 로그만 남고 sport mode 가 유지됩니다.
-  서 있는 로봇에서 sport mode 를 끄면 힘이 빠져 주저앉기 때문입니다.
-- 조합·판정 각도는 `config.yaml` 의 `handover` 블록(`jetson/unitree_cpp_deploy-config.yaml`)에서 바꿉니다. `enabled: false` 면 예전처럼 실행 즉시 넘겨받습니다.
+- **엎드려 있을 때만 넘겨받습니다.** 네 종아리 각도가 모두 −2.3 rad 보다 작은 상태가 1 초 이어져야 합니다.
+  서 있는 로봇에서 sport mode 를 끄면 힘이 빠져 주저앉기 때문입니다. 서 있는 동안은 10 초마다 대기 로그만 남깁니다.
+- 설정은 `config.yaml` 의 `handover` 블록(`jetson/unitree_cpp_deploy-config.yaml`). `keys` 에 조합(예: `"LB(2s) + RB(2s)"`, L1+R1 2 초)을 넣으면
+  자동 대신 리모컨으로 넘겨받습니다. `enabled: false` 면 예전처럼 실행 즉시 넘겨받습니다.
+- 부팅 때 젯슨과 sport mode 중 누가 먼저 준비되는지는 실기에서 확인해야 합니다. 어느 쪽이든 위 흐름으로 넘겨받습니다.
 - 서비스를 등록한 뒤 SSH 로 제어기를 수동 실행할 때는 먼저 `sudo systemctl stop go2-rl`. 두 제어기가 동시에 돌면 안 됩니다.
 
 | 파일 | 내용 |
 |---|---|
-| `jetson/unitree_cpp_deploy-autostart-handover.patch` | main.cpp: rt/lowstate 만 듣고 기다리다가 인계 조건이 되면 sport mode 해제 → FSM 시작. startup-blend 패치와 함께 적용 |
+| `jetson/unitree_cpp_deploy-autostart-handover.patch` | main.cpp: rt/lowstate 만 듣고 기다리다가 엎드린 자세(와 선택적 리모컨 조합)를 확인하면 sport mode 해제 → FSM 시작. startup-blend 패치와 함께 적용 |
 | `jetson/autostart/go2-rl.service` | host systemd 서비스. 컨테이너를 켜고 그 안에서 제어기 실행, 비정상 종료 시 5 초 뒤 재시작(다시 대기) |
 | `jetson/autostart/run_go2_ctrl.sh` | 컨테이너 안 실행 스크립트. `--check` 로 바이너리·설정·라이브러리 점검, 콘솔 로그는 `~/go2_ws/logs/autostart_*.log` |
 | `jetson/autostart/install.sh` | host 에서 서비스 등록 (`--uninstall` 로 제거) |
@@ -710,4 +713,4 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 | 계단 sim2sim (go2_ctrl 체인) | **부분** — 5·8 cm 세트 통과, 그 뒤 조향 없이 코스 이탈. 사람이 조향하는 시험은 미실시 |
 | 젯슨 실기, 절차 A (기존 go2_ctrl) | **검증됨 (기동·정책 진입)** — 2026-10-19, unitree_rl_lab 4960b84, Jetson Docker 컨테이너. 지형 시험은 미실시 (`field-tests/`) |
 | 젯슨 빌드 / 실기, 절차 B (저자 제어기) | **검증됨** — 2026-10-21, 4f71bf3 + startup-blend 패치. 기립·정책·Stand·앉기, 계단·수풀 20 분 주행 (`field-tests/2026-10-21_…`) |
-| 부팅 자동 실행 + 리모컨 인계 (5-6) | **미실시** — 인계 패치의 리모컨 조합 해석만 SDK 헤더로 컴파일 확인. 젯슨 빌드·실기·systemd 는 처음 설치할 때 확인 |
+| 부팅 자동 실행 + 자동 인계 (5-6) | **미실시** — 인계 함수는 실제 SDK·DSL 헤더로 컴파일 확인. 젯슨 빌드·실기·systemd 는 처음 설치할 때 확인 |

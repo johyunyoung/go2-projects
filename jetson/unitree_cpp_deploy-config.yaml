@@ -3,13 +3,15 @@
 #   Velocity ──L2+A──▶ Stand  (same policy, commands clamped to 0: balances in place on any terrain)
 #   Stand    ──start──▶ Velocity          Stand ──L2+A──▶ FixSquat (current pose→crouch, 3 s) ──auto──▶ Passive
 #   L2+B from anywhere ──▶ Passive (emergency: damping only)
-# Handover (needs unitree_cpp_deploy-autostart-handover.patch): the controller listens only, sport mode keeps control,
-# until the robot is lying (all calves < lying_calf_max) and `keys` is held. Then sport mode is released -> Passive.
-# Required for boot autostart (jetson/autostart). Set enabled: false to take over immediately as before.
+# Handover (needs unitree_cpp_deploy-autostart-handover.patch), for boot autostart (jetson/autostart).
+# The controller only listens until the robot has been lying (all calves < lying_calf_max) for lying_hold_s,
+# then releases sport mode -> Passive. keys "" = automatic; or a combo such as "LB(2s) + RB(2s)" (L1+R1 2 s).
+# enabled: false = take over immediately at start as before.
 handover:
   enabled: true
-  keys: "LB(2s) + RB(2s)"   # hold L1 + R1 for 2 s
+  keys: ""
   lying_calf_max: -2.3
+  lying_hold_s: 1.0
 
 FSM:
   _:
