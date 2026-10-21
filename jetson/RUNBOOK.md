@@ -180,7 +180,8 @@ tail -f ~/go2_ws/logs/autostart_*.log
 - 재부팅 시험의 정상 로그 순서: `waiting for enP8p1s0` (있을 수 있음) → `motion switcher answers` → `host booted N s ago. Waiting for sport mode` →
   `sport mode '...' is running. Letting it settle` → (서 있으면 엎드리게 함) → `robot is lying` → `Sport mode: off (confirmed ...)` → `FSM: Start Passive`.
 - 로그 CSV 는 이전과 같이 정책 폴더 `logs/` 에 쌓입니다. 디스크를 가끔 확인하세요.
-- 검증 범위: 인계 함수는 실제 SDK·DSL 헤더로 컴파일 확인. 전체 빌드와 실기 동작, systemd 서비스는 젯슨에서 처음 확인해야 합니다.
+- 검증 범위 (2026-10-21): 수동 실행과 전원 재투입 후 서비스 실행 모두 sport mode('mcf') 감지 → 엎드림 확인 → 해제 확인 → Passive → 기립·정책·앉기 정상.
+- 전원을 켜면 Go2 가 먼저 일어서고, 젯슨·라우터는 1–2 분 더 걸립니다. 그동안 SSH 가 안 되는 것은 정상입니다.
 
 ## README와 다른 점
 

@@ -53,3 +53,7 @@
 | 16:42 | 재부팅: 첫 실행이 1 s 만에 exit 139 (DDS 초기화 시점 추정), 5 s 뒤 재시작 → 엎드림 확인 후 인계. 로그에 sport mode 해제(`[critical] ... lowcmd channel`) 없음 |
 | 16:43 | 로봇이 떨고 모터 소음, 정책 진입 6 s 만에 Passive. 원인: 인계 시점에 sport mode 가 아직 켜지기 전 → 해제하지 않고 인계 → 늦게 켜진 sport mode 와 두 제어기가 모터를 동시에 명령 |
 | 조치 | 서비스 중지·비활성화. 인계 패치 수정: motion switcher 로 sport mode 상태 직접 확인, 부팅 직후엔 sport mode 기동 대기 후 해제·확인, 인계 후 1 s 감시(재기동 시 Passive→해제→종료), 실행 스크립트에서 네트워크 대기 |
+| 17:01 | 수정 버전 수동 실행: `active mode 'mcf'` 감지 → 5 s 안정 → 엎드림 확인 → `releasing 'mcf'` → 0.6 s 만에 해제 확인 → Passive → 기립·정책·앉기 정상 |
+| 17:05 | 서비스 enable 후 전원 재투입. Go2 가 먼저 sport mode 로 기립, 젯슨 SSH 는 1–2 분 뒤 가능 |
+| 17:06–17:08 | 서비스: 서 있는 동안 대기 로그만 (calf −1.42 rad), 모터 명령 없음 → sport mode L2+A 두 번으로 엎드림 → 17:08:50 해제 확인 → Passive |
+| 17:08–17:09 | 기립 → 정책 → Stand → FixSquat → Passive, 떨림·감시 경고 없음. 부팅 자동 실행 검증 |
