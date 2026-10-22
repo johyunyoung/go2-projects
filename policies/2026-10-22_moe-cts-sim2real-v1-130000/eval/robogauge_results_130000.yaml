@@ -1,0 +1,5016 @@
+model_path: /home/cocel/refs/go2_rl_robotlab/logs/rsl_rl/go2_moe_cts/2026-10-21_18-33-12_sim2real_v1/jit_models/policy_jit_130000.pt
+summary:
+  ang_vel_err:
+    mean: 0.7223 ± 0.2292
+    mean@25: 0.6314 ± 0.2338
+    mean@50: 0.6648 ± 0.2261
+  dof_limits:
+    mean: 0.8439 ± 0.2492
+    mean@25: 0.8341 ± 0.2469
+    mean@50: 0.8378 ± 0.2477
+  dof_power:
+    mean: 0.8119 ± 0.2431
+    mean@25: 0.7614 ± 0.2349
+    mean@50: 0.7856 ± 0.2386
+  friction_margin:
+    mean: 0.7095 ± 0.2619
+    mean@25: 0.6249 ± 0.2792
+    mean@50: 0.6541 ± 0.2737
+  lin_vel_err:
+    mean: 0.7797 ± 0.2402
+    mean@25: 0.6969 ± 0.2389
+    mean@50: 0.7376 ± 0.2373
+  orientation_stability:
+    mean: 0.8390 ± 0.2475
+    mean@25: 0.8163 ± 0.2409
+    mean@50: 0.8268 ± 0.2439
+  torque_smoothness:
+    mean: 0.7953 ± 0.2419
+    mean@25: 0.7613 ± 0.2400
+    mean@50: 0.7749 ± 0.2405
+  zmp_margin:
+    mean: 0.8216 ± 0.2462
+    mean@25: 0.7701 ± 0.2421
+    mean@50: 0.7950 ± 0.2429
+robust_score:
+  flat:
+    mean: 0.7672 ± 0.0032
+    mean@25: 0.5857 ± 0.0095
+    mean@50: 0.6811 ± 0.0062
+  obstacle:
+    mean: 0.8580 ± 0.0059
+    mean@25: 0.7736 ± 0.0055
+    mean@50: 0.8068 ± 0.0057
+  slope_bd:
+    mean: 0.6087 ± 0.1087
+    mean@25: 0.5438 ± 0.0972
+    mean@50: 0.5757 ± 0.1030
+  slope_fd:
+    mean: 0.5918 ± 0.1020
+    mean@25: 0.5281 ± 0.0902
+    mean@50: 0.5604 ± 0.0965
+  stairs_bd:
+    mean: 0.8371 ± 0.0306
+    mean@25: 0.7552 ± 0.0293
+    mean@50: 0.7880 ± 0.0306
+  stairs_fd:
+    mean: 0.8724 ± 0.0041
+    mean@25: 0.7922 ± 0.0032
+    mean@50: 0.8207 ± 0.0040
+  wave:
+    mean: 0.6794 ± 0.0509
+    mean@25: 0.6026 ± 0.0500
+    mean@50: 0.6386 ± 0.0500
+benchmark_score: 0.6959015873015874
+scores:
+  flat: 0.681111111111111
+  obstacle: 0.8067555555555556
+  slope_bd: 0.5757333333333334
+  slope_fd: 0.5603777777777778
+  stairs_bd: 0.7880333333333334
+  stairs_fd: 0.8207
+  wave: 0.6386
+  benchmark: 0.6959015873015874
+flat_None_baseMass0_friction0.2:
+  success:
+    Seed_0_BaseMass_0_Friction_0.2: true
+    Seed_1_BaseMass_0_Friction_0.2: true
+    Seed_2_BaseMass_0_Friction_0.2: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.6307 ± 0.0040
+      mean@25: 0.3559 ± 0.0089
+      mean@50: 0.4919 ± 0.0060
+    terrain_quality_score:
+      mean: 0.6307 ± 0.0040
+      mean@25: 0.3559 ± 0.0089
+      mean@50: 0.4919 ± 0.0060
+    ang_vel_err:
+      mean: 0.6404 ± 0.0043
+      mean@25: 0.3348 ± 0.0086
+      mean@50: 0.4735 ± 0.0080
+    dof_limits:
+      mean: 0.9744 ± 0.0002
+      mean@25: 0.9494 ± 0.0007
+      mean@50: 0.9597 ± 0.0005
+    dof_power:
+      mean: 0.8602 ± 0.0030
+      mean@25: 0.7247 ± 0.0112
+      mean@50: 0.7882 ± 0.0062
+    friction_margin:
+      mean: 0.2741 ± 0.0049
+      mean@25: 0.0281 ± 0.0020
+      mean@50: 0.0767 ± 0.0026
+    lin_vel_err:
+      mean: 0.7202 ± 0.0030
+      mean@25: 0.4076 ± 0.0041
+      mean@50: 0.5641 ± 0.0034
+    orientation_stability:
+      mean: 0.9621 ± 0.0010
+      mean@25: 0.9167 ± 0.0012
+      mean@50: 0.9381 ± 0.0015
+    torque_smoothness:
+      mean: 0.7861 ± 0.0013
+      mean@25: 0.6748 ± 0.0060
+      mean@50: 0.7181 ± 0.0027
+    zmp_margin:
+      mean: 0.8669 ± 0.0030
+      mean@25: 0.6708 ± 0.0059
+      mean@50: 0.7710 ± 0.0048
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.6404 ± 0.0043
+      mean@25: 0.3348 ± 0.0086
+      mean@50: 0.4735 ± 0.0080
+    dof_limits:
+      mean: 0.9744 ± 0.0002
+      mean@25: 0.9494 ± 0.0007
+      mean@50: 0.9597 ± 0.0005
+    dof_power:
+      mean: 0.8602 ± 0.0030
+      mean@25: 0.7247 ± 0.0112
+      mean@50: 0.7882 ± 0.0062
+    friction_margin:
+      mean: 0.2741 ± 0.0049
+      mean@25: 0.0281 ± 0.0020
+      mean@50: 0.0767 ± 0.0026
+    lin_vel_err:
+      mean: 0.7202 ± 0.0030
+      mean@25: 0.4076 ± 0.0041
+      mean@50: 0.5641 ± 0.0034
+    orientation_stability:
+      mean: 0.9621 ± 0.0010
+      mean@25: 0.9167 ± 0.0012
+      mean@50: 0.9381 ± 0.0015
+    torque_smoothness:
+      mean: 0.7861 ± 0.0013
+      mean@25: 0.6748 ± 0.0060
+      mean@50: 0.7181 ± 0.0027
+    zmp_margin:
+      mean: 0.8669 ± 0.0030
+      mean@25: 0.6708 ± 0.0059
+      mean@50: 0.7710 ± 0.0048
+flat_None_baseMass0_friction0.3:
+  success:
+    Seed_0_BaseMass_0_Friction_0.3: true
+    Seed_1_BaseMass_0_Friction_0.3: true
+    Seed_2_BaseMass_0_Friction_0.3: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.7144 ± 0.0008
+      mean@25: 0.4877 ± 0.0027
+      mean@50: 0.6063 ± 0.0006
+    terrain_quality_score:
+      mean: 0.7144 ± 0.0008
+      mean@25: 0.4877 ± 0.0027
+      mean@50: 0.6063 ± 0.0006
+    ang_vel_err:
+      mean: 0.6905 ± 0.0021
+      mean@25: 0.4403 ± 0.0086
+      mean@50: 0.5546 ± 0.0039
+    dof_limits:
+      mean: 0.9758 ± 0.0003
+      mean@25: 0.9545 ± 0.0003
+      mean@50: 0.9631 ± 0.0002
+    dof_power:
+      mean: 0.8844 ± 0.0005
+      mean@25: 0.7767 ± 0.0016
+      mean@50: 0.8264 ± 0.0010
+    friction_margin:
+      mean: 0.3870 ± 0.0028
+      mean@25: 0.0794 ± 0.0014
+      mean@50: 0.1814 ± 0.0016
+    lin_vel_err:
+      mean: 0.7809 ± 0.0014
+      mean@25: 0.5072 ± 0.0023
+      mean@50: 0.6556 ± 0.0013
+    orientation_stability:
+      mean: 0.9626 ± 0.0008
+      mean@25: 0.9183 ± 0.0017
+      mean@50: 0.9393 ± 0.0013
+    torque_smoothness:
+      mean: 0.8036 ± 0.0029
+      mean@25: 0.7022 ± 0.0043
+      mean@50: 0.7422 ± 0.0039
+    zmp_margin:
+      mean: 0.8883 ± 0.0024
+      mean@25: 0.7312 ± 0.0066
+      mean@50: 0.8120 ± 0.0037
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.6905 ± 0.0021
+      mean@25: 0.4403 ± 0.0086
+      mean@50: 0.5546 ± 0.0039
+    dof_limits:
+      mean: 0.9758 ± 0.0003
+      mean@25: 0.9545 ± 0.0003
+      mean@50: 0.9631 ± 0.0002
+    dof_power:
+      mean: 0.8844 ± 0.0005
+      mean@25: 0.7767 ± 0.0016
+      mean@50: 0.8264 ± 0.0010
+    friction_margin:
+      mean: 0.3870 ± 0.0028
+      mean@25: 0.0794 ± 0.0014
+      mean@50: 0.1814 ± 0.0016
+    lin_vel_err:
+      mean: 0.7809 ± 0.0014
+      mean@25: 0.5072 ± 0.0023
+      mean@50: 0.6556 ± 0.0013
+    orientation_stability:
+      mean: 0.9626 ± 0.0008
+      mean@25: 0.9183 ± 0.0017
+      mean@50: 0.9393 ± 0.0013
+    torque_smoothness:
+      mean: 0.8036 ± 0.0029
+      mean@25: 0.7022 ± 0.0043
+      mean@50: 0.7422 ± 0.0039
+    zmp_margin:
+      mean: 0.8883 ± 0.0024
+      mean@25: 0.7312 ± 0.0066
+      mean@50: 0.8120 ± 0.0037
+flat_None_baseMass0_friction0.4:
+  success:
+    Seed_0_BaseMass_0_Friction_0.4: true
+    Seed_1_BaseMass_0_Friction_0.4: true
+    Seed_2_BaseMass_0_Friction_0.4: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.7563 ± 0.0014
+      mean@25: 0.5579 ± 0.0040
+      mean@50: 0.6645 ± 0.0027
+    terrain_quality_score:
+      mean: 0.7563 ± 0.0014
+      mean@25: 0.5579 ± 0.0040
+      mean@50: 0.6645 ± 0.0027
+    ang_vel_err:
+      mean: 0.7138 ± 0.0034
+      mean@25: 0.4828 ± 0.0043
+      mean@50: 0.5868 ± 0.0043
+    dof_limits:
+      mean: 0.9768 ± 0.0002
+      mean@25: 0.9567 ± 0.0002
+      mean@50: 0.9647 ± 0.0000
+    dof_power:
+      mean: 0.8930 ± 0.0007
+      mean@25: 0.7986 ± 0.0023
+      mean@50: 0.8406 ± 0.0010
+    friction_margin:
+      mean: 0.4895 ± 0.0015
+      mean@25: 0.1811 ± 0.0087
+      mean@50: 0.3008 ± 0.0053
+    lin_vel_err:
+      mean: 0.8049 ± 0.0021
+      mean@25: 0.5643 ± 0.0011
+      mean@50: 0.6948 ± 0.0023
+    orientation_stability:
+      mean: 0.9628 ± 0.0010
+      mean@25: 0.9210 ± 0.0018
+      mean@50: 0.9400 ± 0.0016
+    torque_smoothness:
+      mean: 0.8096 ± 0.0006
+      mean@25: 0.7186 ± 0.0022
+      mean@50: 0.7529 ± 0.0009
+    zmp_margin:
+      mean: 0.8964 ± 0.0025
+      mean@25: 0.7558 ± 0.0060
+      mean@50: 0.8268 ± 0.0040
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7138 ± 0.0034
+      mean@25: 0.4828 ± 0.0043
+      mean@50: 0.5868 ± 0.0043
+    dof_limits:
+      mean: 0.9768 ± 0.0002
+      mean@25: 0.9567 ± 0.0002
+      mean@50: 0.9647 ± 0.0000
+    dof_power:
+      mean: 0.8930 ± 0.0007
+      mean@25: 0.7986 ± 0.0023
+      mean@50: 0.8406 ± 0.0010
+    friction_margin:
+      mean: 0.4895 ± 0.0015
+      mean@25: 0.1811 ± 0.0087
+      mean@50: 0.3008 ± 0.0053
+    lin_vel_err:
+      mean: 0.8049 ± 0.0021
+      mean@25: 0.5643 ± 0.0011
+      mean@50: 0.6948 ± 0.0023
+    orientation_stability:
+      mean: 0.9628 ± 0.0010
+      mean@25: 0.9210 ± 0.0018
+      mean@50: 0.9400 ± 0.0016
+    torque_smoothness:
+      mean: 0.8096 ± 0.0006
+      mean@25: 0.7186 ± 0.0022
+      mean@50: 0.7529 ± 0.0009
+    zmp_margin:
+      mean: 0.8964 ± 0.0025
+      mean@25: 0.7558 ± 0.0060
+      mean@50: 0.8268 ± 0.0040
+flat_None_baseMass0_friction0.5:
+  success:
+    Seed_0_BaseMass_0_Friction_0.5: true
+    Seed_1_BaseMass_0_Friction_0.5: true
+    Seed_2_BaseMass_0_Friction_0.5: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.7809 ± 0.0040
+      mean@25: 0.6135 ± 0.0112
+      mean@50: 0.7028 ± 0.0065
+    terrain_quality_score:
+      mean: 0.7809 ± 0.0040
+      mean@25: 0.6135 ± 0.0112
+      mean@50: 0.7028 ± 0.0065
+    ang_vel_err:
+      mean: 0.7170 ± 0.0047
+      mean@25: 0.4913 ± 0.0113
+      mean@50: 0.5936 ± 0.0070
+    dof_limits:
+      mean: 0.9764 ± 0.0008
+      mean@25: 0.9578 ± 0.0014
+      mean@50: 0.9650 ± 0.0009
+    dof_power:
+      mean: 0.8942 ± 0.0002
+      mean@25: 0.8024 ± 0.0022
+      mean@50: 0.8428 ± 0.0008
+    friction_margin:
+      mean: 0.5628 ± 0.0091
+      mean@25: 0.2725 ± 0.0079
+      mean@50: 0.3936 ± 0.0109
+    lin_vel_err:
+      mean: 0.8195 ± 0.0007
+      mean@25: 0.6061 ± 0.0033
+      mean@50: 0.7219 ± 0.0017
+    orientation_stability:
+      mean: 0.9638 ± 0.0005
+      mean@25: 0.9225 ± 0.0012
+      mean@50: 0.9414 ± 0.0009
+    torque_smoothness:
+      mean: 0.8120 ± 0.0009
+      mean@25: 0.7248 ± 0.0028
+      mean@50: 0.7571 ± 0.0012
+    zmp_margin:
+      mean: 0.9012 ± 0.0045
+      mean@25: 0.7738 ± 0.0117
+      mean@50: 0.8361 ± 0.0074
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7170 ± 0.0047
+      mean@25: 0.4913 ± 0.0113
+      mean@50: 0.5936 ± 0.0070
+    dof_limits:
+      mean: 0.9764 ± 0.0008
+      mean@25: 0.9578 ± 0.0014
+      mean@50: 0.9650 ± 0.0009
+    dof_power:
+      mean: 0.8942 ± 0.0002
+      mean@25: 0.8024 ± 0.0022
+      mean@50: 0.8428 ± 0.0008
+    friction_margin:
+      mean: 0.5628 ± 0.0091
+      mean@25: 0.2725 ± 0.0079
+      mean@50: 0.3936 ± 0.0109
+    lin_vel_err:
+      mean: 0.8195 ± 0.0007
+      mean@25: 0.6061 ± 0.0033
+      mean@50: 0.7219 ± 0.0017
+    orientation_stability:
+      mean: 0.9638 ± 0.0005
+      mean@25: 0.9225 ± 0.0012
+      mean@50: 0.9414 ± 0.0009
+    torque_smoothness:
+      mean: 0.8120 ± 0.0009
+      mean@25: 0.7248 ± 0.0028
+      mean@50: 0.7571 ± 0.0012
+    zmp_margin:
+      mean: 0.9012 ± 0.0045
+      mean@25: 0.7738 ± 0.0117
+      mean@50: 0.8361 ± 0.0074
+flat_None_baseMass0_friction0.6:
+  success:
+    Seed_0_BaseMass_0_Friction_0.6: true
+    Seed_1_BaseMass_0_Friction_0.6: true
+    Seed_2_BaseMass_0_Friction_0.6: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.7964 ± 0.0028
+      mean@25: 0.6428 ± 0.0069
+      mean@50: 0.7241 ± 0.0047
+    terrain_quality_score:
+      mean: 0.7964 ± 0.0028
+      mean@25: 0.6428 ± 0.0069
+      mean@50: 0.7241 ± 0.0047
+    ang_vel_err:
+      mean: 0.7243 ± 0.0046
+      mean@25: 0.5109 ± 0.0050
+      mean@50: 0.6056 ± 0.0064
+    dof_limits:
+      mean: 0.9771 ± 0.0005
+      mean@25: 0.9581 ± 0.0007
+      mean@50: 0.9654 ± 0.0005
+    dof_power:
+      mean: 0.8954 ± 0.0008
+      mean@25: 0.8063 ± 0.0017
+      mean@50: 0.8450 ± 0.0010
+    friction_margin:
+      mean: 0.6249 ± 0.0038
+      mean@25: 0.3533 ± 0.0037
+      mean@50: 0.4752 ± 0.0022
+    lin_vel_err:
+      mean: 0.8258 ± 0.0028
+      mean@25: 0.6261 ± 0.0054
+      mean@50: 0.7332 ± 0.0040
+    orientation_stability:
+      mean: 0.9654 ± 0.0014
+      mean@25: 0.9264 ± 0.0017
+      mean@50: 0.9442 ± 0.0018
+    torque_smoothness:
+      mean: 0.8119 ± 0.0017
+      mean@25: 0.7228 ± 0.0016
+      mean@50: 0.7561 ± 0.0009
+    zmp_margin:
+      mean: 0.9027 ± 0.0025
+      mean@25: 0.7817 ± 0.0094
+      mean@50: 0.8405 ± 0.0050
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7243 ± 0.0046
+      mean@25: 0.5109 ± 0.0050
+      mean@50: 0.6056 ± 0.0064
+    dof_limits:
+      mean: 0.9771 ± 0.0005
+      mean@25: 0.9581 ± 0.0007
+      mean@50: 0.9654 ± 0.0005
+    dof_power:
+      mean: 0.8954 ± 0.0008
+      mean@25: 0.8063 ± 0.0017
+      mean@50: 0.8450 ± 0.0010
+    friction_margin:
+      mean: 0.6249 ± 0.0038
+      mean@25: 0.3533 ± 0.0037
+      mean@50: 0.4752 ± 0.0022
+    lin_vel_err:
+      mean: 0.8258 ± 0.0028
+      mean@25: 0.6261 ± 0.0054
+      mean@50: 0.7332 ± 0.0040
+    orientation_stability:
+      mean: 0.9654 ± 0.0014
+      mean@25: 0.9264 ± 0.0017
+      mean@50: 0.9442 ± 0.0018
+    torque_smoothness:
+      mean: 0.8119 ± 0.0017
+      mean@25: 0.7228 ± 0.0016
+      mean@50: 0.7561 ± 0.0009
+    zmp_margin:
+      mean: 0.9027 ± 0.0025
+      mean@25: 0.7817 ± 0.0094
+      mean@50: 0.8405 ± 0.0050
+flat_None_baseMass0_friction0.7:
+  success:
+    Seed_0_BaseMass_0_Friction_0.7: true
+    Seed_1_BaseMass_0_Friction_0.7: true
+    Seed_2_BaseMass_0_Friction_0.7: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.8007 ± 0.0006
+      mean@25: 0.6439 ± 0.0054
+      mean@50: 0.7279 ± 0.0017
+    terrain_quality_score:
+      mean: 0.8007 ± 0.0006
+      mean@25: 0.6439 ± 0.0054
+      mean@50: 0.7279 ± 0.0017
+    ang_vel_err:
+      mean: 0.7224 ± 0.0023
+      mean@25: 0.5008 ± 0.0068
+      mean@50: 0.6006 ± 0.0021
+    dof_limits:
+      mean: 0.9766 ± 0.0007
+      mean@25: 0.9579 ± 0.0003
+      mean@50: 0.9650 ± 0.0004
+    dof_power:
+      mean: 0.8954 ± 0.0010
+      mean@25: 0.8082 ± 0.0014
+      mean@50: 0.8456 ± 0.0011
+    friction_margin:
+      mean: 0.6668 ± 0.0054
+      mean@25: 0.4182 ± 0.0044
+      mean@50: 0.5291 ± 0.0059
+    lin_vel_err:
+      mean: 0.8285 ± 0.0007
+      mean@25: 0.6339 ± 0.0050
+      mean@50: 0.7374 ± 0.0017
+    orientation_stability:
+      mean: 0.9652 ± 0.0004
+      mean@25: 0.9255 ± 0.0011
+      mean@50: 0.9439 ± 0.0008
+    torque_smoothness:
+      mean: 0.8107 ± 0.0007
+      mean@25: 0.7205 ± 0.0022
+      mean@50: 0.7541 ± 0.0015
+    zmp_margin:
+      mean: 0.9000 ± 0.0007
+      mean@25: 0.7728 ± 0.0045
+      mean@50: 0.8351 ± 0.0020
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7224 ± 0.0023
+      mean@25: 0.5008 ± 0.0068
+      mean@50: 0.6006 ± 0.0021
+    dof_limits:
+      mean: 0.9766 ± 0.0007
+      mean@25: 0.9579 ± 0.0003
+      mean@50: 0.9650 ± 0.0004
+    dof_power:
+      mean: 0.8954 ± 0.0010
+      mean@25: 0.8082 ± 0.0014
+      mean@50: 0.8456 ± 0.0011
+    friction_margin:
+      mean: 0.6668 ± 0.0054
+      mean@25: 0.4182 ± 0.0044
+      mean@50: 0.5291 ± 0.0059
+    lin_vel_err:
+      mean: 0.8285 ± 0.0007
+      mean@25: 0.6339 ± 0.0050
+      mean@50: 0.7374 ± 0.0017
+    orientation_stability:
+      mean: 0.9652 ± 0.0004
+      mean@25: 0.9255 ± 0.0011
+      mean@50: 0.9439 ± 0.0008
+    torque_smoothness:
+      mean: 0.8107 ± 0.0007
+      mean@25: 0.7205 ± 0.0022
+      mean@50: 0.7541 ± 0.0015
+    zmp_margin:
+      mean: 0.9000 ± 0.0007
+      mean@25: 0.7728 ± 0.0045
+      mean@50: 0.8351 ± 0.0020
+flat_None_baseMass0_friction0.8:
+  success:
+    Seed_0_BaseMass_0_Friction_0.8: true
+    Seed_1_BaseMass_0_Friction_0.8: true
+    Seed_2_BaseMass_0_Friction_0.8: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.8073 ± 0.0037
+      mean@25: 0.6585 ± 0.0131
+      mean@50: 0.7379 ± 0.0072
+    terrain_quality_score:
+      mean: 0.8073 ± 0.0037
+      mean@25: 0.6585 ± 0.0131
+      mean@50: 0.7379 ± 0.0072
+    ang_vel_err:
+      mean: 0.7194 ± 0.0033
+      mean@25: 0.4913 ± 0.0093
+      mean@50: 0.5952 ± 0.0054
+    dof_limits:
+      mean: 0.9761 ± 0.0007
+      mean@25: 0.9565 ± 0.0005
+      mean@50: 0.9642 ± 0.0003
+    dof_power:
+      mean: 0.8947 ± 0.0006
+      mean@25: 0.8046 ± 0.0009
+      mean@50: 0.8438 ± 0.0009
+    friction_margin:
+      mean: 0.7061 ± 0.0031
+      mean@25: 0.4793 ± 0.0146
+      mean@50: 0.5825 ± 0.0065
+    lin_vel_err:
+      mean: 0.8283 ± 0.0019
+      mean@25: 0.6361 ± 0.0100
+      mean@50: 0.7389 ± 0.0044
+    orientation_stability:
+      mean: 0.9644 ± 0.0001
+      mean@25: 0.9245 ± 0.0009
+      mean@50: 0.9427 ± 0.0005
+    torque_smoothness:
+      mean: 0.8101 ± 0.0013
+      mean@25: 0.7214 ± 0.0011
+      mean@50: 0.7541 ± 0.0014
+    zmp_margin:
+      mean: 0.9054 ± 0.0016
+      mean@25: 0.7883 ± 0.0053
+      mean@50: 0.8446 ± 0.0040
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7194 ± 0.0033
+      mean@25: 0.4913 ± 0.0093
+      mean@50: 0.5952 ± 0.0054
+    dof_limits:
+      mean: 0.9761 ± 0.0007
+      mean@25: 0.9565 ± 0.0005
+      mean@50: 0.9642 ± 0.0003
+    dof_power:
+      mean: 0.8947 ± 0.0006
+      mean@25: 0.8046 ± 0.0009
+      mean@50: 0.8438 ± 0.0009
+    friction_margin:
+      mean: 0.7061 ± 0.0031
+      mean@25: 0.4793 ± 0.0146
+      mean@50: 0.5825 ± 0.0065
+    lin_vel_err:
+      mean: 0.8283 ± 0.0019
+      mean@25: 0.6361 ± 0.0100
+      mean@50: 0.7389 ± 0.0044
+    orientation_stability:
+      mean: 0.9644 ± 0.0001
+      mean@25: 0.9245 ± 0.0009
+      mean@50: 0.9427 ± 0.0005
+    torque_smoothness:
+      mean: 0.8101 ± 0.0013
+      mean@25: 0.7214 ± 0.0011
+      mean@50: 0.7541 ± 0.0014
+    zmp_margin:
+      mean: 0.9054 ± 0.0016
+      mean@25: 0.7883 ± 0.0053
+      mean@50: 0.8446 ± 0.0040
+flat_None_baseMass0_friction0.9:
+  success:
+    Seed_0_BaseMass_0_Friction_0.9: true
+    Seed_1_BaseMass_0_Friction_0.9: true
+    Seed_2_BaseMass_0_Friction_0.9: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.8071 ± 0.0043
+      mean@25: 0.6529 ± 0.0151
+      mean@50: 0.7347 ± 0.0086
+    terrain_quality_score:
+      mean: 0.8071 ± 0.0043
+      mean@25: 0.6529 ± 0.0151
+      mean@50: 0.7347 ± 0.0086
+    ang_vel_err:
+      mean: 0.7141 ± 0.0043
+      mean@25: 0.4829 ± 0.0107
+      mean@50: 0.5875 ± 0.0084
+    dof_limits:
+      mean: 0.9757 ± 0.0008
+      mean@25: 0.9555 ± 0.0011
+      mean@50: 0.9636 ± 0.0008
+    dof_power:
+      mean: 0.8928 ± 0.0012
+      mean@25: 0.7982 ± 0.0033
+      mean@50: 0.8402 ± 0.0021
+    friction_margin:
+      mean: 0.7295 ± 0.0037
+      mean@25: 0.5152 ± 0.0067
+      mean@50: 0.6148 ± 0.0045
+    lin_vel_err:
+      mean: 0.8270 ± 0.0026
+      mean@25: 0.6316 ± 0.0153
+      mean@50: 0.7363 ± 0.0072
+    orientation_stability:
+      mean: 0.9645 ± 0.0008
+      mean@25: 0.9249 ± 0.0005
+      mean@50: 0.9429 ± 0.0009
+    torque_smoothness:
+      mean: 0.8093 ± 0.0020
+      mean@25: 0.7208 ± 0.0023
+      mean@50: 0.7534 ± 0.0016
+    zmp_margin:
+      mean: 0.9036 ± 0.0002
+      mean@25: 0.7851 ± 0.0026
+      mean@50: 0.8416 ± 0.0011
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7141 ± 0.0043
+      mean@25: 0.4829 ± 0.0107
+      mean@50: 0.5875 ± 0.0084
+    dof_limits:
+      mean: 0.9757 ± 0.0008
+      mean@25: 0.9555 ± 0.0011
+      mean@50: 0.9636 ± 0.0008
+    dof_power:
+      mean: 0.8928 ± 0.0012
+      mean@25: 0.7982 ± 0.0033
+      mean@50: 0.8402 ± 0.0021
+    friction_margin:
+      mean: 0.7295 ± 0.0037
+      mean@25: 0.5152 ± 0.0067
+      mean@50: 0.6148 ± 0.0045
+    lin_vel_err:
+      mean: 0.8270 ± 0.0026
+      mean@25: 0.6316 ± 0.0153
+      mean@50: 0.7363 ± 0.0072
+    orientation_stability:
+      mean: 0.9645 ± 0.0008
+      mean@25: 0.9249 ± 0.0005
+      mean@50: 0.9429 ± 0.0009
+    torque_smoothness:
+      mean: 0.8093 ± 0.0020
+      mean@25: 0.7208 ± 0.0023
+      mean@50: 0.7534 ± 0.0016
+    zmp_margin:
+      mean: 0.9036 ± 0.0002
+      mean@25: 0.7851 ± 0.0026
+      mean@50: 0.8416 ± 0.0011
+flat_None_baseMass0_friction1.0:
+  success:
+    Seed_0_BaseMass_0_Friction_1.0: true
+    Seed_1_BaseMass_0_Friction_1.0: true
+    Seed_2_BaseMass_0_Friction_1.0: true
+  terrain_name: flat
+  terrain_level: 0
+  summary:
+    quality_score:
+      mean: 0.8109 ± 0.0033
+      mean@25: 0.6582 ± 0.0103
+      mean@50: 0.7399 ± 0.0069
+    terrain_quality_score:
+      mean: 0.8109 ± 0.0033
+      mean@25: 0.6582 ± 0.0103
+      mean@50: 0.7399 ± 0.0069
+    ang_vel_err:
+      mean: 0.7185 ± 0.0051
+      mean@25: 0.4917 ± 0.0131
+      mean@50: 0.5945 ± 0.0106
+    dof_limits:
+      mean: 0.9759 ± 0.0014
+      mean@25: 0.9567 ± 0.0021
+      mean@50: 0.9642 ± 0.0016
+    dof_power:
+      mean: 0.8951 ± 0.0019
+      mean@25: 0.8052 ± 0.0056
+      mean@50: 0.8442 ± 0.0037
+    friction_margin:
+      mean: 0.7551 ± 0.0027
+      mean@25: 0.5592 ± 0.0077
+      mean@50: 0.6519 ± 0.0048
+    lin_vel_err:
+      mean: 0.8250 ± 0.0025
+      mean@25: 0.6266 ± 0.0125
+      mean@50: 0.7326 ± 0.0053
+    orientation_stability:
+      mean: 0.9651 ± 0.0006
+      mean@25: 0.9255 ± 0.0024
+      mean@50: 0.9437 ± 0.0013
+    torque_smoothness:
+      mean: 0.8096 ± 0.0023
+      mean@25: 0.7194 ± 0.0025
+      mean@50: 0.7531 ± 0.0018
+    zmp_margin:
+      mean: 0.9034 ± 0.0021
+      mean@25: 0.7851 ± 0.0060
+      mean@50: 0.8417 ± 0.0034
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7185 ± 0.0051
+      mean@25: 0.4917 ± 0.0131
+      mean@50: 0.5945 ± 0.0106
+    dof_limits:
+      mean: 0.9759 ± 0.0014
+      mean@25: 0.9567 ± 0.0021
+      mean@50: 0.9642 ± 0.0016
+    dof_power:
+      mean: 0.8951 ± 0.0019
+      mean@25: 0.8052 ± 0.0056
+      mean@50: 0.8442 ± 0.0037
+    friction_margin:
+      mean: 0.7551 ± 0.0027
+      mean@25: 0.5592 ± 0.0077
+      mean@50: 0.6519 ± 0.0048
+    lin_vel_err:
+      mean: 0.8250 ± 0.0025
+      mean@25: 0.6266 ± 0.0125
+      mean@50: 0.7326 ± 0.0053
+    orientation_stability:
+      mean: 0.9651 ± 0.0006
+      mean@25: 0.9255 ± 0.0024
+      mean@50: 0.9437 ± 0.0013
+    torque_smoothness:
+      mean: 0.8096 ± 0.0023
+      mean@25: 0.7194 ± 0.0025
+      mean@50: 0.7531 ± 0.0018
+    zmp_margin:
+      mean: 0.9034 ± 0.0021
+      mean@25: 0.7851 ± 0.0060
+      mean@50: 0.8417 ± 0.0034
+obstacle_8_baseMass0_friction0.2:
+  success:
+    Seed_0_BaseMass_0_Friction_0.2: false
+    Seed_1_BaseMass_0_Friction_0.2: true
+    Seed_2_BaseMass_0_Friction_0.2: true
+  terrain_name: obstacle
+  terrain_level: 8
+  summary:
+    quality_score:
+      mean: 0.3766 ± 0.0046
+      mean@25: 0.0076 ± 0.0008
+      mean@50: 0.1206 ± 0.0083
+    terrain_quality_score:
+      mean: 0.7016 ± 0.0009
+      mean@25: 0.6315 ± 0.0002
+      mean@50: 0.6529 ± 0.0016
+    ang_vel_err:
+      mean: 0.3273 ± 0.0095
+      mean@25: 0.0001 ± 0.0001
+      mean@50: 0.0611 ± 0.0051
+    dof_limits:
+      mean: 0.9275 ± 0.0025
+      mean@25: 0.8761 ± 0.0029
+      mean@50: 0.8958 ± 0.0025
+    dof_power:
+      mean: 0.7555 ± 0.0030
+      mean@25: 0.4703 ± 0.0080
+      mean@50: 0.6105 ± 0.0041
+    friction_margin:
+      mean: 0.2832 ± 0.0062
+      mean@25: 0.0201 ± 0.0019
+      mean@50: 0.0540 ± 0.0020
+    lin_vel_err:
+      mean: 0.5749 ± 0.0134
+      mean@25: 0.2533 ± 0.0045
+      mean@50: 0.3799 ± 0.0137
+    orientation_stability:
+      mean: 0.9069 ± 0.0060
+      mean@25: 0.7729 ± 0.0184
+      mean@50: 0.8399 ± 0.0116
+    torque_smoothness:
+      mean: 0.7441 ± 0.0020
+      mean@25: 0.5939 ± 0.0022
+      mean@50: 0.6549 ± 0.0021
+    zmp_margin:
+      mean: 0.8486 ± 0.0042
+      mean@25: 0.6085 ± 0.0071
+      mean@50: 0.7296 ± 0.0063
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.6922 ± 0.0095
+      mean@25: 0.6300 ± 0.0001
+      mean@50: 0.6416 ± 0.0051
+    dof_limits:
+      mean: 0.8062 ± 0.0025
+      mean@25: 0.7965 ± 0.0029
+      mean@50: 0.8002 ± 0.0025
+    dof_power:
+      mean: 0.7735 ± 0.0030
+      mean@25: 0.7194 ± 0.0080
+      mean@50: 0.7460 ± 0.0041
+    friction_margin:
+      mean: 0.6838 ± 0.0062
+      mean@25: 0.6338 ± 0.0019
+      mean@50: 0.6403 ± 0.0020
+    lin_vel_err:
+      mean: 0.7392 ± 0.0134
+      mean@25: 0.6781 ± 0.0045
+      mean@50: 0.7022 ± 0.0137
+    orientation_stability:
+      mean: 0.8023 ± 0.0060
+      mean@25: 0.7769 ± 0.0184
+      mean@50: 0.7896 ± 0.0116
+    torque_smoothness:
+      mean: 0.7714 ± 0.0020
+      mean@25: 0.7428 ± 0.0022
+      mean@50: 0.7544 ± 0.0021
+    zmp_margin:
+      mean: 0.7912 ± 0.0042
+      mean@25: 0.7456 ± 0.0071
+      mean@50: 0.7686 ± 0.0063
+obstacle_10_baseMass0_friction0.3:
+  success:
+    Seed_0_BaseMass_0_Friction_0.3: true
+    Seed_1_BaseMass_0_Friction_0.3: true
+    Seed_2_BaseMass_0_Friction_0.3: true
+  terrain_name: obstacle
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4079 ± 0.0084
+      mean@25: 0.0088 ± 0.0009
+      mean@50: 0.1416 ± 0.0087
+    terrain_quality_score:
+      mean: 0.8875 ± 0.0016
+      mean@25: 0.8116 ± 0.0002
+      mean@50: 0.8369 ± 0.0017
+    ang_vel_err:
+      mean: 0.3335 ± 0.0125
+      mean@25: 0.0007 ± 0.0007
+      mean@50: 0.0689 ± 0.0084
+    dof_limits:
+      mean: 0.9241 ± 0.0023
+      mean@25: 0.8733 ± 0.0008
+      mean@50: 0.8920 ± 0.0019
+    dof_power:
+      mean: 0.7781 ± 0.0026
+      mean@25: 0.5240 ± 0.0100
+      mean@50: 0.6476 ± 0.0058
+    friction_margin:
+      mean: 0.3635 ± 0.0079
+      mean@25: 0.0323 ± 0.0014
+      mean@50: 0.1129 ± 0.0016
+    lin_vel_err:
+      mean: 0.6001 ± 0.0089
+      mean@25: 0.2420 ± 0.0034
+      mean@50: 0.3941 ± 0.0112
+    orientation_stability:
+      mean: 0.8886 ± 0.0011
+      mean@25: 0.7310 ± 0.0061
+      mean@50: 0.8095 ± 0.0026
+    torque_smoothness:
+      mean: 0.7619 ± 0.0020
+      mean@25: 0.6246 ± 0.0007
+      mean@50: 0.6807 ± 0.0011
+    zmp_margin:
+      mean: 0.8541 ± 0.0073
+      mean@25: 0.6272 ± 0.0154
+      mean@50: 0.7386 ± 0.0113
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8734 ± 0.0125
+      mean@25: 0.8101 ± 0.0007
+      mean@50: 0.8231 ± 0.0084
+    dof_limits:
+      mean: 0.9856 ± 0.0023
+      mean@25: 0.9759 ± 0.0008
+      mean@50: 0.9795 ± 0.0019
+    dof_power:
+      mean: 0.9578 ± 0.0026
+      mean@25: 0.9096 ± 0.0100
+      mean@50: 0.9331 ± 0.0058
+    friction_margin:
+      mean: 0.8791 ± 0.0079
+      mean@25: 0.8161 ± 0.0014
+      mean@50: 0.8314 ± 0.0016
+    lin_vel_err:
+      mean: 0.9240 ± 0.0089
+      mean@25: 0.8560 ± 0.0034
+      mean@50: 0.8849 ± 0.0112
+    orientation_stability:
+      mean: 0.9788 ± 0.0011
+      mean@25: 0.9489 ± 0.0061
+      mean@50: 0.9638 ± 0.0026
+    torque_smoothness:
+      mean: 0.9548 ± 0.0020
+      mean@25: 0.9287 ± 0.0007
+      mean@50: 0.9393 ± 0.0011
+    zmp_margin:
+      mean: 0.9723 ± 0.0073
+      mean@25: 0.9292 ± 0.0154
+      mean@50: 0.9503 ± 0.0113
+obstacle_10_baseMass0_friction0.4:
+  success:
+    Seed_0_BaseMass_0_Friction_0.4: true
+    Seed_1_BaseMass_0_Friction_0.4: false
+    Seed_2_BaseMass_0_Friction_0.4: true
+  terrain_name: obstacle
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4289 ± 0.0170
+      mean@25: 0.0103 ± 0.0027
+      mean@50: 0.1577 ± 0.0166
+    terrain_quality_score:
+      mean: 0.8915 ± 0.0033
+      mean@25: 0.8120 ± 0.0005
+      mean@50: 0.8400 ± 0.0032
+    ang_vel_err:
+      mean: 0.3387 ± 0.0202
+      mean@25: 0.0006 ± 0.0005
+      mean@50: 0.0768 ± 0.0102
+    dof_limits:
+      mean: 0.9223 ± 0.0023
+      mean@25: 0.8692 ± 0.0018
+      mean@50: 0.8889 ± 0.0020
+    dof_power:
+      mean: 0.7840 ± 0.0080
+      mean@25: 0.5279 ± 0.0106
+      mean@50: 0.6550 ± 0.0111
+    friction_margin:
+      mean: 0.4392 ± 0.0034
+      mean@25: 0.0901 ± 0.0047
+      mean@50: 0.2059 ± 0.0014
+    lin_vel_err:
+      mean: 0.6176 ± 0.0270
+      mean@25: 0.2684 ± 0.0335
+      mean@50: 0.4185 ± 0.0365
+    orientation_stability:
+      mean: 0.8944 ± 0.0023
+      mean@25: 0.7380 ± 0.0145
+      mean@50: 0.8189 ± 0.0053
+    torque_smoothness:
+      mean: 0.7647 ± 0.0033
+      mean@25: 0.6201 ± 0.0153
+      mean@50: 0.6800 ± 0.0092
+    zmp_margin:
+      mean: 0.8531 ± 0.0125
+      mean@25: 0.6350 ± 0.0327
+      mean@50: 0.7398 ± 0.0225
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8744 ± 0.0202
+      mean@25: 0.8101 ± 0.0005
+      mean@50: 0.8246 ± 0.0102
+    dof_limits:
+      mean: 0.9852 ± 0.0023
+      mean@25: 0.9751 ± 0.0018
+      mean@50: 0.9789 ± 0.0020
+    dof_power:
+      mean: 0.9590 ± 0.0080
+      mean@25: 0.9103 ± 0.0106
+      mean@50: 0.9344 ± 0.0111
+    friction_margin:
+      mean: 0.8934 ± 0.0034
+      mean@25: 0.8271 ± 0.0047
+      mean@50: 0.8491 ± 0.0014
+    lin_vel_err:
+      mean: 0.9273 ± 0.0270
+      mean@25: 0.8610 ± 0.0335
+      mean@50: 0.8895 ± 0.0365
+    orientation_stability:
+      mean: 0.9799 ± 0.0023
+      mean@25: 0.9502 ± 0.0145
+      mean@50: 0.9656 ± 0.0053
+    torque_smoothness:
+      mean: 0.9553 ± 0.0033
+      mean@25: 0.9278 ± 0.0153
+      mean@50: 0.9392 ± 0.0092
+    zmp_margin:
+      mean: 0.9721 ± 0.0125
+      mean@25: 0.9306 ± 0.0327
+      mean@50: 0.9506 ± 0.0225
+obstacle_10_baseMass0_friction0.5:
+  success:
+    Seed_0_BaseMass_0_Friction_0.5: true
+    Seed_1_BaseMass_0_Friction_0.5: true
+    Seed_2_BaseMass_0_Friction_0.5: true
+  terrain_name: obstacle
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4688 ± 0.0148
+      mean@25: 0.0119 ± 0.0017
+      mean@50: 0.1936 ± 0.0203
+    terrain_quality_score:
+      mean: 0.8991 ± 0.0028
+      mean@25: 0.8123 ± 0.0003
+      mean@50: 0.8468 ± 0.0038
+    ang_vel_err:
+      mean: 0.3566 ± 0.0085
+      mean@25: 0.0003 ± 0.0002
+      mean@50: 0.0841 ± 0.0107
+    dof_limits:
+      mean: 0.9265 ± 0.0040
+      mean@25: 0.8728 ± 0.0043
+      mean@50: 0.8923 ± 0.0050
+    dof_power:
+      mean: 0.7961 ± 0.0070
+      mean@25: 0.5471 ± 0.0160
+      mean@50: 0.6722 ± 0.0112
+    friction_margin:
+      mean: 0.5036 ± 0.0021
+      mean@25: 0.1592 ± 0.0061
+      mean@50: 0.2910 ± 0.0033
+    lin_vel_err:
+      mean: 0.6760 ± 0.0137
+      mean@25: 0.3496 ± 0.0236
+      mean@50: 0.5017 ± 0.0200
+    orientation_stability:
+      mean: 0.8899 ± 0.0058
+      mean@25: 0.7353 ± 0.0171
+      mean@50: 0.8108 ± 0.0112
+    torque_smoothness:
+      mean: 0.7722 ± 0.0068
+      mean@25: 0.6393 ± 0.0115
+      mean@50: 0.6939 ± 0.0089
+    zmp_margin:
+      mean: 0.8746 ± 0.0047
+      mean@25: 0.6913 ± 0.0099
+      mean@50: 0.7792 ± 0.0072
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8778 ± 0.0085
+      mean@25: 0.8101 ± 0.0002
+      mean@50: 0.8260 ± 0.0107
+    dof_limits:
+      mean: 0.9860 ± 0.0040
+      mean@25: 0.9758 ± 0.0043
+      mean@50: 0.9795 ± 0.0050
+    dof_power:
+      mean: 0.9613 ± 0.0070
+      mean@25: 0.9139 ± 0.0160
+      mean@50: 0.9377 ± 0.0112
+    friction_margin:
+      mean: 0.9057 ± 0.0021
+      mean@25: 0.8403 ± 0.0061
+      mean@50: 0.8653 ± 0.0033
+    lin_vel_err:
+      mean: 0.9384 ± 0.0137
+      mean@25: 0.8764 ± 0.0236
+      mean@50: 0.9053 ± 0.0200
+    orientation_stability:
+      mean: 0.9791 ± 0.0058
+      mean@25: 0.9497 ± 0.0171
+      mean@50: 0.9640 ± 0.0112
+    torque_smoothness:
+      mean: 0.9567 ± 0.0068
+      mean@25: 0.9315 ± 0.0115
+      mean@50: 0.9418 ± 0.0089
+    zmp_margin:
+      mean: 0.9762 ± 0.0047
+      mean@25: 0.9414 ± 0.0099
+      mean@50: 0.9580 ± 0.0072
+obstacle_10_baseMass0_friction0.6:
+  success:
+    Seed_0_BaseMass_0_Friction_0.6: false
+    Seed_1_BaseMass_0_Friction_0.6: true
+    Seed_2_BaseMass_0_Friction_0.6: true
+  terrain_name: obstacle
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4931 ± 0.0107
+      mean@25: 0.0207 ± 0.0077
+      mean@50: 0.2257 ± 0.0212
+    terrain_quality_score:
+      mean: 0.9037 ± 0.0020
+      mean@25: 0.8139 ± 0.0015
+      mean@50: 0.8529 ± 0.0040
+    ang_vel_err:
+      mean: 0.3708 ± 0.0038
+      mean@25: 0.0012 ± 0.0010
+      mean@50: 0.1049 ± 0.0066
+    dof_limits:
+      mean: 0.9270 ± 0.0013
+      mean@25: 0.8740 ± 0.0009
+      mean@50: 0.8935 ± 0.0006
+    dof_power:
+      mean: 0.7958 ± 0.0039
+      mean@25: 0.5496 ± 0.0094
+      mean@50: 0.6725 ± 0.0071
+    friction_margin:
+      mean: 0.5671 ± 0.0113
+      mean@25: 0.2382 ± 0.0127
+      mean@50: 0.3689 ± 0.0123
+    lin_vel_err:
+      mean: 0.6746 ± 0.0109
+      mean@25: 0.3286 ± 0.0213
+      mean@50: 0.4921 ± 0.0188
+    orientation_stability:
+      mean: 0.9027 ± 0.0083
+      mean@25: 0.7583 ± 0.0138
+      mean@50: 0.8323 ± 0.0129
+    torque_smoothness:
+      mean: 0.7736 ± 0.0030
+      mean@25: 0.6445 ± 0.0072
+      mean@50: 0.6972 ± 0.0049
+    zmp_margin:
+      mean: 0.8784 ± 0.0045
+      mean@25: 0.7028 ± 0.0097
+      mean@50: 0.7862 ± 0.0070
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8805 ± 0.0038
+      mean@25: 0.8102 ± 0.0010
+      mean@50: 0.8299 ± 0.0066
+    dof_limits:
+      mean: 0.9861 ± 0.0013
+      mean@25: 0.9761 ± 0.0009
+      mean@50: 0.9798 ± 0.0006
+    dof_power:
+      mean: 0.9612 ± 0.0039
+      mean@25: 0.9144 ± 0.0094
+      mean@50: 0.9378 ± 0.0071
+    friction_margin:
+      mean: 0.9178 ± 0.0113
+      mean@25: 0.8553 ± 0.0127
+      mean@50: 0.8801 ± 0.0123
+    lin_vel_err:
+      mean: 0.9382 ± 0.0109
+      mean@25: 0.8724 ± 0.0213
+      mean@50: 0.9035 ± 0.0188
+    orientation_stability:
+      mean: 0.9815 ± 0.0083
+      mean@25: 0.9541 ± 0.0138
+      mean@50: 0.9681 ± 0.0129
+    torque_smoothness:
+      mean: 0.9570 ± 0.0030
+      mean@25: 0.9324 ± 0.0072
+      mean@50: 0.9425 ± 0.0049
+    zmp_margin:
+      mean: 0.9769 ± 0.0045
+      mean@25: 0.9435 ± 0.0097
+      mean@50: 0.9594 ± 0.0070
+obstacle_10_baseMass0_friction0.7:
+  success:
+    Seed_0_BaseMass_0_Friction_0.7: true
+    Seed_1_BaseMass_0_Friction_0.7: true
+    Seed_2_BaseMass_0_Friction_0.7: true
+  terrain_name: obstacle
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4818 ± 0.0015
+      mean@25: 0.0187 ± 0.0073
+      mean@50: 0.2012 ± 0.0068
+    terrain_quality_score:
+      mean: 0.9015 ± 0.0003
+      mean@25: 0.8136 ± 0.0014
+      mean@50: 0.8482 ± 0.0013
+    ang_vel_err:
+      mean: 0.3554 ± 0.0033
+      mean@25: 0.0012 ± 0.0009
+      mean@50: 0.0819 ± 0.0035
+    dof_limits:
+      mean: 0.9249 ± 0.0006
+      mean@25: 0.8720 ± 0.0017
+      mean@50: 0.8910 ± 0.0012
+    dof_power:
+      mean: 0.8032 ± 0.0012
+      mean@25: 0.5582 ± 0.0103
+      mean@50: 0.6833 ± 0.0031
+    friction_margin:
+      mean: 0.6060 ± 0.0035
+      mean@25: 0.2817 ± 0.0087
+      mean@50: 0.4205 ± 0.0055
+    lin_vel_err:
+      mean: 0.6799 ± 0.0066
+      mean@25: 0.3376 ± 0.0191
+      mean@50: 0.5010 ± 0.0147
+    orientation_stability:
+      mean: 0.8944 ± 0.0022
+      mean@25: 0.7430 ± 0.0062
+      mean@50: 0.8192 ± 0.0039
+    torque_smoothness:
+      mean: 0.7727 ± 0.0018
+      mean@25: 0.6392 ± 0.0056
+      mean@50: 0.6945 ± 0.0037
+    zmp_margin:
+      mean: 0.8698 ± 0.0011
+      mean@25: 0.6831 ± 0.0074
+      mean@50: 0.7719 ± 0.0019
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8775 ± 0.0033
+      mean@25: 0.8102 ± 0.0009
+      mean@50: 0.8256 ± 0.0035
+    dof_limits:
+      mean: 0.9857 ± 0.0006
+      mean@25: 0.9757 ± 0.0017
+      mean@50: 0.9793 ± 0.0012
+    dof_power:
+      mean: 0.9626 ± 0.0012
+      mean@25: 0.9161 ± 0.0103
+      mean@50: 0.9398 ± 0.0031
+    friction_margin:
+      mean: 0.9251 ± 0.0035
+      mean@25: 0.8635 ± 0.0087
+      mean@50: 0.8899 ± 0.0055
+    lin_vel_err:
+      mean: 0.9392 ± 0.0066
+      mean@25: 0.8742 ± 0.0191
+      mean@50: 0.9052 ± 0.0147
+    orientation_stability:
+      mean: 0.9799 ± 0.0022
+      mean@25: 0.9512 ± 0.0062
+      mean@50: 0.9656 ± 0.0039
+    torque_smoothness:
+      mean: 0.9568 ± 0.0018
+      mean@25: 0.9314 ± 0.0056
+      mean@50: 0.9419 ± 0.0037
+    zmp_margin:
+      mean: 0.9753 ± 0.0011
+      mean@25: 0.9398 ± 0.0074
+      mean@50: 0.9567 ± 0.0019
+obstacle_10_baseMass0_friction0.8:
+  success:
+    Seed_0_BaseMass_0_Friction_0.8: true
+    Seed_1_BaseMass_0_Friction_0.8: true
+    Seed_2_BaseMass_0_Friction_0.8: true
+  terrain_name: obstacle
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5018 ± 0.0081
+      mean@25: 0.0309 ± 0.0146
+      mean@50: 0.2331 ± 0.0145
+    terrain_quality_score:
+      mean: 0.9053 ± 0.0016
+      mean@25: 0.8159 ± 0.0028
+      mean@50: 0.8543 ± 0.0028
+    ang_vel_err:
+      mean: 0.3644 ± 0.0092
+      mean@25: 0.0026 ± 0.0019
+      mean@50: 0.0947 ± 0.0097
+    dof_limits:
+      mean: 0.9240 ± 0.0037
+      mean@25: 0.8712 ± 0.0061
+      mean@50: 0.8901 ± 0.0055
+    dof_power:
+      mean: 0.8073 ± 0.0032
+      mean@25: 0.5760 ± 0.0108
+      mean@50: 0.6922 ± 0.0060
+    friction_margin:
+      mean: 0.6429 ± 0.0031
+      mean@25: 0.3431 ± 0.0050
+      mean@50: 0.4747 ± 0.0038
+    lin_vel_err:
+      mean: 0.6863 ± 0.0004
+      mean@25: 0.3477 ± 0.0160
+      mean@50: 0.5092 ± 0.0038
+    orientation_stability:
+      mean: 0.8906 ± 0.0084
+      mean@25: 0.7388 ± 0.0267
+      mean@50: 0.8128 ± 0.0163
+    torque_smoothness:
+      mean: 0.7743 ± 0.0018
+      mean@25: 0.6469 ± 0.0055
+      mean@50: 0.6986 ± 0.0029
+    zmp_margin:
+      mean: 0.8729 ± 0.0037
+      mean@25: 0.6995 ± 0.0147
+      mean@50: 0.7809 ± 0.0075
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8792 ± 0.0092
+      mean@25: 0.8105 ± 0.0019
+      mean@50: 0.8280 ± 0.0097
+    dof_limits:
+      mean: 0.9856 ± 0.0037
+      mean@25: 0.9755 ± 0.0061
+      mean@50: 0.9791 ± 0.0055
+    dof_power:
+      mean: 0.9634 ± 0.0032
+      mean@25: 0.9194 ± 0.0108
+      mean@50: 0.9415 ± 0.0060
+    friction_margin:
+      mean: 0.9322 ± 0.0031
+      mean@25: 0.8752 ± 0.0050
+      mean@50: 0.9002 ± 0.0038
+    lin_vel_err:
+      mean: 0.9404 ± 0.0004
+      mean@25: 0.8761 ± 0.0160
+      mean@50: 0.9068 ± 0.0038
+    orientation_stability:
+      mean: 0.9792 ± 0.0084
+      mean@25: 0.9504 ± 0.0267
+      mean@50: 0.9644 ± 0.0163
+    torque_smoothness:
+      mean: 0.9571 ± 0.0018
+      mean@25: 0.9329 ± 0.0055
+      mean@50: 0.9427 ± 0.0029
+    zmp_margin:
+      mean: 0.9759 ± 0.0037
+      mean@25: 0.9429 ± 0.0147
+      mean@50: 0.9584 ± 0.0075
+obstacle_8_baseMass0_friction0.9:
+  success:
+    Seed_0_BaseMass_0_Friction_0.9: true
+    Seed_1_BaseMass_0_Friction_0.9: true
+    Seed_2_BaseMass_0_Friction_0.9: true
+  terrain_name: obstacle
+  terrain_level: 8
+  summary:
+    quality_score:
+      mean: 0.5256 ± 0.0067
+      mean@25: 0.0435 ± 0.0199
+      mean@50: 0.2625 ± 0.0124
+    terrain_quality_score:
+      mean: 0.7299 ± 0.0013
+      mean@25: 0.6383 ± 0.0038
+      mean@50: 0.6799 ± 0.0024
+    ang_vel_err:
+      mean: 0.3792 ± 0.0069
+      mean@25: 0.0065 ± 0.0049
+      mean@50: 0.1121 ± 0.0087
+    dof_limits:
+      mean: 0.9330 ± 0.0020
+      mean@25: 0.8817 ± 0.0029
+      mean@50: 0.9014 ± 0.0025
+    dof_power:
+      mean: 0.8047 ± 0.0082
+      mean@25: 0.5706 ± 0.0194
+      mean@50: 0.6901 ± 0.0132
+    friction_margin:
+      mean: 0.6790 ± 0.0076
+      mean@25: 0.3939 ± 0.0067
+      mean@50: 0.5254 ± 0.0072
+    lin_vel_err:
+      mean: 0.7212 ± 0.0071
+      mean@25: 0.4249 ± 0.0155
+      mean@50: 0.5700 ± 0.0108
+    orientation_stability:
+      mean: 0.9141 ± 0.0012
+      mean@25: 0.7982 ± 0.0028
+      mean@50: 0.8560 ± 0.0014
+    torque_smoothness:
+      mean: 0.7735 ± 0.0031
+      mean@25: 0.6470 ± 0.0064
+      mean@50: 0.6998 ± 0.0046
+    zmp_margin:
+      mean: 0.8789 ± 0.0021
+      mean@25: 0.7104 ± 0.0074
+      mean@50: 0.7896 ± 0.0038
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7020 ± 0.0069
+      mean@25: 0.6312 ± 0.0049
+      mean@50: 0.6513 ± 0.0087
+    dof_limits:
+      mean: 0.8073 ± 0.0020
+      mean@25: 0.7975 ± 0.0029
+      mean@50: 0.8013 ± 0.0025
+    dof_power:
+      mean: 0.7829 ± 0.0082
+      mean@25: 0.7384 ± 0.0194
+      mean@50: 0.7611 ± 0.0132
+    friction_margin:
+      mean: 0.7590 ± 0.0076
+      mean@25: 0.7048 ± 0.0067
+      mean@50: 0.7298 ± 0.0072
+    lin_vel_err:
+      mean: 0.7670 ± 0.0071
+      mean@25: 0.7107 ± 0.0155
+      mean@50: 0.7383 ± 0.0108
+    orientation_stability:
+      mean: 0.8037 ± 0.0012
+      mean@25: 0.7817 ± 0.0028
+      mean@50: 0.7926 ± 0.0014
+    torque_smoothness:
+      mean: 0.7770 ± 0.0031
+      mean@25: 0.7529 ± 0.0064
+      mean@50: 0.7630 ± 0.0046
+    zmp_margin:
+      mean: 0.7970 ± 0.0021
+      mean@25: 0.7650 ± 0.0074
+      mean@50: 0.7800 ± 0.0038
+obstacle_10_baseMass0_friction1.0:
+  success:
+    Seed_0_BaseMass_0_Friction_1.0: true
+    Seed_1_BaseMass_0_Friction_1.0: true
+    Seed_2_BaseMass_0_Friction_1.0: true
+  terrain_name: obstacle
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4844 ± 0.0064
+      mean@25: 0.0158 ± 0.0050
+      mean@50: 0.2048 ± 0.0098
+    terrain_quality_score:
+      mean: 0.9020 ± 0.0012
+      mean@25: 0.8130 ± 0.0010
+      mean@50: 0.8489 ± 0.0019
+    ang_vel_err:
+      mean: 0.3546 ± 0.0082
+      mean@25: 0.0012 ± 0.0008
+      mean@50: 0.0881 ± 0.0098
+    dof_limits:
+      mean: 0.9223 ± 0.0012
+      mean@25: 0.8694 ± 0.0005
+      mean@50: 0.8884 ± 0.0008
+    dof_power:
+      mean: 0.7957 ± 0.0025
+      mean@25: 0.5544 ± 0.0026
+      mean@50: 0.6742 ± 0.0036
+    friction_margin:
+      mean: 0.6871 ± 0.0036
+      mean@25: 0.3986 ± 0.0143
+      mean@50: 0.5319 ± 0.0083
+    lin_vel_err:
+      mean: 0.6632 ± 0.0090
+      mean@25: 0.3124 ± 0.0008
+      mean@50: 0.4764 ± 0.0123
+    orientation_stability:
+      mean: 0.8876 ± 0.0074
+      mean@25: 0.7334 ± 0.0227
+      mean@50: 0.8083 ± 0.0153
+    torque_smoothness:
+      mean: 0.7698 ± 0.0014
+      mean@25: 0.6372 ± 0.0051
+      mean@50: 0.6921 ± 0.0033
+    zmp_margin:
+      mean: 0.8650 ± 0.0006
+      mean@25: 0.6781 ± 0.0092
+      mean@50: 0.7667 ± 0.0022
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8774 ± 0.0082
+      mean@25: 0.8102 ± 0.0008
+      mean@50: 0.8267 ± 0.0098
+    dof_limits:
+      mean: 0.9852 ± 0.0012
+      mean@25: 0.9752 ± 0.0005
+      mean@50: 0.9788 ± 0.0008
+    dof_power:
+      mean: 0.9612 ± 0.0025
+      mean@25: 0.9153 ± 0.0026
+      mean@50: 0.9381 ± 0.0036
+    friction_margin:
+      mean: 0.9405 ± 0.0036
+      mean@25: 0.8857 ± 0.0143
+      mean@50: 0.9111 ± 0.0083
+    lin_vel_err:
+      mean: 0.9360 ± 0.0090
+      mean@25: 0.8694 ± 0.0008
+      mean@50: 0.9005 ± 0.0123
+    orientation_stability:
+      mean: 0.9786 ± 0.0074
+      mean@25: 0.9493 ± 0.0227
+      mean@50: 0.9636 ± 0.0153
+    torque_smoothness:
+      mean: 0.9563 ± 0.0014
+      mean@25: 0.9311 ± 0.0051
+      mean@50: 0.9415 ± 0.0033
+    zmp_margin:
+      mean: 0.9743 ± 0.0006
+      mean@25: 0.9388 ± 0.0092
+      mean@50: 0.9557 ± 0.0022
+slope_bd_0_baseMass0_friction0.2: null
+slope_bd_2_baseMass0_friction0.3:
+  success:
+    Seed_0_BaseMass_0_Friction_0.3: true
+    Seed_1_BaseMass_0_Friction_0.3: true
+    Seed_2_BaseMass_0_Friction_0.3: true
+  terrain_name: slope_bd
+  terrain_level: 2
+  summary:
+    quality_score:
+      mean: 0.5523 ± 0.0087
+      mean@25: 0.2219 ± 0.0178
+      mean@50: 0.3791 ± 0.0116
+    terrain_quality_score:
+      mean: 0.1949 ± 0.0017
+      mean@25: 0.1322 ± 0.0034
+      mean@50: 0.1620 ± 0.0022
+    ang_vel_err:
+      mean: 0.5367 ± 0.0096
+      mean@25: 0.1472 ± 0.0127
+      mean@50: 0.3193 ± 0.0120
+    dof_limits:
+      mean: 0.9768 ± 0.0005
+      mean@25: 0.9445 ± 0.0013
+      mean@50: 0.9595 ± 0.0009
+    dof_power:
+      mean: 0.8632 ± 0.0020
+      mean@25: 0.6865 ± 0.0029
+      mean@50: 0.7734 ± 0.0021
+    friction_margin:
+      mean: 0.2360 ± 0.0070
+      mean@25: 0.0090 ± 0.0007
+      mean@50: 0.0365 ± 0.0020
+    lin_vel_err:
+      mean: 0.6898 ± 0.0056
+      mean@25: 0.3604 ± 0.0055
+      mean@50: 0.5172 ± 0.0089
+    orientation_stability:
+      mean: 0.9578 ± 0.0008
+      mean@25: 0.9020 ± 0.0017
+      mean@50: 0.9297 ± 0.0015
+    torque_smoothness:
+      mean: 0.7966 ± 0.0024
+      mean@25: 0.6714 ± 0.0033
+      mean@50: 0.7214 ± 0.0021
+    zmp_margin:
+      mean: 0.8693 ± 0.0031
+      mean@25: 0.6694 ± 0.0090
+      mean@50: 0.7717 ± 0.0055
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.1920 ± 0.0096
+      mean@25: 0.1180 ± 0.0127
+      mean@50: 0.1507 ± 0.0120
+    dof_limits:
+      mean: 0.2756 ± 0.0005
+      mean@25: 0.2695 ± 0.0013
+      mean@50: 0.2723 ± 0.0009
+    dof_power:
+      mean: 0.2540 ± 0.0020
+      mean@25: 0.2204 ± 0.0029
+      mean@50: 0.2369 ± 0.0021
+    friction_margin:
+      mean: 0.1348 ± 0.0070
+      mean@25: 0.0917 ± 0.0007
+      mean@50: 0.0969 ± 0.0020
+    lin_vel_err:
+      mean: 0.2211 ± 0.0056
+      mean@25: 0.1585 ± 0.0055
+      mean@50: 0.1883 ± 0.0089
+    orientation_stability:
+      mean: 0.2720 ± 0.0008
+      mean@25: 0.2614 ± 0.0017
+      mean@50: 0.2666 ± 0.0015
+    torque_smoothness:
+      mean: 0.2414 ± 0.0024
+      mean@25: 0.2176 ± 0.0033
+      mean@50: 0.2271 ± 0.0021
+    zmp_margin:
+      mean: 0.2552 ± 0.0031
+      mean@25: 0.2172 ± 0.0090
+      mean@50: 0.2366 ± 0.0055
+slope_bd_4_baseMass0_friction0.4:
+  success:
+    Seed_0_BaseMass_0_Friction_0.4: true
+    Seed_1_BaseMass_0_Friction_0.4: true
+    Seed_2_BaseMass_0_Friction_0.4: true
+  terrain_name: slope_bd
+  terrain_level: 4
+  summary:
+    quality_score:
+      mean: 0.5302 ± 0.0072
+      mean@25: 0.1615 ± 0.0099
+      mean@50: 0.3392 ± 0.0107
+    terrain_quality_score:
+      mean: 0.3707 ± 0.0013
+      mean@25: 0.3007 ± 0.0019
+      mean@50: 0.3344 ± 0.0020
+    ang_vel_err:
+      mean: 0.5048 ± 0.0036
+      mean@25: 0.1021 ± 0.0042
+      mean@50: 0.2781 ± 0.0057
+    dof_limits:
+      mean: 0.9739 ± 0.0006
+      mean@25: 0.9375 ± 0.0024
+      mean@50: 0.9545 ± 0.0011
+    dof_power:
+      mean: 0.8459 ± 0.0049
+      mean@25: 0.6472 ± 0.0134
+      mean@50: 0.7467 ± 0.0086
+    friction_margin:
+      mean: 0.2483 ± 0.0015
+      mean@25: 0.0087 ± 0.0017
+      mean@50: 0.0409 ± 0.0028
+    lin_vel_err:
+      mean: 0.6903 ± 0.0054
+      mean@25: 0.3655 ± 0.0079
+      mean@50: 0.5163 ± 0.0064
+    orientation_stability:
+      mean: 0.9511 ± 0.0015
+      mean@25: 0.8926 ± 0.0020
+      mean@50: 0.9202 ± 0.0020
+    torque_smoothness:
+      mean: 0.7925 ± 0.0007
+      mean@25: 0.6643 ± 0.0029
+      mean@50: 0.7177 ± 0.0017
+    zmp_margin:
+      mean: 0.8626 ± 0.0047
+      mean@25: 0.6412 ± 0.0177
+      mean@50: 0.7549 ± 0.0093
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.3659 ± 0.0036
+      mean@25: 0.2894 ± 0.0042
+      mean@50: 0.3228 ± 0.0057
+    dof_limits:
+      mean: 0.4550 ± 0.0006
+      mean@25: 0.4481 ± 0.0024
+      mean@50: 0.4514 ± 0.0011
+    dof_power:
+      mean: 0.4307 ± 0.0049
+      mean@25: 0.3930 ± 0.0134
+      mean@50: 0.4119 ± 0.0086
+    friction_margin:
+      mean: 0.3172 ± 0.0015
+      mean@25: 0.2717 ± 0.0017
+      mean@50: 0.2778 ± 0.0028
+    lin_vel_err:
+      mean: 0.4012 ± 0.0054
+      mean@25: 0.3395 ± 0.0079
+      mean@50: 0.3681 ± 0.0064
+    orientation_stability:
+      mean: 0.4507 ± 0.0015
+      mean@25: 0.4396 ± 0.0020
+      mean@50: 0.4448 ± 0.0020
+    torque_smoothness:
+      mean: 0.4206 ± 0.0007
+      mean@25: 0.3962 ± 0.0029
+      mean@50: 0.4064 ± 0.0017
+    zmp_margin:
+      mean: 0.4339 ± 0.0047
+      mean@25: 0.3918 ± 0.0177
+      mean@50: 0.4134 ± 0.0093
+slope_bd_6_baseMass0_friction0.5:
+  success:
+    Seed_0_BaseMass_0_Friction_0.5: true
+    Seed_1_BaseMass_0_Friction_0.5: true
+    Seed_2_BaseMass_0_Friction_0.5: true
+  terrain_name: slope_bd
+  terrain_level: 6
+  summary:
+    quality_score:
+      mean: 0.5239 ± 0.0043
+      mean@25: 0.1505 ± 0.0058
+      mean@50: 0.3314 ± 0.0050
+    terrain_quality_score:
+      mean: 0.5495 ± 0.0008
+      mean@25: 0.4786 ± 0.0011
+      mean@50: 0.5130 ± 0.0010
+    ang_vel_err:
+      mean: 0.4813 ± 0.0075
+      mean@25: 0.0921 ± 0.0034
+      mean@50: 0.2539 ± 0.0099
+    dof_limits:
+      mean: 0.9681 ± 0.0004
+      mean@25: 0.9275 ± 0.0019
+      mean@50: 0.9463 ± 0.0009
+    dof_power:
+      mean: 0.8335 ± 0.0034
+      mean@25: 0.6207 ± 0.0062
+      mean@50: 0.7270 ± 0.0045
+    friction_margin:
+      mean: 0.2717 ± 0.0029
+      mean@25: 0.0101 ± 0.0002
+      mean@50: 0.0491 ± 0.0006
+    lin_vel_err:
+      mean: 0.6915 ± 0.0027
+      mean@25: 0.3613 ± 0.0078
+      mean@50: 0.5159 ± 0.0035
+    orientation_stability:
+      mean: 0.9452 ± 0.0023
+      mean@25: 0.8848 ± 0.0044
+      mean@50: 0.9122 ± 0.0033
+    torque_smoothness:
+      mean: 0.7892 ± 0.0043
+      mean@25: 0.6594 ± 0.0053
+      mean@50: 0.7135 ± 0.0045
+    zmp_margin:
+      mean: 0.8554 ± 0.0040
+      mean@25: 0.6206 ± 0.0102
+      mean@50: 0.7397 ± 0.0067
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.5414 ± 0.0075
+      mean@25: 0.4675 ± 0.0034
+      mean@50: 0.4982 ± 0.0099
+    dof_limits:
+      mean: 0.6339 ± 0.0004
+      mean@25: 0.6262 ± 0.0019
+      mean@50: 0.6298 ± 0.0009
+    dof_power:
+      mean: 0.6084 ± 0.0034
+      mean@25: 0.5679 ± 0.0062
+      mean@50: 0.5881 ± 0.0045
+    friction_margin:
+      mean: 0.5016 ± 0.0029
+      mean@25: 0.4519 ± 0.0002
+      mean@50: 0.4593 ± 0.0006
+    lin_vel_err:
+      mean: 0.5814 ± 0.0027
+      mean@25: 0.5186 ± 0.0078
+      mean@50: 0.5480 ± 0.0035
+    orientation_stability:
+      mean: 0.6296 ± 0.0023
+      mean@25: 0.6181 ± 0.0044
+      mean@50: 0.6233 ± 0.0033
+    torque_smoothness:
+      mean: 0.5999 ± 0.0043
+      mean@25: 0.5753 ± 0.0053
+      mean@50: 0.5856 ± 0.0045
+    zmp_margin:
+      mean: 0.6125 ± 0.0040
+      mean@25: 0.5679 ± 0.0102
+      mean@50: 0.5905 ± 0.0067
+slope_bd_8_baseMass0_friction0.6:
+  success:
+    Seed_0_BaseMass_0_Friction_0.6: true
+    Seed_1_BaseMass_0_Friction_0.6: true
+    Seed_2_BaseMass_0_Friction_0.6: true
+  terrain_name: slope_bd
+  terrain_level: 8
+  summary:
+    quality_score:
+      mean: 0.5001 ± 0.0061
+      mean@25: 0.1094 ± 0.0110
+      mean@50: 0.2949 ± 0.0102
+    terrain_quality_score:
+      mean: 0.7250 ± 0.0012
+      mean@25: 0.6508 ± 0.0021
+      mean@50: 0.6860 ± 0.0019
+    ang_vel_err:
+      mean: 0.4484 ± 0.0100
+      mean@25: 0.0519 ± 0.0081
+      mean@50: 0.2092 ± 0.0110
+    dof_limits:
+      mean: 0.9602 ± 0.0007
+      mean@25: 0.9178 ± 0.0020
+      mean@50: 0.9367 ± 0.0012
+    dof_power:
+      mean: 0.8224 ± 0.0049
+      mean@25: 0.5962 ± 0.0231
+      mean@50: 0.7082 ± 0.0118
+    friction_margin:
+      mean: 0.2810 ± 0.0066
+      mean@25: 0.0101 ± 0.0013
+      mean@50: 0.0520 ± 0.0040
+    lin_vel_err:
+      mean: 0.6783 ± 0.0043
+      mean@25: 0.3425 ± 0.0044
+      mean@50: 0.4970 ± 0.0053
+    orientation_stability:
+      mean: 0.9376 ± 0.0017
+      mean@25: 0.8688 ± 0.0042
+      mean@50: 0.9000 ± 0.0029
+    torque_smoothness:
+      mean: 0.7880 ± 0.0015
+      mean@25: 0.6614 ± 0.0027
+      mean@50: 0.7134 ± 0.0022
+    zmp_margin:
+      mean: 0.8508 ± 0.0041
+      mean@25: 0.6160 ± 0.0139
+      mean@50: 0.7293 ± 0.0073
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7152 ± 0.0100
+      mean@25: 0.6399 ± 0.0081
+      mean@50: 0.6698 ± 0.0110
+    dof_limits:
+      mean: 0.8124 ± 0.0007
+      mean@25: 0.8044 ± 0.0020
+      mean@50: 0.8080 ± 0.0012
+    dof_power:
+      mean: 0.7862 ± 0.0049
+      mean@25: 0.7433 ± 0.0231
+      mean@50: 0.7646 ± 0.0118
+    friction_margin:
+      mean: 0.6834 ± 0.0066
+      mean@25: 0.6319 ± 0.0013
+      mean@50: 0.6399 ± 0.0040
+    lin_vel_err:
+      mean: 0.7589 ± 0.0043
+      mean@25: 0.6951 ± 0.0044
+      mean@50: 0.7244 ± 0.0053
+    orientation_stability:
+      mean: 0.8082 ± 0.0017
+      mean@25: 0.7951 ± 0.0042
+      mean@50: 0.8010 ± 0.0029
+    torque_smoothness:
+      mean: 0.7797 ± 0.0015
+      mean@25: 0.7557 ± 0.0027
+      mean@50: 0.7655 ± 0.0022
+    zmp_margin:
+      mean: 0.7917 ± 0.0041
+      mean@25: 0.7470 ± 0.0139
+      mean@50: 0.7686 ± 0.0073
+slope_bd_10_baseMass0_friction0.7:
+  success:
+    Seed_0_BaseMass_0_Friction_0.7: true
+    Seed_1_BaseMass_0_Friction_0.7: true
+    Seed_2_BaseMass_0_Friction_0.7: true
+  terrain_name: slope_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4712 ± 0.0048
+      mean@25: 0.0752 ± 0.0075
+      mean@50: 0.2591 ± 0.0065
+    terrain_quality_score:
+      mean: 0.8995 ± 0.0009
+      mean@25: 0.8243 ± 0.0014
+      mean@50: 0.8592 ± 0.0012
+    ang_vel_err:
+      mean: 0.4253 ± 0.0069
+      mean@25: 0.0334 ± 0.0014
+      mean@50: 0.1808 ± 0.0070
+    dof_limits:
+      mean: 0.9480 ± 0.0012
+      mean@25: 0.9032 ± 0.0015
+      mean@50: 0.9217 ± 0.0015
+    dof_power:
+      mean: 0.8162 ± 0.0039
+      mean@25: 0.5753 ± 0.0094
+      mean@50: 0.6981 ± 0.0069
+    friction_margin:
+      mean: 0.2791 ± 0.0018
+      mean@25: 0.0097 ± 0.0007
+      mean@50: 0.0483 ± 0.0015
+    lin_vel_err:
+      mean: 0.6597 ± 0.0071
+      mean@25: 0.3021 ± 0.0150
+      mean@50: 0.4688 ± 0.0115
+    orientation_stability:
+      mean: 0.9308 ± 0.0021
+      mean@25: 0.8506 ± 0.0073
+      mean@50: 0.8877 ± 0.0041
+    torque_smoothness:
+      mean: 0.7854 ± 0.0029
+      mean@25: 0.6554 ± 0.0071
+      mean@50: 0.7105 ± 0.0049
+    zmp_margin:
+      mean: 0.8373 ± 0.0025
+      mean@25: 0.5851 ± 0.0076
+      mean@50: 0.7043 ± 0.0025
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8908 ± 0.0069
+      mean@25: 0.8163 ± 0.0014
+      mean@50: 0.8443 ± 0.0070
+    dof_limits:
+      mean: 0.9901 ± 0.0012
+      mean@25: 0.9816 ± 0.0015
+      mean@50: 0.9851 ± 0.0015
+    dof_power:
+      mean: 0.9651 ± 0.0039
+      mean@25: 0.9193 ± 0.0094
+      mean@50: 0.9426 ± 0.0069
+    friction_margin:
+      mean: 0.8630 ± 0.0018
+      mean@25: 0.8118 ± 0.0007
+      mean@50: 0.8192 ± 0.0015
+    lin_vel_err:
+      mean: 0.9353 ± 0.0071
+      mean@25: 0.8674 ± 0.0150
+      mean@50: 0.8991 ± 0.0115
+    orientation_stability:
+      mean: 0.9868 ± 0.0021
+      mean@25: 0.9716 ± 0.0073
+      mean@50: 0.9787 ± 0.0041
+    torque_smoothness:
+      mean: 0.9592 ± 0.0029
+      mean@25: 0.9345 ± 0.0071
+      mean@50: 0.9450 ± 0.0049
+    zmp_margin:
+      mean: 0.9691 ± 0.0025
+      mean@25: 0.9212 ± 0.0076
+      mean@50: 0.9438 ± 0.0025
+slope_bd_10_baseMass0_friction0.8:
+  success:
+    Seed_0_BaseMass_0_Friction_0.8: true
+    Seed_1_BaseMass_0_Friction_0.8: true
+    Seed_2_BaseMass_0_Friction_0.8: true
+  terrain_name: slope_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5125 ± 0.0031
+      mean@25: 0.1008 ± 0.0061
+      mean@50: 0.3058 ± 0.0053
+    terrain_quality_score:
+      mean: 0.9074 ± 0.0006
+      mean@25: 0.8291 ± 0.0012
+      mean@50: 0.8681 ± 0.0010
+    ang_vel_err:
+      mean: 0.4191 ± 0.0052
+      mean@25: 0.0417 ± 0.0035
+      mean@50: 0.1817 ± 0.0049
+    dof_limits:
+      mean: 0.9488 ± 0.0007
+      mean@25: 0.9014 ± 0.0019
+      mean@50: 0.9215 ± 0.0012
+    dof_power:
+      mean: 0.8130 ± 0.0042
+      mean@25: 0.5885 ± 0.0073
+      mean@50: 0.6998 ± 0.0063
+    friction_margin:
+      mean: 0.3425 ± 0.0029
+      mean@25: 0.0465 ± 0.0058
+      mean@50: 0.1160 ± 0.0049
+    lin_vel_err:
+      mean: 0.6992 ± 0.0076
+      mean@25: 0.3729 ± 0.0063
+      mean@50: 0.5283 ± 0.0085
+    orientation_stability:
+      mean: 0.9269 ± 0.0042
+      mean@25: 0.8475 ± 0.0055
+      mean@50: 0.8831 ± 0.0060
+    torque_smoothness:
+      mean: 0.7804 ± 0.0038
+      mean@25: 0.6541 ± 0.0083
+      mean@50: 0.7066 ± 0.0057
+    zmp_margin:
+      mean: 0.8553 ± 0.0019
+      mean@25: 0.6404 ± 0.0033
+      mean@50: 0.7369 ± 0.0023
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8896 ± 0.0052
+      mean@25: 0.8179 ± 0.0035
+      mean@50: 0.8445 ± 0.0049
+    dof_limits:
+      mean: 0.9903 ± 0.0007
+      mean@25: 0.9813 ± 0.0019
+      mean@50: 0.9851 ± 0.0012
+    dof_power:
+      mean: 0.9645 ± 0.0042
+      mean@25: 0.9218 ± 0.0073
+      mean@50: 0.9430 ± 0.0063
+    friction_margin:
+      mean: 0.8751 ± 0.0029
+      mean@25: 0.8188 ± 0.0058
+      mean@50: 0.8320 ± 0.0049
+    lin_vel_err:
+      mean: 0.9429 ± 0.0076
+      mean@25: 0.8809 ± 0.0063
+      mean@50: 0.9104 ± 0.0085
+    orientation_stability:
+      mean: 0.9861 ± 0.0042
+      mean@25: 0.9710 ± 0.0055
+      mean@50: 0.9778 ± 0.0060
+    torque_smoothness:
+      mean: 0.9583 ± 0.0038
+      mean@25: 0.9343 ± 0.0083
+      mean@50: 0.9443 ± 0.0057
+    zmp_margin:
+      mean: 0.9725 ± 0.0019
+      mean@25: 0.9317 ± 0.0033
+      mean@50: 0.9500 ± 0.0023
+slope_bd_10_baseMass0_friction0.9:
+  success:
+    Seed_0_BaseMass_0_Friction_0.9: true
+    Seed_1_BaseMass_0_Friction_0.9: true
+    Seed_2_BaseMass_0_Friction_0.9: true
+  terrain_name: slope_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5403 ± 0.0067
+      mean@25: 0.1277 ± 0.0142
+      mean@50: 0.3413 ± 0.0131
+    terrain_quality_score:
+      mean: 0.9127 ± 0.0013
+      mean@25: 0.8343 ± 0.0027
+      mean@50: 0.8748 ± 0.0025
+    ang_vel_err:
+      mean: 0.4291 ± 0.0073
+      mean@25: 0.0483 ± 0.0072
+      mean@50: 0.1937 ± 0.0135
+    dof_limits:
+      mean: 0.9499 ± 0.0010
+      mean@25: 0.9042 ± 0.0019
+      mean@50: 0.9233 ± 0.0010
+    dof_power:
+      mean: 0.8183 ± 0.0013
+      mean@25: 0.6050 ± 0.0037
+      mean@50: 0.7080 ± 0.0024
+    friction_margin:
+      mean: 0.3743 ± 0.0049
+      mean@25: 0.0986 ± 0.0036
+      mean@50: 0.1789 ± 0.0014
+    lin_vel_err:
+      mean: 0.7292 ± 0.0018
+      mean@25: 0.4243 ± 0.0067
+      mean@50: 0.5766 ± 0.0041
+    orientation_stability:
+      mean: 0.9279 ± 0.0016
+      mean@25: 0.8502 ± 0.0037
+      mean@50: 0.8849 ± 0.0027
+    torque_smoothness:
+      mean: 0.7860 ± 0.0016
+      mean@25: 0.6643 ± 0.0029
+      mean@50: 0.7145 ± 0.0010
+    zmp_margin:
+      mean: 0.8595 ± 0.0041
+      mean@25: 0.6687 ± 0.0074
+      mean@50: 0.7514 ± 0.0061
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8915 ± 0.0073
+      mean@25: 0.8192 ± 0.0072
+      mean@50: 0.8468 ± 0.0135
+    dof_limits:
+      mean: 0.9905 ± 0.0010
+      mean@25: 0.9818 ± 0.0019
+      mean@50: 0.9854 ± 0.0010
+    dof_power:
+      mean: 0.9655 ± 0.0013
+      mean@25: 0.9249 ± 0.0037
+      mean@50: 0.9445 ± 0.0024
+    friction_margin:
+      mean: 0.8811 ± 0.0049
+      mean@25: 0.8287 ± 0.0036
+      mean@50: 0.8440 ± 0.0014
+    lin_vel_err:
+      mean: 0.9485 ± 0.0018
+      mean@25: 0.8906 ± 0.0067
+      mean@50: 0.9196 ± 0.0041
+    orientation_stability:
+      mean: 0.9863 ± 0.0016
+      mean@25: 0.9715 ± 0.0037
+      mean@50: 0.9781 ± 0.0027
+    torque_smoothness:
+      mean: 0.9593 ± 0.0016
+      mean@25: 0.9362 ± 0.0029
+      mean@50: 0.9457 ± 0.0010
+    zmp_margin:
+      mean: 0.9733 ± 0.0041
+      mean@25: 0.9370 ± 0.0074
+      mean@50: 0.9528 ± 0.0061
+slope_bd_10_baseMass0_friction1.0:
+  success:
+    Seed_0_BaseMass_0_Friction_1.0: true
+    Seed_1_BaseMass_0_Friction_1.0: true
+    Seed_2_BaseMass_0_Friction_1.0: true
+  terrain_name: slope_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5735 ± 0.0055
+      mean@25: 0.1779 ± 0.0116
+      mean@50: 0.3899 ± 0.0084
+    terrain_quality_score:
+      mean: 0.9190 ± 0.0011
+      mean@25: 0.8438 ± 0.0022
+      mean@50: 0.8841 ± 0.0016
+    ang_vel_err:
+      mean: 0.4395 ± 0.0072
+      mean@25: 0.0615 ± 0.0052
+      mean@50: 0.2076 ± 0.0057
+    dof_limits:
+      mean: 0.9497 ± 0.0009
+      mean@25: 0.9029 ± 0.0014
+      mean@50: 0.9231 ± 0.0012
+    dof_power:
+      mean: 0.8218 ± 0.0015
+      mean@25: 0.6118 ± 0.0048
+      mean@50: 0.7125 ± 0.0025
+    friction_margin:
+      mean: 0.4322 ± 0.0025
+      mean@25: 0.1622 ± 0.0008
+      mean@50: 0.2478 ± 0.0013
+    lin_vel_err:
+      mean: 0.7539 ± 0.0026
+      mean@25: 0.4746 ± 0.0010
+      mean@50: 0.6180 ± 0.0014
+    orientation_stability:
+      mean: 0.9284 ± 0.0039
+      mean@25: 0.8540 ± 0.0057
+      mean@50: 0.8874 ± 0.0052
+    torque_smoothness:
+      mean: 0.7881 ± 0.0026
+      mean@25: 0.6694 ± 0.0074
+      mean@50: 0.7175 ± 0.0047
+    zmp_margin:
+      mean: 0.8698 ± 0.0016
+      mean@25: 0.7000 ± 0.0022
+      mean@50: 0.7695 ± 0.0036
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8935 ± 0.0072
+      mean@25: 0.8217 ± 0.0052
+      mean@50: 0.8494 ± 0.0057
+    dof_limits:
+      mean: 0.9904 ± 0.0009
+      mean@25: 0.9815 ± 0.0014
+      mean@50: 0.9854 ± 0.0012
+    dof_power:
+      mean: 0.9661 ± 0.0015
+      mean@25: 0.9262 ± 0.0048
+      mean@50: 0.9454 ± 0.0025
+    friction_margin:
+      mean: 0.8921 ± 0.0025
+      mean@25: 0.8408 ± 0.0008
+      mean@50: 0.8571 ± 0.0013
+    lin_vel_err:
+      mean: 0.9532 ± 0.0026
+      mean@25: 0.9002 ± 0.0010
+      mean@50: 0.9274 ± 0.0014
+    orientation_stability:
+      mean: 0.9864 ± 0.0039
+      mean@25: 0.9723 ± 0.0057
+      mean@50: 0.9786 ± 0.0052
+    torque_smoothness:
+      mean: 0.9597 ± 0.0026
+      mean@25: 0.9372 ± 0.0074
+      mean@50: 0.9463 ± 0.0047
+    zmp_margin:
+      mean: 0.9753 ± 0.0016
+      mean@25: 0.9430 ± 0.0022
+      mean@50: 0.9562 ± 0.0036
+slope_fd_0_baseMass0_friction0.2: null
+slope_fd_2_baseMass0_friction0.3:
+  success:
+    Seed_0_BaseMass_0_Friction_0.3: true
+    Seed_1_BaseMass_0_Friction_0.3: true
+    Seed_2_BaseMass_0_Friction_0.3: true
+  terrain_name: slope_fd
+  terrain_level: 2
+  summary:
+    quality_score:
+      mean: 0.5711 ± 0.0032
+      mean@25: 0.2551 ± 0.0074
+      mean@50: 0.4076 ± 0.0055
+    terrain_quality_score:
+      mean: 0.1985 ± 0.0006
+      mean@25: 0.1385 ± 0.0014
+      mean@50: 0.1675 ± 0.0010
+    ang_vel_err:
+      mean: 0.5701 ± 0.0039
+      mean@25: 0.1891 ± 0.0093
+      mean@50: 0.3622 ± 0.0077
+    dof_limits:
+      mean: 0.9588 ± 0.0007
+      mean@25: 0.9325 ± 0.0017
+      mean@50: 0.9443 ± 0.0012
+    dof_power:
+      mean: 0.8706 ± 0.0028
+      mean@25: 0.6935 ± 0.0095
+      mean@50: 0.7793 ± 0.0054
+    friction_margin:
+      mean: 0.2184 ± 0.0041
+      mean@25: 0.0104 ± 0.0005
+      mean@50: 0.0413 ± 0.0010
+    lin_vel_err:
+      mean: 0.7088 ± 0.0035
+      mean@25: 0.3968 ± 0.0032
+      mean@50: 0.5495 ± 0.0051
+    orientation_stability:
+      mean: 0.9637 ± 0.0012
+      mean@25: 0.9198 ± 0.0019
+      mean@50: 0.9407 ± 0.0015
+    torque_smoothness:
+      mean: 0.8005 ± 0.0013
+      mean@25: 0.6683 ± 0.0036
+      mean@50: 0.7236 ± 0.0018
+    zmp_margin:
+      mean: 0.8681 ± 0.0019
+      mean@25: 0.6673 ± 0.0031
+      mean@50: 0.7725 ± 0.0027
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.1983 ± 0.0039
+      mean@25: 0.1259 ± 0.0093
+      mean@50: 0.1588 ± 0.0077
+    dof_limits:
+      mean: 0.2722 ± 0.0007
+      mean@25: 0.2672 ± 0.0017
+      mean@50: 0.2694 ± 0.0012
+    dof_power:
+      mean: 0.2554 ± 0.0028
+      mean@25: 0.2218 ± 0.0095
+      mean@50: 0.2381 ± 0.0054
+    friction_margin:
+      mean: 0.1315 ± 0.0041
+      mean@25: 0.0920 ± 0.0005
+      mean@50: 0.0978 ± 0.0010
+    lin_vel_err:
+      mean: 0.2247 ± 0.0035
+      mean@25: 0.1654 ± 0.0032
+      mean@50: 0.1944 ± 0.0051
+    orientation_stability:
+      mean: 0.2731 ± 0.0012
+      mean@25: 0.2648 ± 0.0019
+      mean@50: 0.2687 ± 0.0015
+    torque_smoothness:
+      mean: 0.2421 ± 0.0013
+      mean@25: 0.2170 ± 0.0036
+      mean@50: 0.2275 ± 0.0018
+    zmp_margin:
+      mean: 0.2549 ± 0.0019
+      mean@25: 0.2168 ± 0.0031
+      mean@50: 0.2368 ± 0.0027
+slope_fd_4_baseMass0_friction0.4:
+  success:
+    Seed_0_BaseMass_0_Friction_0.4: true
+    Seed_1_BaseMass_0_Friction_0.4: true
+    Seed_2_BaseMass_0_Friction_0.4: true
+  terrain_name: slope_fd
+  terrain_level: 4
+  summary:
+    quality_score:
+      mean: 0.5589 ± 0.0013
+      mean@25: 0.2280 ± 0.0022
+      mean@50: 0.3890 ± 0.0008
+    terrain_quality_score:
+      mean: 0.3762 ± 0.0002
+      mean@25: 0.3133 ± 0.0004
+      mean@50: 0.3439 ± 0.0002
+    ang_vel_err:
+      mean: 0.5443 ± 0.0006
+      mean@25: 0.1598 ± 0.0037
+      mean@50: 0.3304 ± 0.0030
+    dof_limits:
+      mean: 0.9483 ± 0.0001
+      mean@25: 0.9191 ± 0.0004
+      mean@50: 0.9323 ± 0.0003
+    dof_power:
+      mean: 0.8552 ± 0.0020
+      mean@25: 0.6609 ± 0.0070
+      mean@50: 0.7569 ± 0.0036
+    friction_margin:
+      mean: 0.2314 ± 0.0039
+      mean@25: 0.0111 ± 0.0007
+      mean@50: 0.0468 ± 0.0020
+    lin_vel_err:
+      mean: 0.7077 ± 0.0023
+      mean@25: 0.3977 ± 0.0094
+      mean@50: 0.5497 ± 0.0046
+    orientation_stability:
+      mean: 0.9614 ± 0.0012
+      mean@25: 0.9129 ± 0.0031
+      mean@50: 0.9365 ± 0.0021
+    torque_smoothness:
+      mean: 0.7937 ± 0.0014
+      mean@25: 0.6565 ± 0.0051
+      mean@50: 0.7155 ± 0.0033
+    zmp_margin:
+      mean: 0.8707 ± 0.0011
+      mean@25: 0.6825 ± 0.0078
+      mean@50: 0.7779 ± 0.0023
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.3734 ± 0.0006
+      mean@25: 0.3004 ± 0.0037
+      mean@50: 0.3328 ± 0.0030
+    dof_limits:
+      mean: 0.4502 ± 0.0001
+      mean@25: 0.4446 ± 0.0004
+      mean@50: 0.4471 ± 0.0003
+    dof_power:
+      mean: 0.4325 ± 0.0020
+      mean@25: 0.3956 ± 0.0070
+      mean@50: 0.4138 ± 0.0036
+    friction_margin:
+      mean: 0.3140 ± 0.0039
+      mean@25: 0.2721 ± 0.0007
+      mean@50: 0.2789 ± 0.0020
+    lin_vel_err:
+      mean: 0.4045 ± 0.0023
+      mean@25: 0.3456 ± 0.0094
+      mean@50: 0.3744 ± 0.0046
+    orientation_stability:
+      mean: 0.4527 ± 0.0012
+      mean@25: 0.4434 ± 0.0031
+      mean@50: 0.4479 ± 0.0021
+    torque_smoothness:
+      mean: 0.4208 ± 0.0014
+      mean@25: 0.3947 ± 0.0051
+      mean@50: 0.4059 ± 0.0033
+    zmp_margin:
+      mean: 0.4354 ± 0.0011
+      mean@25: 0.3997 ± 0.0078
+      mean@50: 0.4178 ± 0.0023
+slope_fd_6_baseMass0_friction0.5:
+  success:
+    Seed_0_BaseMass_0_Friction_0.5: true
+    Seed_1_BaseMass_0_Friction_0.5: true
+    Seed_2_BaseMass_0_Friction_0.5: true
+  terrain_name: slope_fd
+  terrain_level: 6
+  summary:
+    quality_score:
+      mean: 0.5271 ± 0.0037
+      mean@25: 0.1635 ± 0.0049
+      mean@50: 0.3419 ± 0.0045
+    terrain_quality_score:
+      mean: 0.5502 ± 0.0007
+      mean@25: 0.4811 ± 0.0009
+      mean@50: 0.5150 ± 0.0008
+    ang_vel_err:
+      mean: 0.4987 ± 0.0060
+      mean@25: 0.0889 ± 0.0057
+      mean@50: 0.2639 ± 0.0068
+    dof_limits:
+      mean: 0.9360 ± 0.0008
+      mean@25: 0.9016 ± 0.0021
+      mean@50: 0.9170 ± 0.0014
+    dof_power:
+      mean: 0.8284 ± 0.0049
+      mean@25: 0.5937 ± 0.0125
+      mean@50: 0.7128 ± 0.0079
+    friction_margin:
+      mean: 0.2352 ± 0.0043
+      mean@25: 0.0103 ± 0.0003
+      mean@50: 0.0461 ± 0.0025
+    lin_vel_err:
+      mean: 0.6899 ± 0.0055
+      mean@25: 0.3654 ± 0.0093
+      mean@50: 0.5253 ± 0.0101
+    orientation_stability:
+      mean: 0.9551 ± 0.0005
+      mean@25: 0.8963 ± 0.0009
+      mean@50: 0.9255 ± 0.0004
+    torque_smoothness:
+      mean: 0.7780 ± 0.0025
+      mean@25: 0.6301 ± 0.0053
+      mean@50: 0.6936 ± 0.0039
+    zmp_margin:
+      mean: 0.8694 ± 0.0002
+      mean@25: 0.6716 ± 0.0024
+      mean@50: 0.7715 ± 0.0005
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.5448 ± 0.0060
+      mean@25: 0.4669 ± 0.0057
+      mean@50: 0.5001 ± 0.0068
+    dof_limits:
+      mean: 0.6278 ± 0.0008
+      mean@25: 0.6213 ± 0.0021
+      mean@50: 0.6242 ± 0.0014
+    dof_power:
+      mean: 0.6074 ± 0.0049
+      mean@25: 0.5628 ± 0.0125
+      mean@50: 0.5854 ± 0.0079
+    friction_margin:
+      mean: 0.4947 ± 0.0043
+      mean@25: 0.4520 ± 0.0003
+      mean@50: 0.4588 ± 0.0025
+    lin_vel_err:
+      mean: 0.5811 ± 0.0055
+      mean@25: 0.5194 ± 0.0093
+      mean@50: 0.5498 ± 0.0101
+    orientation_stability:
+      mean: 0.6315 ± 0.0005
+      mean@25: 0.6203 ± 0.0009
+      mean@50: 0.6258 ± 0.0004
+    torque_smoothness:
+      mean: 0.5978 ± 0.0025
+      mean@25: 0.5697 ± 0.0053
+      mean@50: 0.5818 ± 0.0039
+    zmp_margin:
+      mean: 0.6152 ± 0.0002
+      mean@25: 0.5776 ± 0.0024
+      mean@50: 0.5966 ± 0.0005
+slope_fd_7_baseMass0_friction0.6:
+  success:
+    Seed_0_BaseMass_0_Friction_0.6: true
+    Seed_1_BaseMass_0_Friction_0.6: true
+    Seed_2_BaseMass_0_Friction_0.6: true
+  terrain_name: slope_fd
+  terrain_level: 7
+  summary:
+    quality_score:
+      mean: 0.5388 ± 0.0121
+      mean@25: 0.1473 ± 0.0243
+      mean@50: 0.3464 ± 0.0191
+    terrain_quality_score:
+      mean: 0.6424 ± 0.0023
+      mean@25: 0.5680 ± 0.0046
+      mean@50: 0.6058 ± 0.0036
+    ang_vel_err:
+      mean: 0.4789 ± 0.0094
+      mean@25: 0.0744 ± 0.0059
+      mean@50: 0.2427 ± 0.0106
+    dof_limits:
+      mean: 0.9332 ± 0.0011
+      mean@25: 0.8982 ± 0.0010
+      mean@50: 0.9130 ± 0.0012
+    dof_power:
+      mean: 0.8215 ± 0.0054
+      mean@25: 0.5966 ± 0.0157
+      mean@50: 0.7082 ± 0.0094
+    friction_margin:
+      mean: 0.2822 ± 0.0151
+      mean@25: 0.0315 ± 0.0035
+      mean@50: 0.0873 ± 0.0038
+    lin_vel_err:
+      mean: 0.7152 ± 0.0093
+      mean@25: 0.4041 ± 0.0153
+      mean@50: 0.5552 ± 0.0128
+    orientation_stability:
+      mean: 0.9532 ± 0.0019
+      mean@25: 0.8947 ± 0.0048
+      mean@50: 0.9226 ± 0.0035
+    torque_smoothness:
+      mean: 0.7763 ± 0.0026
+      mean@25: 0.6374 ± 0.0049
+      mean@50: 0.6956 ± 0.0037
+    zmp_margin:
+      mean: 0.8722 ± 0.0046
+      mean@25: 0.6873 ± 0.0164
+      mean@50: 0.7782 ± 0.0092
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.6310 ± 0.0094
+      mean@25: 0.5541 ± 0.0059
+      mean@50: 0.5861 ± 0.0106
+    dof_limits:
+      mean: 0.7173 ± 0.0011
+      mean@25: 0.7107 ± 0.0010
+      mean@50: 0.7135 ± 0.0012
+    dof_power:
+      mean: 0.6961 ± 0.0054
+      mean@25: 0.6534 ± 0.0157
+      mean@50: 0.6746 ± 0.0094
+    friction_margin:
+      mean: 0.5936 ± 0.0151
+      mean@25: 0.5460 ± 0.0035
+      mean@50: 0.5566 ± 0.0038
+    lin_vel_err:
+      mean: 0.6759 ± 0.0093
+      mean@25: 0.6168 ± 0.0153
+      mean@50: 0.6455 ± 0.0128
+    orientation_stability:
+      mean: 0.7211 ± 0.0019
+      mean@25: 0.7100 ± 0.0048
+      mean@50: 0.7153 ± 0.0035
+    torque_smoothness:
+      mean: 0.6875 ± 0.0026
+      mean@25: 0.6611 ± 0.0049
+      mean@50: 0.6722 ± 0.0037
+    zmp_margin:
+      mean: 0.7057 ± 0.0046
+      mean@25: 0.6706 ± 0.0164
+      mean@50: 0.6879 ± 0.0092
+slope_fd_9_baseMass0_friction0.7:
+  success:
+    Seed_0_BaseMass_0_Friction_0.7: true
+    Seed_1_BaseMass_0_Friction_0.7: true
+    Seed_2_BaseMass_0_Friction_0.7: true
+  terrain_name: slope_fd
+  terrain_level: 9
+  summary:
+    quality_score:
+      mean: 0.5168 ± 0.0025
+      mean@25: 0.1208 ± 0.0046
+      mean@50: 0.3205 ± 0.0039
+    terrain_quality_score:
+      mean: 0.8182 ± 0.0005
+      mean@25: 0.7430 ± 0.0009
+      mean@50: 0.7809 ± 0.0007
+    ang_vel_err:
+      mean: 0.4526 ± 0.0026
+      mean@25: 0.0503 ± 0.0025
+      mean@50: 0.2090 ± 0.0038
+    dof_limits:
+      mean: 0.9211 ± 0.0006
+      mean@25: 0.8847 ± 0.0002
+      mean@50: 0.8998 ± 0.0004
+    dof_power:
+      mean: 0.8044 ± 0.0007
+      mean@25: 0.5543 ± 0.0054
+      mean@50: 0.6794 ± 0.0016
+    friction_margin:
+      mean: 0.2843 ± 0.0058
+      mean@25: 0.0275 ± 0.0008
+      mean@50: 0.0807 ± 0.0013
+    lin_vel_err:
+      mean: 0.6915 ± 0.0039
+      mean@25: 0.3761 ± 0.0034
+      mean@50: 0.5273 ± 0.0046
+    orientation_stability:
+      mean: 0.9472 ± 0.0009
+      mean@25: 0.8795 ± 0.0012
+      mean@50: 0.9127 ± 0.0012
+    torque_smoothness:
+      mean: 0.7678 ± 0.0004
+      mean@25: 0.6251 ± 0.0016
+      mean@50: 0.6857 ± 0.0013
+    zmp_margin:
+      mean: 0.8716 ± 0.0024
+      mean@25: 0.6828 ± 0.0065
+      mean@50: 0.7744 ± 0.0038
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8060 ± 0.0026
+      mean@25: 0.7296 ± 0.0025
+      mean@50: 0.7597 ± 0.0038
+    dof_limits:
+      mean: 0.8950 ± 0.0006
+      mean@25: 0.8881 ± 0.0002
+      mean@50: 0.8910 ± 0.0004
+    dof_power:
+      mean: 0.8728 ± 0.0007
+      mean@25: 0.8253 ± 0.0054
+      mean@50: 0.8491 ± 0.0016
+    friction_margin:
+      mean: 0.7740 ± 0.0058
+      mean@25: 0.7252 ± 0.0008
+      mean@50: 0.7353 ± 0.0013
+    lin_vel_err:
+      mean: 0.8514 ± 0.0039
+      mean@25: 0.7915 ± 0.0034
+      mean@50: 0.8202 ± 0.0046
+    orientation_stability:
+      mean: 0.9000 ± 0.0009
+      mean@25: 0.8871 ± 0.0012
+      mean@50: 0.8934 ± 0.0012
+    torque_smoothness:
+      mean: 0.8659 ± 0.0004
+      mean@25: 0.8388 ± 0.0016
+      mean@50: 0.8503 ± 0.0013
+    zmp_margin:
+      mean: 0.8856 ± 0.0024
+      mean@25: 0.8497 ± 0.0065
+      mean@50: 0.8671 ± 0.0038
+slope_fd_10_baseMass0_friction0.8:
+  success:
+    Seed_0_BaseMass_0_Friction_0.8: true
+    Seed_1_BaseMass_0_Friction_0.8: true
+    Seed_2_BaseMass_0_Friction_0.8: true
+  terrain_name: slope_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5111 ± 0.0081
+      mean@25: 0.0945 ± 0.0155
+      mean@50: 0.3072 ± 0.0150
+    terrain_quality_score:
+      mean: 0.9071 ± 0.0016
+      mean@25: 0.8280 ± 0.0029
+      mean@50: 0.8684 ± 0.0028
+    ang_vel_err:
+      mean: 0.4388 ± 0.0053
+      mean@25: 0.0386 ± 0.0068
+      mean@50: 0.1956 ± 0.0068
+    dof_limits:
+      mean: 0.9172 ± 0.0007
+      mean@25: 0.8810 ± 0.0006
+      mean@50: 0.8958 ± 0.0007
+    dof_power:
+      mean: 0.7991 ± 0.0055
+      mean@25: 0.5461 ± 0.0154
+      mean@50: 0.6726 ± 0.0103
+    friction_margin:
+      mean: 0.2992 ± 0.0037
+      mean@25: 0.0454 ± 0.0035
+      mean@50: 0.1099 ± 0.0033
+    lin_vel_err:
+      mean: 0.6948 ± 0.0055
+      mean@25: 0.3844 ± 0.0150
+      mean@50: 0.5311 ± 0.0103
+    orientation_stability:
+      mean: 0.9428 ± 0.0027
+      mean@25: 0.8665 ± 0.0082
+      mean@50: 0.9049 ± 0.0047
+    torque_smoothness:
+      mean: 0.7650 ± 0.0002
+      mean@25: 0.6221 ± 0.0035
+      mean@50: 0.6826 ± 0.0011
+    zmp_margin:
+      mean: 0.8671 ± 0.0005
+      mean@25: 0.6768 ± 0.0022
+      mean@50: 0.7688 ± 0.0005
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8934 ± 0.0053
+      mean@25: 0.8173 ± 0.0068
+      mean@50: 0.8472 ± 0.0068
+    dof_limits:
+      mean: 0.9843 ± 0.0007
+      mean@25: 0.9774 ± 0.0006
+      mean@50: 0.9802 ± 0.0007
+    dof_power:
+      mean: 0.9618 ± 0.0055
+      mean@25: 0.9138 ± 0.0154
+      mean@50: 0.9378 ± 0.0103
+    friction_margin:
+      mean: 0.8668 ± 0.0037
+      mean@25: 0.8186 ± 0.0035
+      mean@50: 0.8309 ± 0.0033
+    lin_vel_err:
+      mean: 0.9420 ± 0.0055
+      mean@25: 0.8830 ± 0.0150
+      mean@50: 0.9109 ± 0.0103
+    orientation_stability:
+      mean: 0.9891 ± 0.0027
+      mean@25: 0.9746 ± 0.0082
+      mean@50: 0.9819 ± 0.0047
+    torque_smoothness:
+      mean: 0.9553 ± 0.0002
+      mean@25: 0.9282 ± 0.0035
+      mean@50: 0.9397 ± 0.0011
+    zmp_margin:
+      mean: 0.9747 ± 0.0005
+      mean@25: 0.9386 ± 0.0022
+      mean@50: 0.9561 ± 0.0005
+slope_fd_10_baseMass0_friction0.9:
+  success:
+    Seed_0_BaseMass_0_Friction_0.9: true
+    Seed_1_BaseMass_0_Friction_0.9: true
+    Seed_2_BaseMass_0_Friction_0.9: true
+  terrain_name: slope_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5488 ± 0.0025
+      mean@25: 0.1458 ± 0.0050
+      mean@50: 0.3570 ± 0.0046
+    terrain_quality_score:
+      mean: 0.9143 ± 0.0005
+      mean@25: 0.8377 ± 0.0009
+      mean@50: 0.8778 ± 0.0009
+    ang_vel_err:
+      mean: 0.4436 ± 0.0009
+      mean@25: 0.0560 ± 0.0023
+      mean@50: 0.2065 ± 0.0025
+    dof_limits:
+      mean: 0.9196 ± 0.0015
+      mean@25: 0.8842 ± 0.0006
+      mean@50: 0.8985 ± 0.0010
+    dof_power:
+      mean: 0.8025 ± 0.0044
+      mean@25: 0.5682 ± 0.0122
+      mean@50: 0.6848 ± 0.0089
+    friction_margin:
+      mean: 0.3603 ± 0.0022
+      mean@25: 0.0961 ± 0.0060
+      mean@50: 0.1746 ± 0.0029
+    lin_vel_err:
+      mean: 0.7145 ± 0.0032
+      mean@25: 0.4136 ± 0.0143
+      mean@50: 0.5577 ± 0.0059
+    orientation_stability:
+      mean: 0.9423 ± 0.0030
+      mean@25: 0.8725 ± 0.0056
+      mean@50: 0.9059 ± 0.0041
+    torque_smoothness:
+      mean: 0.7658 ± 0.0010
+      mean@25: 0.6281 ± 0.0019
+      mean@50: 0.6852 ± 0.0019
+    zmp_margin:
+      mean: 0.8754 ± 0.0015
+      mean@25: 0.7001 ± 0.0050
+      mean@50: 0.7841 ± 0.0039
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8943 ± 0.0009
+      mean@25: 0.8206 ± 0.0023
+      mean@50: 0.8492 ± 0.0025
+    dof_limits:
+      mean: 0.9847 ± 0.0015
+      mean@25: 0.9780 ± 0.0006
+      mean@50: 0.9807 ± 0.0010
+    dof_power:
+      mean: 0.9625 ± 0.0044
+      mean@25: 0.9180 ± 0.0122
+      mean@50: 0.9401 ± 0.0089
+    friction_margin:
+      mean: 0.8785 ± 0.0022
+      mean@25: 0.8283 ± 0.0060
+      mean@50: 0.8432 ± 0.0029
+    lin_vel_err:
+      mean: 0.9458 ± 0.0032
+      mean@25: 0.8886 ± 0.0143
+      mean@50: 0.9160 ± 0.0059
+    orientation_stability:
+      mean: 0.9890 ± 0.0030
+      mean@25: 0.9758 ± 0.0056
+      mean@50: 0.9821 ± 0.0041
+    torque_smoothness:
+      mean: 0.9555 ± 0.0010
+      mean@25: 0.9293 ± 0.0019
+      mean@50: 0.9402 ± 0.0019
+    zmp_margin:
+      mean: 0.9763 ± 0.0015
+      mean@25: 0.9430 ± 0.0050
+      mean@50: 0.9590 ± 0.0039
+slope_fd_10_baseMass0_friction1.0:
+  success:
+    Seed_0_BaseMass_0_Friction_1.0: true
+    Seed_1_BaseMass_0_Friction_1.0: true
+    Seed_2_BaseMass_0_Friction_1.0: true
+  terrain_name: slope_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5754 ± 0.0160
+      mean@25: 0.1755 ± 0.0333
+      mean@50: 0.3901 ± 0.0260
+    terrain_quality_score:
+      mean: 0.9193 ± 0.0030
+      mean@25: 0.8433 ± 0.0063
+      mean@50: 0.8841 ± 0.0049
+    ang_vel_err:
+      mean: 0.4587 ± 0.0147
+      mean@25: 0.0687 ± 0.0159
+      mean@50: 0.2274 ± 0.0188
+    dof_limits:
+      mean: 0.9223 ± 0.0018
+      mean@25: 0.8891 ± 0.0037
+      mean@50: 0.9026 ± 0.0026
+    dof_power:
+      mean: 0.8055 ± 0.0077
+      mean@25: 0.5789 ± 0.0199
+      mean@50: 0.6909 ± 0.0115
+    friction_margin:
+      mean: 0.4096 ± 0.0026
+      mean@25: 0.1507 ± 0.0069
+      mean@50: 0.2383 ± 0.0070
+    lin_vel_err:
+      mean: 0.7358 ± 0.0092
+      mean@25: 0.4582 ± 0.0186
+      mean@50: 0.5933 ± 0.0131
+    orientation_stability:
+      mean: 0.9438 ± 0.0010
+      mean@25: 0.8717 ± 0.0011
+      mean@50: 0.9073 ± 0.0014
+    torque_smoothness:
+      mean: 0.7674 ± 0.0044
+      mean@25: 0.6356 ± 0.0069
+      mean@50: 0.6895 ± 0.0059
+    zmp_margin:
+      mean: 0.8803 ± 0.0045
+      mean@25: 0.7211 ± 0.0164
+      mean@50: 0.7949 ± 0.0093
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8972 ± 0.0147
+      mean@25: 0.8231 ± 0.0159
+      mean@50: 0.8532 ± 0.0188
+    dof_limits:
+      mean: 0.9852 ± 0.0018
+      mean@25: 0.9789 ± 0.0037
+      mean@50: 0.9815 ± 0.0026
+    dof_power:
+      mean: 0.9630 ± 0.0077
+      mean@25: 0.9200 ± 0.0199
+      mean@50: 0.9413 ± 0.0115
+    friction_margin:
+      mean: 0.8878 ± 0.0026
+      mean@25: 0.8386 ± 0.0069
+      mean@50: 0.8553 ± 0.0070
+    lin_vel_err:
+      mean: 0.9498 ± 0.0092
+      mean@25: 0.8971 ± 0.0186
+      mean@50: 0.9227 ± 0.0131
+    orientation_stability:
+      mean: 0.9893 ± 0.0010
+      mean@25: 0.9756 ± 0.0011
+      mean@50: 0.9824 ± 0.0014
+    torque_smoothness:
+      mean: 0.9558 ± 0.0044
+      mean@25: 0.9308 ± 0.0069
+      mean@50: 0.9410 ± 0.0059
+    zmp_margin:
+      mean: 0.9773 ± 0.0045
+      mean@25: 0.9470 ± 0.0164
+      mean@50: 0.9610 ± 0.0093
+stairs_bd_4_baseMass0_friction0.2:
+  success:
+    Seed_0_BaseMass_0_Friction_0.2: true
+    Seed_1_BaseMass_0_Friction_0.2: true
+    Seed_2_BaseMass_0_Friction_0.2: true
+  terrain_name: stairs_bd
+  terrain_level: 4
+  summary:
+    quality_score:
+      mean: 0.3806 ± 0.0103
+      mean@25: 0.0078 ± 0.0008
+      mean@50: 0.1232 ± 0.0107
+    terrain_quality_score:
+      mean: 0.3423 ± 0.0019
+      mean@25: 0.2715 ± 0.0002
+      mean@50: 0.2934 ± 0.0020
+    ang_vel_err:
+      mean: 0.3260 ± 0.0096
+      mean@25: 0.0001 ± 0.0001
+      mean@50: 0.0722 ± 0.0084
+    dof_limits:
+      mean: 0.9390 ± 0.0005
+      mean@25: 0.8911 ± 0.0011
+      mean@50: 0.9090 ± 0.0006
+    dof_power:
+      mean: 0.7766 ± 0.0045
+      mean@25: 0.5217 ± 0.0101
+      mean@50: 0.6474 ± 0.0078
+    friction_margin:
+      mean: 0.3194 ± 0.0077
+      mean@25: 0.0184 ± 0.0011
+      mean@50: 0.0573 ± 0.0005
+    lin_vel_err:
+      mean: 0.5938 ± 0.0092
+      mean@25: 0.2246 ± 0.0109
+      mean@50: 0.3784 ± 0.0112
+    orientation_stability:
+      mean: 0.8989 ± 0.0044
+      mean@25: 0.7893 ± 0.0080
+      mean@50: 0.8379 ± 0.0063
+    torque_smoothness:
+      mean: 0.7629 ± 0.0021
+      mean@25: 0.6340 ± 0.0027
+      mean@50: 0.6856 ± 0.0009
+    zmp_margin:
+      mean: 0.8435 ± 0.0050
+      mean@25: 0.6026 ± 0.0112
+      mean@50: 0.7182 ± 0.0088
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.3319 ± 0.0096
+      mean@25: 0.2700 ± 0.0001
+      mean@50: 0.2837 ± 0.0084
+    dof_limits:
+      mean: 0.4484 ± 0.0005
+      mean@25: 0.4393 ± 0.0011
+      mean@50: 0.4427 ± 0.0006
+    dof_power:
+      mean: 0.4175 ± 0.0045
+      mean@25: 0.3691 ± 0.0101
+      mean@50: 0.3930 ± 0.0078
+    friction_margin:
+      mean: 0.3307 ± 0.0077
+      mean@25: 0.2735 ± 0.0011
+      mean@50: 0.2809 ± 0.0005
+    lin_vel_err:
+      mean: 0.3828 ± 0.0092
+      mean@25: 0.3127 ± 0.0109
+      mean@50: 0.3419 ± 0.0112
+    orientation_stability:
+      mean: 0.4408 ± 0.0044
+      mean@25: 0.4200 ± 0.0080
+      mean@50: 0.4292 ± 0.0063
+    torque_smoothness:
+      mean: 0.4150 ± 0.0021
+      mean@25: 0.3905 ± 0.0027
+      mean@50: 0.4003 ± 0.0009
+    zmp_margin:
+      mean: 0.4303 ± 0.0050
+      mean@25: 0.3845 ± 0.0112
+      mean@50: 0.4065 ± 0.0088
+stairs_bd_10_baseMass0_friction0.3:
+  success:
+    Seed_0_BaseMass_0_Friction_0.3: true
+    Seed_1_BaseMass_0_Friction_0.3: true
+    Seed_2_BaseMass_0_Friction_0.3: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4162 ± 0.0049
+      mean@25: 0.0173 ± 0.0106
+      mean@50: 0.1582 ± 0.0096
+    terrain_quality_score:
+      mean: 0.8891 ± 0.0009
+      mean@25: 0.8133 ± 0.0020
+      mean@50: 0.8401 ± 0.0018
+    ang_vel_err:
+      mean: 0.3395 ± 0.0011
+      mean@25: 0.0024 ± 0.0027
+      mean@50: 0.0865 ± 0.0041
+    dof_limits:
+      mean: 0.9187 ± 0.0011
+      mean@25: 0.8736 ± 0.0022
+      mean@50: 0.8865 ± 0.0018
+    dof_power:
+      mean: 0.7883 ± 0.0099
+      mean@25: 0.5418 ± 0.0256
+      mean@50: 0.6616 ± 0.0159
+    friction_margin:
+      mean: 0.4011 ± 0.0055
+      mean@25: 0.0367 ± 0.0030
+      mean@50: 0.1294 ± 0.0049
+    lin_vel_err:
+      mean: 0.6046 ± 0.0079
+      mean@25: 0.2393 ± 0.0223
+      mean@50: 0.3994 ± 0.0136
+    orientation_stability:
+      mean: 0.8691 ± 0.0053
+      mean@25: 0.7327 ± 0.0121
+      mean@50: 0.7924 ± 0.0089
+    torque_smoothness:
+      mean: 0.7759 ± 0.0053
+      mean@25: 0.6467 ± 0.0099
+      mean@50: 0.6995 ± 0.0061
+    zmp_margin:
+      mean: 0.8333 ± 0.0033
+      mean@25: 0.5987 ± 0.0076
+      mean@50: 0.7011 ± 0.0051
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8745 ± 0.0011
+      mean@25: 0.8105 ± 0.0027
+      mean@50: 0.8264 ± 0.0041
+    dof_limits:
+      mean: 0.9846 ± 0.0011
+      mean@25: 0.9760 ± 0.0022
+      mean@50: 0.9784 ± 0.0018
+    dof_power:
+      mean: 0.9598 ± 0.0099
+      mean@25: 0.9129 ± 0.0256
+      mean@50: 0.9357 ± 0.0159
+    friction_margin:
+      mean: 0.8862 ± 0.0055
+      mean@25: 0.8170 ± 0.0030
+      mean@50: 0.8346 ± 0.0049
+    lin_vel_err:
+      mean: 0.9249 ± 0.0079
+      mean@25: 0.8555 ± 0.0223
+      mean@50: 0.8859 ± 0.0136
+    orientation_stability:
+      mean: 0.9751 ± 0.0053
+      mean@25: 0.9492 ± 0.0121
+      mean@50: 0.9606 ± 0.0089
+    torque_smoothness:
+      mean: 0.9574 ± 0.0053
+      mean@25: 0.9329 ± 0.0099
+      mean@50: 0.9429 ± 0.0061
+    zmp_margin:
+      mean: 0.9683 ± 0.0033
+      mean@25: 0.9237 ± 0.0076
+      mean@50: 0.9432 ± 0.0051
+stairs_bd_10_baseMass0_friction0.4:
+  success:
+    Seed_0_BaseMass_0_Friction_0.4: true
+    Seed_1_BaseMass_0_Friction_0.4: true
+    Seed_2_BaseMass_0_Friction_0.4: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4473 ± 0.0052
+      mean@25: 0.0158 ± 0.0052
+      mean@50: 0.1892 ± 0.0053
+    terrain_quality_score:
+      mean: 0.8950 ± 0.0010
+      mean@25: 0.8130 ± 0.0010
+      mean@50: 0.8459 ± 0.0010
+    ang_vel_err:
+      mean: 0.3468 ± 0.0033
+      mean@25: 0.0017 ± 0.0013
+      mean@50: 0.0925 ± 0.0058
+    dof_limits:
+      mean: 0.9186 ± 0.0017
+      mean@25: 0.8717 ± 0.0011
+      mean@50: 0.8856 ± 0.0015
+    dof_power:
+      mean: 0.8026 ± 0.0042
+      mean@25: 0.5674 ± 0.0166
+      mean@50: 0.6827 ± 0.0084
+    friction_margin:
+      mean: 0.4863 ± 0.0075
+      mean@25: 0.1018 ± 0.0020
+      mean@50: 0.2309 ± 0.0031
+    lin_vel_err:
+      mean: 0.6301 ± 0.0051
+      mean@25: 0.2676 ± 0.0047
+      mean@50: 0.4322 ± 0.0046
+    orientation_stability:
+      mean: 0.8723 ± 0.0063
+      mean@25: 0.7347 ± 0.0147
+      mean@50: 0.7942 ± 0.0095
+    torque_smoothness:
+      mean: 0.7835 ± 0.0015
+      mean@25: 0.6586 ± 0.0065
+      mean@50: 0.7105 ± 0.0038
+    zmp_margin:
+      mean: 0.8444 ± 0.0054
+      mean@25: 0.6237 ± 0.0048
+      mean@50: 0.7205 ± 0.0066
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8759 ± 0.0033
+      mean@25: 0.8103 ± 0.0013
+      mean@50: 0.8276 ± 0.0058
+    dof_limits:
+      mean: 0.9845 ± 0.0017
+      mean@25: 0.9756 ± 0.0011
+      mean@50: 0.9783 ± 0.0015
+    dof_power:
+      mean: 0.9625 ± 0.0042
+      mean@25: 0.9178 ± 0.0166
+      mean@50: 0.9397 ± 0.0084
+    friction_margin:
+      mean: 0.9024 ± 0.0075
+      mean@25: 0.8293 ± 0.0020
+      mean@50: 0.8539 ± 0.0031
+    lin_vel_err:
+      mean: 0.9297 ± 0.0051
+      mean@25: 0.8609 ± 0.0047
+      mean@50: 0.8921 ± 0.0046
+    orientation_stability:
+      mean: 0.9757 ± 0.0063
+      mean@25: 0.9496 ± 0.0147
+      mean@50: 0.9609 ± 0.0095
+    torque_smoothness:
+      mean: 0.9589 ± 0.0015
+      mean@25: 0.9351 ± 0.0065
+      mean@50: 0.9450 ± 0.0038
+    zmp_margin:
+      mean: 0.9704 ± 0.0054
+      mean@25: 0.9285 ± 0.0048
+      mean@50: 0.9469 ± 0.0066
+stairs_bd_10_baseMass0_friction0.5:
+  success:
+    Seed_0_BaseMass_0_Friction_0.5: true
+    Seed_1_BaseMass_0_Friction_0.5: true
+    Seed_2_BaseMass_0_Friction_0.5: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4649 ± 0.0079
+      mean@25: 0.0298 ± 0.0144
+      mean@50: 0.2078 ± 0.0136
+    terrain_quality_score:
+      mean: 0.8983 ± 0.0015
+      mean@25: 0.8156 ± 0.0027
+      mean@50: 0.8495 ± 0.0026
+    ang_vel_err:
+      mean: 0.3559 ± 0.0040
+      mean@25: 0.0042 ± 0.0031
+      mean@50: 0.0990 ± 0.0080
+    dof_limits:
+      mean: 0.9178 ± 0.0010
+      mean@25: 0.8712 ± 0.0019
+      mean@50: 0.8851 ± 0.0016
+    dof_power:
+      mean: 0.7963 ± 0.0021
+      mean@25: 0.5577 ± 0.0060
+      mean@50: 0.6743 ± 0.0050
+    friction_margin:
+      mean: 0.5404 ± 0.0092
+      mean@25: 0.1628 ± 0.0041
+      mean@50: 0.3073 ± 0.0096
+    lin_vel_err:
+      mean: 0.6473 ± 0.0154
+      mean@25: 0.3005 ± 0.0342
+      mean@50: 0.4643 ± 0.0268
+    orientation_stability:
+      mean: 0.8647 ± 0.0085
+      mean@25: 0.7267 ± 0.0221
+      mean@50: 0.7867 ± 0.0146
+    torque_smoothness:
+      mean: 0.7832 ± 0.0021
+      mean@25: 0.6606 ± 0.0086
+      mean@50: 0.7106 ± 0.0056
+    zmp_margin:
+      mean: 0.8468 ± 0.0050
+      mean@25: 0.6302 ± 0.0171
+      mean@50: 0.7252 ± 0.0094
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8776 ± 0.0040
+      mean@25: 0.8108 ± 0.0031
+      mean@50: 0.8288 ± 0.0080
+    dof_limits:
+      mean: 0.9844 ± 0.0010
+      mean@25: 0.9755 ± 0.0019
+      mean@50: 0.9782 ± 0.0016
+    dof_power:
+      mean: 0.9613 ± 0.0021
+      mean@25: 0.9160 ± 0.0060
+      mean@50: 0.9381 ± 0.0050
+    friction_margin:
+      mean: 0.9127 ± 0.0092
+      mean@25: 0.8409 ± 0.0041
+      mean@50: 0.8684 ± 0.0096
+    lin_vel_err:
+      mean: 0.9330 ± 0.0154
+      mean@25: 0.8671 ± 0.0342
+      mean@50: 0.8982 ± 0.0268
+    orientation_stability:
+      mean: 0.9743 ± 0.0085
+      mean@25: 0.9481 ± 0.0221
+      mean@50: 0.9595 ± 0.0146
+    torque_smoothness:
+      mean: 0.9588 ± 0.0021
+      mean@25: 0.9355 ± 0.0086
+      mean@50: 0.9450 ± 0.0056
+    zmp_margin:
+      mean: 0.9709 ± 0.0050
+      mean@25: 0.9297 ± 0.0171
+      mean@50: 0.9478 ± 0.0094
+stairs_bd_10_baseMass0_friction0.6:
+  success:
+    Seed_0_BaseMass_0_Friction_0.6: true
+    Seed_1_BaseMass_0_Friction_0.6: true
+    Seed_2_BaseMass_0_Friction_0.6: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4752 ± 0.0145
+      mean@25: 0.0337 ± 0.0155
+      mean@50: 0.2171 ± 0.0218
+    terrain_quality_score:
+      mean: 0.9003 ± 0.0027
+      mean@25: 0.8164 ± 0.0030
+      mean@50: 0.8512 ± 0.0041
+    ang_vel_err:
+      mean: 0.3533 ± 0.0095
+      mean@25: 0.0051 ± 0.0054
+      mean@50: 0.0939 ± 0.0148
+    dof_limits:
+      mean: 0.9194 ± 0.0020
+      mean@25: 0.8735 ± 0.0025
+      mean@50: 0.8873 ± 0.0020
+    dof_power:
+      mean: 0.7973 ± 0.0051
+      mean@25: 0.5555 ± 0.0050
+      mean@50: 0.6758 ± 0.0058
+    friction_margin:
+      mean: 0.5886 ± 0.0033
+      mean@25: 0.2304 ± 0.0047
+      mean@50: 0.3759 ± 0.0034
+    lin_vel_err:
+      mean: 0.6520 ± 0.0121
+      mean@25: 0.3085 ± 0.0211
+      mean@50: 0.4694 ± 0.0187
+    orientation_stability:
+      mean: 0.8635 ± 0.0153
+      mean@25: 0.7293 ± 0.0308
+      mean@50: 0.7855 ± 0.0245
+    torque_smoothness:
+      mean: 0.7825 ± 0.0025
+      mean@25: 0.6604 ± 0.0024
+      mean@50: 0.7111 ± 0.0029
+    zmp_margin:
+      mean: 0.8569 ± 0.0030
+      mean@25: 0.6518 ± 0.0056
+      mean@50: 0.7434 ± 0.0044
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8771 ± 0.0095
+      mean@25: 0.8110 ± 0.0054
+      mean@50: 0.8278 ± 0.0148
+    dof_limits:
+      mean: 0.9847 ± 0.0020
+      mean@25: 0.9760 ± 0.0025
+      mean@50: 0.9786 ± 0.0020
+    dof_power:
+      mean: 0.9615 ± 0.0051
+      mean@25: 0.9156 ± 0.0050
+      mean@50: 0.9384 ± 0.0058
+    friction_margin:
+      mean: 0.9218 ± 0.0033
+      mean@25: 0.8538 ± 0.0047
+      mean@50: 0.8814 ± 0.0034
+    lin_vel_err:
+      mean: 0.9339 ± 0.0121
+      mean@25: 0.8686 ± 0.0211
+      mean@50: 0.8992 ± 0.0187
+    orientation_stability:
+      mean: 0.9741 ± 0.0153
+      mean@25: 0.9486 ± 0.0308
+      mean@50: 0.9592 ± 0.0245
+    torque_smoothness:
+      mean: 0.9587 ± 0.0025
+      mean@25: 0.9355 ± 0.0024
+      mean@50: 0.9451 ± 0.0029
+    zmp_margin:
+      mean: 0.9728 ± 0.0030
+      mean@25: 0.9338 ± 0.0056
+      mean@50: 0.9512 ± 0.0044
+stairs_bd_10_baseMass0_friction0.7:
+  success:
+    Seed_0_BaseMass_0_Friction_0.7: true
+    Seed_1_BaseMass_0_Friction_0.7: true
+    Seed_2_BaseMass_0_Friction_0.7: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4842 ± 0.0052
+      mean@25: 0.0430 ± 0.0069
+      mean@50: 0.2267 ± 0.0049
+    terrain_quality_score:
+      mean: 0.9020 ± 0.0010
+      mean@25: 0.8182 ± 0.0013
+      mean@50: 0.8531 ± 0.0010
+    ang_vel_err:
+      mean: 0.3583 ± 0.0020
+      mean@25: 0.0063 ± 0.0027
+      mean@50: 0.1034 ± 0.0035
+    dof_limits:
+      mean: 0.9178 ± 0.0004
+      mean@25: 0.8718 ± 0.0011
+      mean@50: 0.8857 ± 0.0012
+    dof_power:
+      mean: 0.8006 ± 0.0060
+      mean@25: 0.5632 ± 0.0187
+      mean@50: 0.6808 ± 0.0111
+    friction_margin:
+      mean: 0.6296 ± 0.0013
+      mean@25: 0.2921 ± 0.0133
+      mean@50: 0.4350 ± 0.0068
+    lin_vel_err:
+      mean: 0.6561 ± 0.0096
+      mean@25: 0.3178 ± 0.0194
+      mean@50: 0.4750 ± 0.0140
+    orientation_stability:
+      mean: 0.8657 ± 0.0043
+      mean@25: 0.7222 ± 0.0063
+      mean@50: 0.7850 ± 0.0063
+    torque_smoothness:
+      mean: 0.7835 ± 0.0049
+      mean@25: 0.6603 ± 0.0063
+      mean@50: 0.7108 ± 0.0065
+    zmp_margin:
+      mean: 0.8520 ± 0.0038
+      mean@25: 0.6483 ± 0.0082
+      mean@50: 0.7363 ± 0.0081
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8781 ± 0.0020
+      mean@25: 0.8112 ± 0.0027
+      mean@50: 0.8296 ± 0.0035
+    dof_limits:
+      mean: 0.9844 ± 0.0004
+      mean@25: 0.9756 ± 0.0011
+      mean@50: 0.9783 ± 0.0012
+    dof_power:
+      mean: 0.9621 ± 0.0060
+      mean@25: 0.9170 ± 0.0187
+      mean@50: 0.9393 ± 0.0111
+    friction_margin:
+      mean: 0.9296 ± 0.0013
+      mean@25: 0.8655 ± 0.0133
+      mean@50: 0.8926 ± 0.0068
+    lin_vel_err:
+      mean: 0.9347 ± 0.0096
+      mean@25: 0.8704 ± 0.0194
+      mean@50: 0.9002 ± 0.0140
+    orientation_stability:
+      mean: 0.9745 ± 0.0043
+      mean@25: 0.9472 ± 0.0063
+      mean@50: 0.9592 ± 0.0063
+    torque_smoothness:
+      mean: 0.9589 ± 0.0049
+      mean@25: 0.9355 ± 0.0063
+      mean@50: 0.9451 ± 0.0065
+    zmp_margin:
+      mean: 0.9719 ± 0.0038
+      mean@25: 0.9332 ± 0.0082
+      mean@50: 0.9499 ± 0.0081
+stairs_bd_10_baseMass0_friction0.8:
+  success:
+    Seed_0_BaseMass_0_Friction_0.8: true
+    Seed_1_BaseMass_0_Friction_0.8: true
+    Seed_2_BaseMass_0_Friction_0.8: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4724 ± 0.0181
+      mean@25: 0.0221 ± 0.0080
+      mean@50: 0.2086 ± 0.0253
+    terrain_quality_score:
+      mean: 0.8998 ± 0.0034
+      mean@25: 0.8142 ± 0.0015
+      mean@50: 0.8496 ± 0.0048
+    ang_vel_err:
+      mean: 0.3502 ± 0.0155
+      mean@25: 0.0021 ± 0.0017
+      mean@50: 0.0945 ± 0.0153
+    dof_limits:
+      mean: 0.9196 ± 0.0019
+      mean@25: 0.8733 ± 0.0029
+      mean@50: 0.8875 ± 0.0031
+    dof_power:
+      mean: 0.7963 ± 0.0049
+      mean@25: 0.5490 ± 0.0110
+      mean@50: 0.6724 ± 0.0079
+    friction_margin:
+      mean: 0.6539 ± 0.0131
+      mean@25: 0.3206 ± 0.0347
+      mean@50: 0.4691 ± 0.0208
+    lin_vel_err:
+      mean: 0.6397 ± 0.0166
+      mean@25: 0.2952 ± 0.0314
+      mean@50: 0.4511 ± 0.0281
+    orientation_stability:
+      mean: 0.8593 ± 0.0049
+      mean@25: 0.7256 ± 0.0161
+      mean@50: 0.7798 ± 0.0102
+    torque_smoothness:
+      mean: 0.7804 ± 0.0012
+      mean@25: 0.6539 ± 0.0033
+      mean@50: 0.7065 ± 0.0015
+    zmp_margin:
+      mean: 0.8551 ± 0.0018
+      mean@25: 0.6521 ± 0.0076
+      mean@50: 0.7405 ± 0.0043
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8765 ± 0.0155
+      mean@25: 0.8104 ± 0.0017
+      mean@50: 0.8280 ± 0.0153
+    dof_limits:
+      mean: 0.9847 ± 0.0019
+      mean@25: 0.9759 ± 0.0029
+      mean@50: 0.9786 ± 0.0031
+    dof_power:
+      mean: 0.9613 ± 0.0049
+      mean@25: 0.9143 ± 0.0110
+      mean@50: 0.9377 ± 0.0079
+    friction_margin:
+      mean: 0.9342 ± 0.0131
+      mean@25: 0.8709 ± 0.0347
+      mean@50: 0.8991 ± 0.0208
+    lin_vel_err:
+      mean: 0.9315 ± 0.0166
+      mean@25: 0.8661 ± 0.0314
+      mean@50: 0.8957 ± 0.0281
+    orientation_stability:
+      mean: 0.9733 ± 0.0049
+      mean@25: 0.9479 ± 0.0161
+      mean@50: 0.9582 ± 0.0102
+    torque_smoothness:
+      mean: 0.9583 ± 0.0012
+      mean@25: 0.9342 ± 0.0033
+      mean@50: 0.9442 ± 0.0015
+    zmp_margin:
+      mean: 0.9725 ± 0.0018
+      mean@25: 0.9339 ± 0.0076
+      mean@50: 0.9507 ± 0.0043
+stairs_bd_10_baseMass0_friction0.9:
+  success:
+    Seed_0_BaseMass_0_Friction_0.9: true
+    Seed_1_BaseMass_0_Friction_0.9: true
+    Seed_2_BaseMass_0_Friction_0.9: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4936 ± 0.0068
+      mean@25: 0.0365 ± 0.0049
+      mean@50: 0.2394 ± 0.0100
+    terrain_quality_score:
+      mean: 0.9038 ± 0.0013
+      mean@25: 0.8169 ± 0.0009
+      mean@50: 0.8555 ± 0.0019
+    ang_vel_err:
+      mean: 0.3605 ± 0.0089
+      mean@25: 0.0055 ± 0.0010
+      mean@50: 0.1046 ± 0.0081
+    dof_limits:
+      mean: 0.9183 ± 0.0011
+      mean@25: 0.8725 ± 0.0017
+      mean@50: 0.8863 ± 0.0017
+    dof_power:
+      mean: 0.8063 ± 0.0036
+      mean@25: 0.5765 ± 0.0083
+      mean@50: 0.6888 ± 0.0048
+    friction_margin:
+      mean: 0.6849 ± 0.0079
+      mean@25: 0.3696 ± 0.0148
+      mean@50: 0.5120 ± 0.0104
+    lin_vel_err:
+      mean: 0.6509 ± 0.0055
+      mean@25: 0.3096 ± 0.0063
+      mean@50: 0.4674 ± 0.0068
+    orientation_stability:
+      mean: 0.8655 ± 0.0009
+      mean@25: 0.7301 ± 0.0024
+      mean@50: 0.7889 ± 0.0014
+    torque_smoothness:
+      mean: 0.7830 ± 0.0024
+      mean@25: 0.6619 ± 0.0029
+      mean@50: 0.7112 ± 0.0025
+    zmp_margin:
+      mean: 0.8470 ± 0.0025
+      mean@25: 0.6416 ± 0.0051
+      mean@50: 0.7302 ± 0.0030
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8785 ± 0.0089
+      mean@25: 0.8110 ± 0.0010
+      mean@50: 0.8299 ± 0.0081
+    dof_limits:
+      mean: 0.9845 ± 0.0011
+      mean@25: 0.9758 ± 0.0017
+      mean@50: 0.9784 ± 0.0017
+    dof_power:
+      mean: 0.9632 ± 0.0036
+      mean@25: 0.9195 ± 0.0083
+      mean@50: 0.9409 ± 0.0048
+    friction_margin:
+      mean: 0.9401 ± 0.0079
+      mean@25: 0.8802 ± 0.0148
+      mean@50: 0.9073 ± 0.0104
+    lin_vel_err:
+      mean: 0.9337 ± 0.0055
+      mean@25: 0.8688 ± 0.0063
+      mean@50: 0.8988 ± 0.0068
+    orientation_stability:
+      mean: 0.9744 ± 0.0009
+      mean@25: 0.9487 ± 0.0024
+      mean@50: 0.9599 ± 0.0014
+    torque_smoothness:
+      mean: 0.9588 ± 0.0024
+      mean@25: 0.9358 ± 0.0029
+      mean@50: 0.9451 ± 0.0025
+    zmp_margin:
+      mean: 0.9709 ± 0.0025
+      mean@25: 0.9319 ± 0.0051
+      mean@50: 0.9487 ± 0.0030
+stairs_bd_10_baseMass0_friction1.0:
+  success:
+    Seed_0_BaseMass_0_Friction_1.0: true
+    Seed_1_BaseMass_0_Friction_1.0: true
+    Seed_2_BaseMass_0_Friction_1.0: true
+  terrain_name: stairs_bd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4896 ± 0.0101
+      mean@25: 0.0426 ± 0.0125
+      mean@50: 0.2318 ± 0.0181
+    terrain_quality_score:
+      mean: 0.9030 ± 0.0019
+      mean@25: 0.8181 ± 0.0024
+      mean@50: 0.8540 ± 0.0035
+    ang_vel_err:
+      mean: 0.3554 ± 0.0128
+      mean@25: 0.0065 ± 0.0022
+      mean@50: 0.1018 ± 0.0135
+    dof_limits:
+      mean: 0.9209 ± 0.0038
+      mean@25: 0.8730 ± 0.0049
+      mean@50: 0.8881 ± 0.0047
+    dof_power:
+      mean: 0.7959 ± 0.0010
+      mean@25: 0.5458 ± 0.0039
+      mean@50: 0.6698 ± 0.0027
+    friction_margin:
+      mean: 0.7004 ± 0.0063
+      mean@25: 0.3896 ± 0.0145
+      mean@50: 0.5351 ± 0.0091
+    lin_vel_err:
+      mean: 0.6572 ± 0.0084
+      mean@25: 0.3195 ± 0.0163
+      mean@50: 0.4767 ± 0.0153
+    orientation_stability:
+      mean: 0.8665 ± 0.0029
+      mean@25: 0.7247 ± 0.0217
+      mean@50: 0.7875 ± 0.0076
+    torque_smoothness:
+      mean: 0.7804 ± 0.0040
+      mean@25: 0.6530 ± 0.0053
+      mean@50: 0.7056 ± 0.0044
+    zmp_margin:
+      mean: 0.8500 ± 0.0030
+      mean@25: 0.6485 ± 0.0058
+      mean@50: 0.7359 ± 0.0046
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8775 ± 0.0128
+      mean@25: 0.8112 ± 0.0022
+      mean@50: 0.8293 ± 0.0135
+    dof_limits:
+      mean: 0.9850 ± 0.0038
+      mean@25: 0.9759 ± 0.0049
+      mean@50: 0.9787 ± 0.0047
+    dof_power:
+      mean: 0.9612 ± 0.0010
+      mean@25: 0.9137 ± 0.0039
+      mean@50: 0.9373 ± 0.0027
+    friction_margin:
+      mean: 0.9431 ± 0.0063
+      mean@25: 0.8840 ± 0.0145
+      mean@50: 0.9117 ± 0.0091
+    lin_vel_err:
+      mean: 0.9349 ± 0.0084
+      mean@25: 0.8707 ± 0.0163
+      mean@50: 0.9006 ± 0.0153
+    orientation_stability:
+      mean: 0.9746 ± 0.0029
+      mean@25: 0.9477 ± 0.0217
+      mean@50: 0.9596 ± 0.0076
+    torque_smoothness:
+      mean: 0.9583 ± 0.0040
+      mean@25: 0.9341 ± 0.0053
+      mean@50: 0.9441 ± 0.0044
+    zmp_margin:
+      mean: 0.9715 ± 0.0030
+      mean@25: 0.9332 ± 0.0058
+      mean@50: 0.9498 ± 0.0046
+stairs_fd_8_baseMass0_friction0.2:
+  success:
+    Seed_0_BaseMass_0_Friction_0.2: true
+    Seed_1_BaseMass_0_Friction_0.2: true
+    Seed_2_BaseMass_0_Friction_0.2: true
+  terrain_name: stairs_fd
+  terrain_level: 8
+  summary:
+    quality_score:
+      mean: 0.3293 ± 0.0061
+      mean@25: 0.0059 ± 0.0001
+      mean@50: 0.0699 ± 0.0058
+    terrain_quality_score:
+      mean: 0.6926 ± 0.0011
+      mean@25: 0.6311 ± 0.0000
+      mean@50: 0.6433 ± 0.0011
+    ang_vel_err:
+      mean: 0.2705 ± 0.0081
+      mean@25: 0.0000 ± 0.0000
+      mean@50: 0.0286 ± 0.0025
+    dof_limits:
+      mean: 0.8991 ± 0.0016
+      mean@25: 0.8538 ± 0.0016
+      mean@50: 0.8701 ± 0.0020
+    dof_power:
+      mean: 0.7609 ± 0.0056
+      mean@25: 0.4907 ± 0.0165
+      mean@50: 0.6242 ± 0.0103
+    friction_margin:
+      mean: 0.2806 ± 0.0056
+      mean@25: 0.0187 ± 0.0005
+      mean@50: 0.0504 ± 0.0002
+    lin_vel_err:
+      mean: 0.5860 ± 0.0062
+      mean@25: 0.2194 ± 0.0089
+      mean@50: 0.3733 ± 0.0056
+    orientation_stability:
+      mean: 0.8872 ± 0.0091
+      mean@25: 0.7521 ± 0.0106
+      mean@50: 0.8141 ± 0.0126
+    torque_smoothness:
+      mean: 0.7489 ± 0.0027
+      mean@25: 0.6098 ± 0.0010
+      mean@50: 0.6679 ± 0.0008
+    zmp_margin:
+      mean: 0.8454 ± 0.0021
+      mean@25: 0.6087 ± 0.0085
+      mean@50: 0.7263 ± 0.0040
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.6814 ± 0.0081
+      mean@25: 0.6300 ± 0.0000
+      mean@50: 0.6354 ± 0.0025
+    dof_limits:
+      mean: 0.8008 ± 0.0016
+      mean@25: 0.7922 ± 0.0016
+      mean@50: 0.7953 ± 0.0020
+    dof_power:
+      mean: 0.7746 ± 0.0056
+      mean@25: 0.7232 ± 0.0165
+      mean@50: 0.7486 ± 0.0103
+    friction_margin:
+      mean: 0.6833 ± 0.0056
+      mean@25: 0.6335 ± 0.0005
+      mean@50: 0.6396 ± 0.0002
+    lin_vel_err:
+      mean: 0.7413 ± 0.0062
+      mean@25: 0.6717 ± 0.0089
+      mean@50: 0.7009 ± 0.0056
+    orientation_stability:
+      mean: 0.7986 ± 0.0091
+      mean@25: 0.7729 ± 0.0106
+      mean@50: 0.7847 ± 0.0126
+    torque_smoothness:
+      mean: 0.7723 ± 0.0027
+      mean@25: 0.7459 ± 0.0010
+      mean@50: 0.7569 ± 0.0008
+    zmp_margin:
+      mean: 0.7906 ± 0.0021
+      mean@25: 0.7457 ± 0.0085
+      mean@50: 0.7680 ± 0.0040
+stairs_fd_10_baseMass0_friction0.3:
+  success:
+    Seed_0_BaseMass_0_Friction_0.3: true
+    Seed_1_BaseMass_0_Friction_0.3: true
+    Seed_2_BaseMass_0_Friction_0.3: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.3713 ± 0.0021
+      mean@25: 0.0073 ± 0.0003
+      mean@50: 0.0969 ± 0.0035
+    terrain_quality_score:
+      mean: 0.8805 ± 0.0004
+      mean@25: 0.8114 ± 0.0000
+      mean@50: 0.8284 ± 0.0007
+    ang_vel_err:
+      mean: 0.2939 ± 0.0062
+      mean@25: 0.0000 ± 0.0000
+      mean@50: 0.0376 ± 0.0055
+    dof_limits:
+      mean: 0.8959 ± 0.0025
+      mean@25: 0.8508 ± 0.0025
+      mean@50: 0.8670 ± 0.0028
+    dof_power:
+      mean: 0.7727 ± 0.0011
+      mean@25: 0.5179 ± 0.0016
+      mean@50: 0.6414 ± 0.0018
+    friction_margin:
+      mean: 0.3499 ± 0.0097
+      mean@25: 0.0334 ± 0.0033
+      mean@50: 0.1043 ± 0.0041
+    lin_vel_err:
+      mean: 0.6265 ± 0.0051
+      mean@25: 0.2756 ± 0.0209
+      mean@50: 0.4328 ± 0.0089
+    orientation_stability:
+      mean: 0.8765 ± 0.0067
+      mean@25: 0.7331 ± 0.0082
+      mean@50: 0.7968 ± 0.0106
+    torque_smoothness:
+      mean: 0.7602 ± 0.0021
+      mean@25: 0.6261 ± 0.0038
+      mean@50: 0.6818 ± 0.0027
+    zmp_margin:
+      mean: 0.8567 ± 0.0019
+      mean@25: 0.6478 ± 0.0071
+      mean@50: 0.7486 ± 0.0034
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8658 ± 0.0062
+      mean@25: 0.8100 ± 0.0000
+      mean@50: 0.8171 ± 0.0055
+    dof_limits:
+      mean: 0.9802 ± 0.0025
+      mean@25: 0.9717 ± 0.0025
+      mean@50: 0.9747 ± 0.0028
+    dof_power:
+      mean: 0.9568 ± 0.0011
+      mean@25: 0.9084 ± 0.0016
+      mean@50: 0.9319 ± 0.0018
+    friction_margin:
+      mean: 0.8765 ± 0.0097
+      mean@25: 0.8163 ± 0.0033
+      mean@50: 0.8298 ± 0.0041
+    lin_vel_err:
+      mean: 0.9290 ± 0.0051
+      mean@25: 0.8624 ± 0.0209
+      mean@50: 0.8922 ± 0.0089
+    orientation_stability:
+      mean: 0.9765 ± 0.0067
+      mean@25: 0.9493 ± 0.0082
+      mean@50: 0.9614 ± 0.0106
+    torque_smoothness:
+      mean: 0.9544 ± 0.0021
+      mean@25: 0.9290 ± 0.0038
+      mean@50: 0.9395 ± 0.0027
+    zmp_margin:
+      mean: 0.9728 ± 0.0019
+      mean@25: 0.9331 ± 0.0071
+      mean@50: 0.9522 ± 0.0034
+stairs_fd_10_baseMass0_friction0.4:
+  success:
+    Seed_0_BaseMass_0_Friction_0.4: true
+    Seed_1_BaseMass_0_Friction_0.4: true
+    Seed_2_BaseMass_0_Friction_0.4: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4136 ± 0.0051
+      mean@25: 0.0086 ± 0.0002
+      mean@50: 0.1359 ± 0.0078
+    terrain_quality_score:
+      mean: 0.8886 ± 0.0010
+      mean@25: 0.8116 ± 0.0000
+      mean@50: 0.8358 ± 0.0015
+    ang_vel_err:
+      mean: 0.3135 ± 0.0017
+      mean@25: 0.0000 ± 0.0000
+      mean@50: 0.0538 ± 0.0045
+    dof_limits:
+      mean: 0.8959 ± 0.0004
+      mean@25: 0.8522 ± 0.0008
+      mean@50: 0.8684 ± 0.0002
+    dof_power:
+      mean: 0.7868 ± 0.0042
+      mean@25: 0.5499 ± 0.0127
+      mean@50: 0.6657 ± 0.0083
+    friction_margin:
+      mean: 0.4306 ± 0.0084
+      mean@25: 0.0785 ± 0.0039
+      mean@50: 0.1922 ± 0.0027
+    lin_vel_err:
+      mean: 0.6532 ± 0.0108
+      mean@25: 0.3059 ± 0.0194
+      mean@50: 0.4725 ± 0.0153
+    orientation_stability:
+      mean: 0.8815 ± 0.0063
+      mean@25: 0.7463 ± 0.0086
+      mean@50: 0.8066 ± 0.0083
+    torque_smoothness:
+      mean: 0.7669 ± 0.0018
+      mean@25: 0.6322 ± 0.0017
+      mean@50: 0.6892 ± 0.0002
+    zmp_margin:
+      mean: 0.8609 ± 0.0006
+      mean@25: 0.6638 ± 0.0025
+      mean@50: 0.7577 ± 0.0008
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8696 ± 0.0017
+      mean@25: 0.8100 ± 0.0000
+      mean@50: 0.8202 ± 0.0045
+    dof_limits:
+      mean: 0.9802 ± 0.0004
+      mean@25: 0.9719 ± 0.0008
+      mean@50: 0.9750 ± 0.0002
+    dof_power:
+      mean: 0.9595 ± 0.0042
+      mean@25: 0.9145 ± 0.0127
+      mean@50: 0.9365 ± 0.0083
+    friction_margin:
+      mean: 0.8918 ± 0.0084
+      mean@25: 0.8249 ± 0.0039
+      mean@50: 0.8465 ± 0.0027
+    lin_vel_err:
+      mean: 0.9341 ± 0.0108
+      mean@25: 0.8681 ± 0.0194
+      mean@50: 0.8998 ± 0.0153
+    orientation_stability:
+      mean: 0.9775 ± 0.0063
+      mean@25: 0.9518 ± 0.0086
+      mean@50: 0.9633 ± 0.0083
+    torque_smoothness:
+      mean: 0.9557 ± 0.0018
+      mean@25: 0.9301 ± 0.0017
+      mean@50: 0.9409 ± 0.0002
+    zmp_margin:
+      mean: 0.9736 ± 0.0006
+      mean@25: 0.9361 ± 0.0025
+      mean@50: 0.9540 ± 0.0008
+stairs_fd_10_baseMass0_friction0.5:
+  success:
+    Seed_0_BaseMass_0_Friction_0.5: true
+    Seed_1_BaseMass_0_Friction_0.5: true
+    Seed_2_BaseMass_0_Friction_0.5: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4477 ± 0.0035
+      mean@25: 0.0098 ± 0.0010
+      mean@50: 0.1742 ± 0.0034
+    terrain_quality_score:
+      mean: 0.8950 ± 0.0007
+      mean@25: 0.8119 ± 0.0002
+      mean@50: 0.8431 ± 0.0006
+    ang_vel_err:
+      mean: 0.3339 ± 0.0025
+      mean@25: 0.0001 ± 0.0002
+      mean@50: 0.0724 ± 0.0033
+    dof_limits:
+      mean: 0.8964 ± 0.0015
+      mean@25: 0.8530 ± 0.0019
+      mean@50: 0.8692 ± 0.0021
+    dof_power:
+      mean: 0.7915 ± 0.0047
+      mean@25: 0.5493 ± 0.0113
+      mean@50: 0.6679 ± 0.0078
+    friction_margin:
+      mean: 0.4894 ± 0.0051
+      mean@25: 0.1288 ± 0.0058
+      mean@50: 0.2651 ± 0.0056
+    lin_vel_err:
+      mean: 0.6651 ± 0.0043
+      mean@25: 0.3251 ± 0.0113
+      mean@50: 0.4851 ± 0.0087
+    orientation_stability:
+      mean: 0.8795 ± 0.0065
+      mean@25: 0.7414 ± 0.0056
+      mean@50: 0.8039 ± 0.0077
+    torque_smoothness:
+      mean: 0.7688 ± 0.0018
+      mean@25: 0.6344 ± 0.0002
+      mean@50: 0.6894 ± 0.0009
+    zmp_margin:
+      mean: 0.8709 ± 0.0055
+      mean@25: 0.6899 ± 0.0165
+      mean@50: 0.7756 ± 0.0099
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8734 ± 0.0025
+      mean@25: 0.8100 ± 0.0002
+      mean@50: 0.8237 ± 0.0033
+    dof_limits:
+      mean: 0.9803 ± 0.0015
+      mean@25: 0.9721 ± 0.0019
+      mean@50: 0.9751 ± 0.0021
+    dof_power:
+      mean: 0.9604 ± 0.0047
+      mean@25: 0.9144 ± 0.0113
+      mean@50: 0.9369 ± 0.0078
+    friction_margin:
+      mean: 0.9030 ± 0.0051
+      mean@25: 0.8345 ± 0.0058
+      mean@50: 0.8604 ± 0.0056
+    lin_vel_err:
+      mean: 0.9364 ± 0.0043
+      mean@25: 0.8718 ± 0.0113
+      mean@50: 0.9022 ± 0.0087
+    orientation_stability:
+      mean: 0.9771 ± 0.0065
+      mean@25: 0.9509 ± 0.0056
+      mean@50: 0.9627 ± 0.0077
+    torque_smoothness:
+      mean: 0.9561 ± 0.0018
+      mean@25: 0.9305 ± 0.0002
+      mean@50: 0.9410 ± 0.0009
+    zmp_margin:
+      mean: 0.9755 ± 0.0055
+      mean@25: 0.9411 ± 0.0165
+      mean@50: 0.9574 ± 0.0099
+stairs_fd_10_baseMass0_friction0.6:
+  success:
+    Seed_0_BaseMass_0_Friction_0.6: true
+    Seed_1_BaseMass_0_Friction_0.6: true
+    Seed_2_BaseMass_0_Friction_0.6: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4681 ± 0.0094
+      mean@25: 0.0154 ± 0.0076
+      mean@50: 0.1981 ± 0.0125
+    terrain_quality_score:
+      mean: 0.8989 ± 0.0018
+      mean@25: 0.8129 ± 0.0015
+      mean@50: 0.8476 ± 0.0024
+    ang_vel_err:
+      mean: 0.3479 ± 0.0084
+      mean@25: 0.0008 ± 0.0010
+      mean@50: 0.0825 ± 0.0081
+    dof_limits:
+      mean: 0.8970 ± 0.0005
+      mean@25: 0.8542 ± 0.0010
+      mean@50: 0.8698 ± 0.0005
+    dof_power:
+      mean: 0.7937 ± 0.0023
+      mean@25: 0.5530 ± 0.0145
+      mean@50: 0.6698 ± 0.0067
+    friction_margin:
+      mean: 0.5501 ± 0.0045
+      mean@25: 0.2001 ± 0.0065
+      mean@50: 0.3422 ± 0.0051
+    lin_vel_err:
+      mean: 0.6765 ± 0.0050
+      mean@25: 0.3381 ± 0.0080
+      mean@50: 0.4993 ± 0.0052
+    orientation_stability:
+      mean: 0.8842 ± 0.0090
+      mean@25: 0.7487 ± 0.0158
+      mean@50: 0.8099 ± 0.0141
+    torque_smoothness:
+      mean: 0.7706 ± 0.0017
+      mean@25: 0.6364 ± 0.0065
+      mean@50: 0.6922 ± 0.0033
+    zmp_margin:
+      mean: 0.8733 ± 0.0025
+      mean@25: 0.7079 ± 0.0083
+      mean@50: 0.7829 ± 0.0037
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8761 ± 0.0084
+      mean@25: 0.8101 ± 0.0010
+      mean@50: 0.8257 ± 0.0081
+    dof_limits:
+      mean: 0.9804 ± 0.0005
+      mean@25: 0.9723 ± 0.0010
+      mean@50: 0.9753 ± 0.0005
+    dof_power:
+      mean: 0.9608 ± 0.0023
+      mean@25: 0.9151 ± 0.0145
+      mean@50: 0.9373 ± 0.0067
+    friction_margin:
+      mean: 0.9145 ± 0.0045
+      mean@25: 0.8480 ± 0.0065
+      mean@50: 0.8750 ± 0.0051
+    lin_vel_err:
+      mean: 0.9385 ± 0.0050
+      mean@25: 0.8742 ± 0.0080
+      mean@50: 0.9049 ± 0.0052
+    orientation_stability:
+      mean: 0.9780 ± 0.0090
+      mean@25: 0.9523 ± 0.0158
+      mean@50: 0.9639 ± 0.0141
+    torque_smoothness:
+      mean: 0.9564 ± 0.0017
+      mean@25: 0.9309 ± 0.0065
+      mean@50: 0.9415 ± 0.0033
+    zmp_margin:
+      mean: 0.9759 ± 0.0025
+      mean@25: 0.9445 ± 0.0083
+      mean@50: 0.9587 ± 0.0037
+stairs_fd_10_baseMass0_friction0.7:
+  success:
+    Seed_0_BaseMass_0_Friction_0.7: true
+    Seed_1_BaseMass_0_Friction_0.7: true
+    Seed_2_BaseMass_0_Friction_0.7: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4723 ± 0.0052
+      mean@25: 0.0195 ± 0.0074
+      mean@50: 0.2042 ± 0.0105
+    terrain_quality_score:
+      mean: 0.8997 ± 0.0010
+      mean@25: 0.8137 ± 0.0014
+      mean@50: 0.8488 ± 0.0020
+    ang_vel_err:
+      mean: 0.3436 ± 0.0029
+      mean@25: 0.0007 ± 0.0005
+      mean@50: 0.0815 ± 0.0027
+    dof_limits:
+      mean: 0.8956 ± 0.0008
+      mean@25: 0.8512 ± 0.0014
+      mean@50: 0.8672 ± 0.0005
+    dof_power:
+      mean: 0.7942 ± 0.0054
+      mean@25: 0.5558 ± 0.0058
+      mean@50: 0.6732 ± 0.0060
+    friction_margin:
+      mean: 0.5833 ± 0.0025
+      mean@25: 0.2437 ± 0.0039
+      mean@50: 0.3881 ± 0.0038
+    lin_vel_err:
+      mean: 0.6701 ± 0.0041
+      mean@25: 0.3253 ± 0.0104
+      mean@50: 0.4900 ± 0.0083
+    orientation_stability:
+      mean: 0.8896 ± 0.0036
+      mean@25: 0.7585 ± 0.0063
+      mean@50: 0.8190 ± 0.0033
+    torque_smoothness:
+      mean: 0.7710 ± 0.0023
+      mean@25: 0.6392 ± 0.0010
+      mean@50: 0.6937 ± 0.0013
+    zmp_margin:
+      mean: 0.8705 ± 0.0022
+      mean@25: 0.6996 ± 0.0082
+      mean@50: 0.7780 ± 0.0048
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8753 ± 0.0029
+      mean@25: 0.8101 ± 0.0005
+      mean@50: 0.8255 ± 0.0027
+    dof_limits:
+      mean: 0.9802 ± 0.0008
+      mean@25: 0.9717 ± 0.0014
+      mean@50: 0.9748 ± 0.0005
+    dof_power:
+      mean: 0.9609 ± 0.0054
+      mean@25: 0.9156 ± 0.0058
+      mean@50: 0.9379 ± 0.0060
+    friction_margin:
+      mean: 0.9208 ± 0.0025
+      mean@25: 0.8563 ± 0.0039
+      mean@50: 0.8837 ± 0.0038
+    lin_vel_err:
+      mean: 0.9373 ± 0.0041
+      mean@25: 0.8718 ± 0.0104
+      mean@50: 0.9031 ± 0.0083
+    orientation_stability:
+      mean: 0.9790 ± 0.0036
+      mean@25: 0.9541 ± 0.0063
+      mean@50: 0.9656 ± 0.0033
+    torque_smoothness:
+      mean: 0.9565 ± 0.0023
+      mean@25: 0.9315 ± 0.0010
+      mean@50: 0.9418 ± 0.0013
+    zmp_margin:
+      mean: 0.9754 ± 0.0022
+      mean@25: 0.9429 ± 0.0082
+      mean@50: 0.9578 ± 0.0048
+stairs_fd_10_baseMass0_friction0.8:
+  success:
+    Seed_0_BaseMass_0_Friction_0.8: true
+    Seed_1_BaseMass_0_Friction_0.8: true
+    Seed_2_BaseMass_0_Friction_0.8: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4760 ± 0.0033
+      mean@25: 0.0114 ± 0.0018
+      mean@50: 0.2049 ± 0.0054
+    terrain_quality_score:
+      mean: 0.9004 ± 0.0006
+      mean@25: 0.8121 ± 0.0003
+      mean@50: 0.8489 ± 0.0010
+    ang_vel_err:
+      mean: 0.3454 ± 0.0040
+      mean@25: 0.0001 ± 0.0001
+      mean@50: 0.0826 ± 0.0052
+    dof_limits:
+      mean: 0.8929 ± 0.0006
+      mean@25: 0.8493 ± 0.0010
+      mean@50: 0.8650 ± 0.0004
+    dof_power:
+      mean: 0.8025 ± 0.0053
+      mean@25: 0.5731 ± 0.0110
+      mean@50: 0.6855 ± 0.0074
+    friction_margin:
+      mean: 0.6176 ± 0.0021
+      mean@25: 0.2901 ± 0.0057
+      mean@50: 0.4362 ± 0.0029
+    lin_vel_err:
+      mean: 0.6622 ± 0.0026
+      mean@25: 0.3122 ± 0.0051
+      mean@50: 0.4787 ± 0.0048
+    orientation_stability:
+      mean: 0.8850 ± 0.0051
+      mean@25: 0.7510 ± 0.0059
+      mean@50: 0.8114 ± 0.0051
+    torque_smoothness:
+      mean: 0.7728 ± 0.0008
+      mean@25: 0.6398 ± 0.0028
+      mean@50: 0.6947 ± 0.0023
+    zmp_margin:
+      mean: 0.8684 ± 0.0008
+      mean@25: 0.7037 ± 0.0018
+      mean@50: 0.7772 ± 0.0020
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8756 ± 0.0040
+      mean@25: 0.8100 ± 0.0001
+      mean@50: 0.8257 ± 0.0052
+    dof_limits:
+      mean: 0.9797 ± 0.0006
+      mean@25: 0.9714 ± 0.0010
+      mean@50: 0.9744 ± 0.0004
+    dof_power:
+      mean: 0.9625 ± 0.0053
+      mean@25: 0.9189 ± 0.0110
+      mean@50: 0.9402 ± 0.0074
+    friction_margin:
+      mean: 0.9273 ± 0.0021
+      mean@25: 0.8651 ± 0.0057
+      mean@50: 0.8929 ± 0.0029
+    lin_vel_err:
+      mean: 0.9358 ± 0.0026
+      mean@25: 0.8693 ± 0.0051
+      mean@50: 0.9010 ± 0.0048
+    orientation_stability:
+      mean: 0.9781 ± 0.0051
+      mean@25: 0.9527 ± 0.0059
+      mean@50: 0.9642 ± 0.0051
+    torque_smoothness:
+      mean: 0.9568 ± 0.0008
+      mean@25: 0.9316 ± 0.0028
+      mean@50: 0.9420 ± 0.0023
+    zmp_margin:
+      mean: 0.9750 ± 0.0008
+      mean@25: 0.9437 ± 0.0018
+      mean@50: 0.9577 ± 0.0020
+stairs_fd_10_baseMass0_friction0.9:
+  success:
+    Seed_0_BaseMass_0_Friction_0.9: true
+    Seed_1_BaseMass_0_Friction_0.9: true
+    Seed_2_BaseMass_0_Friction_0.9: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4638 ± 0.0199
+      mean@25: 0.0133 ± 0.0050
+      mean@50: 0.1835 ± 0.0285
+    terrain_quality_score:
+      mean: 0.8981 ± 0.0038
+      mean@25: 0.8125 ± 0.0010
+      mean@50: 0.8448 ± 0.0054
+    ang_vel_err:
+      mean: 0.3326 ± 0.0165
+      mean@25: 0.0005 ± 0.0008
+      mean@50: 0.0697 ± 0.0160
+    dof_limits:
+      mean: 0.8928 ± 0.0007
+      mean@25: 0.8508 ± 0.0016
+      mean@50: 0.8653 ± 0.0017
+    dof_power:
+      mean: 0.7980 ± 0.0055
+      mean@25: 0.5623 ± 0.0141
+      mean@50: 0.6780 ± 0.0101
+    friction_margin:
+      mean: 0.6444 ± 0.0050
+      mean@25: 0.3226 ± 0.0163
+      mean@50: 0.4697 ± 0.0093
+    lin_vel_err:
+      mean: 0.6679 ± 0.0146
+      mean@25: 0.3323 ± 0.0343
+      mean@50: 0.4902 ± 0.0240
+    orientation_stability:
+      mean: 0.8819 ± 0.0069
+      mean@25: 0.7447 ± 0.0098
+      mean@50: 0.8069 ± 0.0097
+    torque_smoothness:
+      mean: 0.7714 ± 0.0034
+      mean@25: 0.6376 ± 0.0036
+      mean@50: 0.6934 ± 0.0040
+    zmp_margin:
+      mean: 0.8653 ± 0.0003
+      mean@25: 0.6891 ± 0.0054
+      mean@50: 0.7693 ± 0.0014
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8732 ± 0.0165
+      mean@25: 0.8101 ± 0.0008
+      mean@50: 0.8232 ± 0.0160
+    dof_limits:
+      mean: 0.9796 ± 0.0007
+      mean@25: 0.9716 ± 0.0016
+      mean@50: 0.9744 ± 0.0017
+    dof_power:
+      mean: 0.9616 ± 0.0055
+      mean@25: 0.9168 ± 0.0141
+      mean@50: 0.9388 ± 0.0101
+    friction_margin:
+      mean: 0.9324 ± 0.0050
+      mean@25: 0.8713 ± 0.0163
+      mean@50: 0.8992 ± 0.0093
+    lin_vel_err:
+      mean: 0.9369 ± 0.0146
+      mean@25: 0.8731 ± 0.0343
+      mean@50: 0.9031 ± 0.0240
+    orientation_stability:
+      mean: 0.9776 ± 0.0069
+      mean@25: 0.9515 ± 0.0098
+      mean@50: 0.9633 ± 0.0097
+    torque_smoothness:
+      mean: 0.9566 ± 0.0034
+      mean@25: 0.9312 ± 0.0036
+      mean@50: 0.9417 ± 0.0040
+    zmp_margin:
+      mean: 0.9744 ± 0.0003
+      mean@25: 0.9409 ± 0.0054
+      mean@50: 0.9562 ± 0.0014
+stairs_fd_10_baseMass0_friction1.0:
+  success:
+    Seed_0_BaseMass_0_Friction_1.0: true
+    Seed_1_BaseMass_0_Friction_1.0: true
+    Seed_2_BaseMass_0_Friction_1.0: true
+  terrain_name: stairs_fd
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.4641 ± 0.0121
+      mean@25: 0.0128 ± 0.0042
+      mean@50: 0.1871 ± 0.0201
+    terrain_quality_score:
+      mean: 0.8982 ± 0.0023
+      mean@25: 0.8124 ± 0.0008
+      mean@50: 0.8456 ± 0.0038
+    ang_vel_err:
+      mean: 0.3260 ± 0.0077
+      mean@25: 0.0001 ± 0.0002
+      mean@50: 0.0710 ± 0.0086
+    dof_limits:
+      mean: 0.8926 ± 0.0021
+      mean@25: 0.8491 ± 0.0034
+      mean@50: 0.8645 ± 0.0032
+    dof_power:
+      mean: 0.7968 ± 0.0038
+      mean@25: 0.5610 ± 0.0081
+      mean@50: 0.6782 ± 0.0063
+    friction_margin:
+      mean: 0.6670 ± 0.0040
+      mean@25: 0.3560 ± 0.0147
+      mean@50: 0.5002 ± 0.0092
+    lin_vel_err:
+      mean: 0.6647 ± 0.0098
+      mean@25: 0.3152 ± 0.0214
+      mean@50: 0.4821 ± 0.0149
+    orientation_stability:
+      mean: 0.8798 ± 0.0173
+      mean@25: 0.7396 ± 0.0269
+      mean@50: 0.8029 ± 0.0264
+    torque_smoothness:
+      mean: 0.7690 ± 0.0022
+      mean@25: 0.6397 ± 0.0048
+      mean@50: 0.6929 ± 0.0031
+    zmp_margin:
+      mean: 0.8639 ± 0.0037
+      mean@25: 0.6887 ± 0.0135
+      mean@50: 0.7686 ± 0.0077
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8719 ± 0.0077
+      mean@25: 0.8100 ± 0.0002
+      mean@50: 0.8235 ± 0.0086
+    dof_limits:
+      mean: 0.9796 ± 0.0021
+      mean@25: 0.9713 ± 0.0034
+      mean@50: 0.9743 ± 0.0032
+    dof_power:
+      mean: 0.9614 ± 0.0038
+      mean@25: 0.9166 ± 0.0081
+      mean@50: 0.9389 ± 0.0063
+    friction_margin:
+      mean: 0.9367 ± 0.0040
+      mean@25: 0.8776 ± 0.0147
+      mean@50: 0.9050 ± 0.0092
+    lin_vel_err:
+      mean: 0.9363 ± 0.0098
+      mean@25: 0.8699 ± 0.0214
+      mean@50: 0.9016 ± 0.0149
+    orientation_stability:
+      mean: 0.9772 ± 0.0173
+      mean@25: 0.9505 ± 0.0269
+      mean@50: 0.9626 ± 0.0264
+    torque_smoothness:
+      mean: 0.9561 ± 0.0022
+      mean@25: 0.9315 ± 0.0048
+      mean@50: 0.9417 ± 0.0031
+    zmp_margin:
+      mean: 0.9741 ± 0.0037
+      mean@25: 0.9409 ± 0.0135
+      mean@50: 0.9560 ± 0.0077
+wave_3_baseMass0_friction0.2:
+  success:
+    Seed_0_BaseMass_0_Friction_0.2: true
+    Seed_1_BaseMass_0_Friction_0.2: true
+    Seed_2_BaseMass_0_Friction_0.2: true
+  terrain_name: wave
+  terrain_level: 3
+  summary:
+    quality_score:
+      mean: 0.5179 ± 0.0061
+      mean@25: 0.1374 ± 0.0136
+      mean@50: 0.3228 ± 0.0088
+    terrain_quality_score:
+      mean: 0.2784 ± 0.0011
+      mean@25: 0.2061 ± 0.0026
+      mean@50: 0.2413 ± 0.0017
+    ang_vel_err:
+      mean: 0.4763 ± 0.0120
+      mean@25: 0.0979 ± 0.0224
+      mean@50: 0.2508 ± 0.0186
+    dof_limits:
+      mean: 0.9652 ± 0.0008
+      mean@25: 0.9330 ± 0.0015
+      mean@50: 0.9467 ± 0.0011
+    dof_power:
+      mean: 0.8249 ± 0.0029
+      mean@25: 0.6441 ± 0.0084
+      mean@50: 0.7317 ± 0.0057
+    friction_margin:
+      mean: 0.3036 ± 0.0068
+      mean@25: 0.0167 ± 0.0004
+      mean@50: 0.0551 ± 0.0002
+    lin_vel_err:
+      mean: 0.6845 ± 0.0039
+      mean@25: 0.4031 ± 0.0052
+      mean@50: 0.5306 ± 0.0026
+    orientation_stability:
+      mean: 0.9532 ± 0.0012
+      mean@25: 0.8946 ± 0.0042
+      mean@50: 0.9227 ± 0.0023
+    torque_smoothness:
+      mean: 0.7678 ± 0.0028
+      mean@25: 0.6419 ± 0.0054
+      mean@50: 0.6932 ± 0.0040
+    zmp_margin:
+      mean: 0.8358 ± 0.0049
+      mean@25: 0.5880 ± 0.0148
+      mean@50: 0.7118 ± 0.0094
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.2705 ± 0.0120
+      mean@25: 0.1986 ± 0.0224
+      mean@50: 0.2277 ± 0.0186
+    dof_limits:
+      mean: 0.3634 ± 0.0008
+      mean@25: 0.3573 ± 0.0015
+      mean@50: 0.3599 ± 0.0011
+    dof_power:
+      mean: 0.3367 ± 0.0029
+      mean@25: 0.3024 ± 0.0084
+      mean@50: 0.3190 ± 0.0057
+    friction_margin:
+      mean: 0.2377 ± 0.0068
+      mean@25: 0.1832 ± 0.0004
+      mean@50: 0.1905 ± 0.0002
+    lin_vel_err:
+      mean: 0.3100 ± 0.0039
+      mean@25: 0.2566 ± 0.0052
+      mean@50: 0.2808 ± 0.0026
+    orientation_stability:
+      mean: 0.3611 ± 0.0012
+      mean@25: 0.3500 ± 0.0042
+      mean@50: 0.3553 ± 0.0023
+    torque_smoothness:
+      mean: 0.3259 ± 0.0028
+      mean@25: 0.3020 ± 0.0054
+      mean@50: 0.3117 ± 0.0040
+    zmp_margin:
+      mean: 0.3388 ± 0.0049
+      mean@25: 0.2917 ± 0.0148
+      mean@50: 0.3152 ± 0.0094
+wave_4_baseMass0_friction0.3:
+  success:
+    Seed_0_BaseMass_0_Friction_0.3: true
+    Seed_1_BaseMass_0_Friction_0.3: true
+    Seed_2_BaseMass_0_Friction_0.3: true
+  terrain_name: wave
+  terrain_level: 4
+  summary:
+    quality_score:
+      mean: 0.5364 ± 0.0040
+      mean@25: 0.1452 ± 0.0142
+      mean@50: 0.3388 ± 0.0085
+    terrain_quality_score:
+      mean: 0.3719 ± 0.0007
+      mean@25: 0.2976 ± 0.0027
+      mean@50: 0.3344 ± 0.0016
+    ang_vel_err:
+      mean: 0.4805 ± 0.0106
+      mean@25: 0.0998 ± 0.0161
+      mean@50: 0.2559 ± 0.0154
+    dof_limits:
+      mean: 0.9625 ± 0.0008
+      mean@25: 0.9285 ± 0.0013
+      mean@50: 0.9428 ± 0.0012
+    dof_power:
+      mean: 0.8302 ± 0.0047
+      mean@25: 0.6505 ± 0.0142
+      mean@50: 0.7360 ± 0.0091
+    friction_margin:
+      mean: 0.3386 ± 0.0102
+      mean@25: 0.0204 ± 0.0018
+      mean@50: 0.0783 ± 0.0046
+    lin_vel_err:
+      mean: 0.7123 ± 0.0038
+      mean@25: 0.4420 ± 0.0071
+      mean@50: 0.5663 ± 0.0045
+    orientation_stability:
+      mean: 0.9476 ± 0.0017
+      mean@25: 0.8856 ± 0.0033
+      mean@50: 0.9138 ± 0.0026
+    torque_smoothness:
+      mean: 0.7749 ± 0.0024
+      mean@25: 0.6514 ± 0.0068
+      mean@50: 0.7014 ± 0.0051
+    zmp_margin:
+      mean: 0.8431 ± 0.0093
+      mean@25: 0.5977 ± 0.0202
+      mean@50: 0.7230 ± 0.0145
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.3613 ± 0.0106
+      mean@25: 0.2890 ± 0.0161
+      mean@50: 0.3186 ± 0.0154
+    dof_limits:
+      mean: 0.4529 ± 0.0008
+      mean@25: 0.4464 ± 0.0013
+      mean@50: 0.4491 ± 0.0012
+    dof_power:
+      mean: 0.4277 ± 0.0047
+      mean@25: 0.3936 ± 0.0142
+      mean@50: 0.4098 ± 0.0091
+    friction_margin:
+      mean: 0.3343 ± 0.0102
+      mean@25: 0.2739 ± 0.0018
+      mean@50: 0.2849 ± 0.0046
+    lin_vel_err:
+      mean: 0.4053 ± 0.0038
+      mean@25: 0.3540 ± 0.0071
+      mean@50: 0.3776 ± 0.0045
+    orientation_stability:
+      mean: 0.4500 ± 0.0017
+      mean@25: 0.4383 ± 0.0033
+      mean@50: 0.4436 ± 0.0026
+    torque_smoothness:
+      mean: 0.4172 ± 0.0024
+      mean@25: 0.3938 ± 0.0068
+      mean@50: 0.4033 ± 0.0051
+    zmp_margin:
+      mean: 0.4302 ± 0.0093
+      mean@25: 0.3836 ± 0.0202
+      mean@50: 0.4074 ± 0.0145
+wave_6_baseMass0_friction0.4:
+  success:
+    Seed_0_BaseMass_0_Friction_0.4: true
+    Seed_1_BaseMass_0_Friction_0.4: true
+    Seed_2_BaseMass_0_Friction_0.4: true
+  terrain_name: wave
+  terrain_level: 6
+  summary:
+    quality_score:
+      mean: 0.4990 ± 0.0040
+      mean@25: 0.0919 ± 0.0126
+      mean@50: 0.2812 ± 0.0063
+    terrain_quality_score:
+      mean: 0.5448 ± 0.0007
+      mean@25: 0.4674 ± 0.0024
+      mean@50: 0.5034 ± 0.0012
+    ang_vel_err:
+      mean: 0.4290 ± 0.0081
+      mean@25: 0.0432 ± 0.0060
+      mean@50: 0.1868 ± 0.0096
+    dof_limits:
+      mean: 0.9525 ± 0.0017
+      mean@25: 0.9084 ± 0.0028
+      mean@50: 0.9267 ± 0.0021
+    dof_power:
+      mean: 0.7972 ± 0.0031
+      mean@25: 0.5736 ± 0.0054
+      mean@50: 0.6818 ± 0.0042
+    friction_margin:
+      mean: 0.3478 ± 0.0124
+      mean@25: 0.0203 ± 0.0011
+      mean@50: 0.0831 ± 0.0041
+    lin_vel_err:
+      mean: 0.6876 ± 0.0044
+      mean@25: 0.4064 ± 0.0014
+      mean@50: 0.5312 ± 0.0020
+    orientation_stability:
+      mean: 0.9344 ± 0.0003
+      mean@25: 0.8572 ± 0.0004
+      mean@50: 0.8929 ± 0.0007
+    torque_smoothness:
+      mean: 0.7601 ± 0.0038
+      mean@25: 0.6261 ± 0.0054
+      mean@50: 0.6804 ± 0.0041
+    zmp_margin:
+      mean: 0.8439 ± 0.0066
+      mean@25: 0.5900 ± 0.0150
+      mean@50: 0.7191 ± 0.0116
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.5315 ± 0.0081
+      mean@25: 0.4582 ± 0.0060
+      mean@50: 0.4855 ± 0.0096
+    dof_limits:
+      mean: 0.6310 ± 0.0017
+      mean@25: 0.6226 ± 0.0028
+      mean@50: 0.6261 ± 0.0021
+    dof_power:
+      mean: 0.6015 ± 0.0031
+      mean@25: 0.5590 ± 0.0054
+      mean@50: 0.5795 ± 0.0042
+    friction_margin:
+      mean: 0.5161 ± 0.0124
+      mean@25: 0.4539 ± 0.0011
+      mean@50: 0.4658 ± 0.0041
+    lin_vel_err:
+      mean: 0.5806 ± 0.0044
+      mean@25: 0.5272 ± 0.0014
+      mean@50: 0.5509 ± 0.0020
+    orientation_stability:
+      mean: 0.6275 ± 0.0003
+      mean@25: 0.6129 ± 0.0004
+      mean@50: 0.6197 ± 0.0007
+    torque_smoothness:
+      mean: 0.5944 ± 0.0038
+      mean@25: 0.5690 ± 0.0054
+      mean@50: 0.5793 ± 0.0041
+    zmp_margin:
+      mean: 0.6103 ± 0.0066
+      mean@25: 0.5621 ± 0.0150
+      mean@50: 0.5866 ± 0.0116
+wave_7_baseMass0_friction0.5:
+  success:
+    Seed_0_BaseMass_0_Friction_0.5: true
+    Seed_1_BaseMass_0_Friction_0.5: true
+    Seed_2_BaseMass_0_Friction_0.5: true
+  terrain_name: wave
+  terrain_level: 7
+  summary:
+    quality_score:
+      mean: 0.5198 ± 0.0047
+      mean@25: 0.1195 ± 0.0172
+      mean@50: 0.3102 ± 0.0085
+    terrain_quality_score:
+      mean: 0.6388 ± 0.0009
+      mean@25: 0.5627 ± 0.0033
+      mean@50: 0.5989 ± 0.0016
+    ang_vel_err:
+      mean: 0.4399 ± 0.0080
+      mean@25: 0.0585 ± 0.0118
+      mean@50: 0.2044 ± 0.0119
+    dof_limits:
+      mean: 0.9511 ± 0.0017
+      mean@25: 0.9068 ± 0.0023
+      mean@50: 0.9252 ± 0.0024
+    dof_power:
+      mean: 0.8000 ± 0.0038
+      mean@25: 0.5723 ± 0.0111
+      mean@50: 0.6852 ± 0.0064
+    friction_margin:
+      mean: 0.3734 ± 0.0097
+      mean@25: 0.0307 ± 0.0034
+      mean@50: 0.1068 ± 0.0047
+    lin_vel_err:
+      mean: 0.7048 ± 0.0059
+      mean@25: 0.4351 ± 0.0208
+      mean@50: 0.5599 ± 0.0146
+    orientation_stability:
+      mean: 0.9292 ± 0.0014
+      mean@25: 0.8423 ± 0.0041
+      mean@50: 0.8828 ± 0.0023
+    torque_smoothness:
+      mean: 0.7674 ± 0.0026
+      mean@25: 0.6369 ± 0.0047
+      mean@50: 0.6897 ± 0.0042
+    zmp_margin:
+      mean: 0.8512 ± 0.0026
+      mean@25: 0.6102 ± 0.0037
+      mean@50: 0.7324 ± 0.0033
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.6236 ± 0.0080
+      mean@25: 0.5511 ± 0.0118
+      mean@50: 0.5788 ± 0.0119
+    dof_limits:
+      mean: 0.7207 ± 0.0017
+      mean@25: 0.7123 ± 0.0023
+      mean@50: 0.7158 ± 0.0024
+    dof_power:
+      mean: 0.6920 ± 0.0038
+      mean@25: 0.6487 ± 0.0111
+      mean@50: 0.6702 ± 0.0064
+    friction_margin:
+      mean: 0.6110 ± 0.0097
+      mean@25: 0.5458 ± 0.0034
+      mean@50: 0.5603 ± 0.0047
+    lin_vel_err:
+      mean: 0.6739 ± 0.0059
+      mean@25: 0.6227 ± 0.0208
+      mean@50: 0.6464 ± 0.0146
+    orientation_stability:
+      mean: 0.7165 ± 0.0014
+      mean@25: 0.7000 ± 0.0041
+      mean@50: 0.7077 ± 0.0023
+    torque_smoothness:
+      mean: 0.6858 ± 0.0026
+      mean@25: 0.6610 ± 0.0047
+      mean@50: 0.6710 ± 0.0042
+    zmp_margin:
+      mean: 0.7017 ± 0.0026
+      mean@25: 0.6559 ± 0.0037
+      mean@50: 0.6792 ± 0.0033
+wave_8_baseMass0_friction0.6:
+  success:
+    Seed_0_BaseMass_0_Friction_0.6: true
+    Seed_1_BaseMass_0_Friction_0.6: true
+    Seed_2_BaseMass_0_Friction_0.6: true
+  terrain_name: wave
+  terrain_level: 8
+  summary:
+    quality_score:
+      mean: 0.5221 ± 0.0132
+      mean@25: 0.1237 ± 0.0272
+      mean@50: 0.3100 ± 0.0250
+    terrain_quality_score:
+      mean: 0.7292 ± 0.0025
+      mean@25: 0.6535 ± 0.0051
+      mean@50: 0.6889 ± 0.0047
+    ang_vel_err:
+      mean: 0.4403 ± 0.0029
+      mean@25: 0.0541 ± 0.0119
+      mean@50: 0.2000 ± 0.0131
+    dof_limits:
+      mean: 0.9461 ± 0.0019
+      mean@25: 0.8985 ± 0.0034
+      mean@50: 0.9175 ± 0.0028
+    dof_power:
+      mean: 0.7980 ± 0.0095
+      mean@25: 0.5669 ± 0.0250
+      mean@50: 0.6804 ± 0.0167
+    friction_margin:
+      mean: 0.3857 ± 0.0094
+      mean@25: 0.0527 ± 0.0093
+      mean@50: 0.1360 ± 0.0117
+    lin_vel_err:
+      mean: 0.7060 ± 0.0122
+      mean@25: 0.4331 ± 0.0254
+      mean@50: 0.5601 ± 0.0185
+    orientation_stability:
+      mean: 0.9227 ± 0.0026
+      mean@25: 0.8306 ± 0.0072
+      mean@50: 0.8728 ± 0.0050
+    torque_smoothness:
+      mean: 0.7652 ± 0.0021
+      mean@25: 0.6330 ± 0.0050
+      mean@50: 0.6869 ± 0.0032
+    zmp_margin:
+      mean: 0.8547 ± 0.0042
+      mean@25: 0.6152 ± 0.0149
+      mean@50: 0.7389 ± 0.0079
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.7137 ± 0.0029
+      mean@25: 0.6403 ± 0.0119
+      mean@50: 0.6680 ± 0.0131
+    dof_limits:
+      mean: 0.8098 ± 0.0019
+      mean@25: 0.8007 ± 0.0034
+      mean@50: 0.8043 ± 0.0028
+    dof_power:
+      mean: 0.7816 ± 0.0095
+      mean@25: 0.7377 ± 0.0250
+      mean@50: 0.7593 ± 0.0167
+    friction_margin:
+      mean: 0.7033 ± 0.0094
+      mean@25: 0.6400 ± 0.0093
+      mean@50: 0.6558 ± 0.0117
+    lin_vel_err:
+      mean: 0.7641 ± 0.0122
+      mean@25: 0.7123 ± 0.0254
+      mean@50: 0.7364 ± 0.0185
+    orientation_stability:
+      mean: 0.8053 ± 0.0026
+      mean@25: 0.7878 ± 0.0072
+      mean@50: 0.7958 ± 0.0050
+    torque_smoothness:
+      mean: 0.7754 ± 0.0021
+      mean@25: 0.7503 ± 0.0050
+      mean@50: 0.7605 ± 0.0032
+    zmp_margin:
+      mean: 0.7924 ± 0.0042
+      mean@25: 0.7469 ± 0.0149
+      mean@50: 0.7704 ± 0.0079
+wave_9_baseMass0_friction0.7:
+  success:
+    Seed_0_BaseMass_0_Friction_0.7: true
+    Seed_1_BaseMass_0_Friction_0.7: true
+    Seed_2_BaseMass_0_Friction_0.7: true
+  terrain_name: wave
+  terrain_level: 9
+  summary:
+    quality_score:
+      mean: 0.5073 ± 0.0031
+      mean@25: 0.1008 ± 0.0074
+      mean@50: 0.2793 ± 0.0022
+    terrain_quality_score:
+      mean: 0.8164 ± 0.0006
+      mean@25: 0.7391 ± 0.0014
+      mean@50: 0.7731 ± 0.0004
+    ang_vel_err:
+      mean: 0.4226 ± 0.0077
+      mean@25: 0.0433 ± 0.0077
+      mean@50: 0.1733 ± 0.0055
+    dof_limits:
+      mean: 0.9414 ± 0.0014
+      mean@25: 0.8919 ± 0.0003
+      mean@50: 0.9107 ± 0.0012
+    dof_power:
+      mean: 0.7919 ± 0.0026
+      mean@25: 0.5459 ± 0.0098
+      mean@50: 0.6664 ± 0.0068
+    friction_margin:
+      mean: 0.4010 ± 0.0133
+      mean@25: 0.0585 ± 0.0065
+      mean@50: 0.1508 ± 0.0079
+    lin_vel_err:
+      mean: 0.7012 ± 0.0060
+      mean@25: 0.4148 ± 0.0129
+      mean@50: 0.5461 ± 0.0088
+    orientation_stability:
+      mean: 0.9211 ± 0.0041
+      mean@25: 0.8273 ± 0.0101
+      mean@50: 0.8696 ± 0.0076
+    torque_smoothness:
+      mean: 0.7645 ± 0.0011
+      mean@25: 0.6237 ± 0.0021
+      mean@50: 0.6828 ± 0.0021
+    zmp_margin:
+      mean: 0.8636 ± 0.0029
+      mean@25: 0.6454 ± 0.0102
+      mean@50: 0.7555 ± 0.0053
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8003 ± 0.0077
+      mean@25: 0.7282 ± 0.0077
+      mean@50: 0.7529 ± 0.0055
+    dof_limits:
+      mean: 0.8989 ± 0.0014
+      mean@25: 0.8895 ± 0.0003
+      mean@50: 0.8930 ± 0.0012
+    dof_power:
+      mean: 0.8705 ± 0.0026
+      mean@25: 0.8237 ± 0.0098
+      mean@50: 0.8466 ± 0.0068
+    friction_margin:
+      mean: 0.7962 ± 0.0133
+      mean@25: 0.7311 ± 0.0065
+      mean@50: 0.7487 ± 0.0079
+    lin_vel_err:
+      mean: 0.8532 ± 0.0060
+      mean@25: 0.7988 ± 0.0129
+      mean@50: 0.8238 ± 0.0088
+    orientation_stability:
+      mean: 0.8950 ± 0.0041
+      mean@25: 0.8772 ± 0.0101
+      mean@50: 0.8852 ± 0.0076
+    torque_smoothness:
+      mean: 0.8653 ± 0.0011
+      mean@25: 0.8385 ± 0.0021
+      mean@50: 0.8497 ± 0.0021
+    zmp_margin:
+      mean: 0.8841 ± 0.0029
+      mean@25: 0.8426 ± 0.0102
+      mean@50: 0.8636 ± 0.0053
+wave_10_baseMass0_friction0.8:
+  success:
+    Seed_0_BaseMass_0_Friction_0.8: true
+    Seed_1_BaseMass_0_Friction_0.8: true
+    Seed_2_BaseMass_0_Friction_0.8: true
+  terrain_name: wave
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5161 ± 0.0079
+      mean@25: 0.0903 ± 0.0204
+      mean@50: 0.2842 ± 0.0120
+    terrain_quality_score:
+      mean: 0.9081 ± 0.0015
+      mean@25: 0.8272 ± 0.0039
+      mean@50: 0.8640 ± 0.0023
+    ang_vel_err:
+      mean: 0.4246 ± 0.0104
+      mean@25: 0.0382 ± 0.0087
+      mean@50: 0.1747 ± 0.0100
+    dof_limits:
+      mean: 0.9414 ± 0.0011
+      mean@25: 0.8896 ± 0.0020
+      mean@50: 0.9098 ± 0.0016
+    dof_power:
+      mean: 0.7933 ± 0.0013
+      mean@25: 0.5382 ± 0.0079
+      mean@50: 0.6656 ± 0.0040
+    friction_margin:
+      mean: 0.4306 ± 0.0059
+      mean@25: 0.0794 ± 0.0055
+      mean@50: 0.1824 ± 0.0042
+    lin_vel_err:
+      mean: 0.7086 ± 0.0031
+      mean@25: 0.4279 ± 0.0058
+      mean@50: 0.5572 ± 0.0060
+    orientation_stability:
+      mean: 0.9177 ± 0.0008
+      mean@25: 0.8137 ± 0.0061
+      mean@50: 0.8620 ± 0.0025
+    torque_smoothness:
+      mean: 0.7657 ± 0.0019
+      mean@25: 0.6258 ± 0.0031
+      mean@50: 0.6837 ± 0.0019
+    zmp_margin:
+      mean: 0.8654 ± 0.0025
+      mean@25: 0.6445 ± 0.0056
+      mean@50: 0.7575 ± 0.0045
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8907 ± 0.0104
+      mean@25: 0.8173 ± 0.0087
+      mean@50: 0.8432 ± 0.0100
+    dof_limits:
+      mean: 0.9889 ± 0.0011
+      mean@25: 0.9790 ± 0.0020
+      mean@50: 0.9829 ± 0.0016
+    dof_power:
+      mean: 0.9607 ± 0.0013
+      mean@25: 0.9123 ± 0.0079
+      mean@50: 0.9365 ± 0.0040
+    friction_margin:
+      mean: 0.8918 ± 0.0059
+      mean@25: 0.8251 ± 0.0055
+      mean@50: 0.8447 ± 0.0042
+    lin_vel_err:
+      mean: 0.9446 ± 0.0031
+      mean@25: 0.8913 ± 0.0058
+      mean@50: 0.9159 ± 0.0060
+    orientation_stability:
+      mean: 0.9844 ± 0.0008
+      mean@25: 0.9646 ± 0.0061
+      mean@50: 0.9738 ± 0.0025
+    torque_smoothness:
+      mean: 0.9555 ± 0.0019
+      mean@25: 0.9289 ± 0.0031
+      mean@50: 0.9399 ± 0.0019
+    zmp_margin:
+      mean: 0.9744 ± 0.0025
+      mean@25: 0.9325 ± 0.0056
+      mean@50: 0.9539 ± 0.0045
+wave_10_baseMass0_friction0.9:
+  success:
+    Seed_0_BaseMass_0_Friction_0.9: true
+    Seed_1_BaseMass_0_Friction_0.9: true
+    Seed_2_BaseMass_0_Friction_0.9: true
+  terrain_name: wave
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5363 ± 0.0088
+      mean@25: 0.1211 ± 0.0118
+      mean@50: 0.3103 ± 0.0115
+    terrain_quality_score:
+      mean: 0.9119 ± 0.0017
+      mean@25: 0.8330 ± 0.0022
+      mean@50: 0.8689 ± 0.0022
+    ang_vel_err:
+      mean: 0.4400 ± 0.0120
+      mean@25: 0.0538 ± 0.0092
+      mean@50: 0.1948 ± 0.0127
+    dof_limits:
+      mean: 0.9433 ± 0.0008
+      mean@25: 0.8946 ± 0.0005
+      mean@50: 0.9142 ± 0.0002
+    dof_power:
+      mean: 0.8055 ± 0.0031
+      mean@25: 0.5707 ± 0.0075
+      mean@50: 0.6862 ± 0.0044
+    friction_margin:
+      mean: 0.4542 ± 0.0069
+      mean@25: 0.1059 ± 0.0079
+      mean@50: 0.2166 ± 0.0066
+    lin_vel_err:
+      mean: 0.7216 ± 0.0037
+      mean@25: 0.4485 ± 0.0053
+      mean@50: 0.5759 ± 0.0036
+    orientation_stability:
+      mean: 0.9188 ± 0.0038
+      mean@25: 0.8187 ± 0.0085
+      mean@50: 0.8649 ± 0.0060
+    torque_smoothness:
+      mean: 0.7717 ± 0.0021
+      mean@25: 0.6370 ± 0.0018
+      mean@50: 0.6924 ± 0.0007
+    zmp_margin:
+      mean: 0.8782 ± 0.0030
+      mean@25: 0.6840 ± 0.0073
+      mean@50: 0.7827 ± 0.0055
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8936 ± 0.0120
+      mean@25: 0.8202 ± 0.0092
+      mean@50: 0.8470 ± 0.0127
+    dof_limits:
+      mean: 0.9892 ± 0.0008
+      mean@25: 0.9800 ± 0.0005
+      mean@50: 0.9837 ± 0.0002
+    dof_power:
+      mean: 0.9630 ± 0.0031
+      mean@25: 0.9184 ± 0.0075
+      mean@50: 0.9404 ± 0.0044
+    friction_margin:
+      mean: 0.8963 ± 0.0069
+      mean@25: 0.8301 ± 0.0079
+      mean@50: 0.8512 ± 0.0066
+    lin_vel_err:
+      mean: 0.9471 ± 0.0037
+      mean@25: 0.8952 ± 0.0053
+      mean@50: 0.9194 ± 0.0036
+    orientation_stability:
+      mean: 0.9846 ± 0.0038
+      mean@25: 0.9656 ± 0.0085
+      mean@50: 0.9743 ± 0.0060
+    torque_smoothness:
+      mean: 0.9566 ± 0.0021
+      mean@25: 0.9310 ± 0.0018
+      mean@50: 0.9416 ± 0.0007
+    zmp_margin:
+      mean: 0.9769 ± 0.0030
+      mean@25: 0.9400 ± 0.0073
+      mean@50: 0.9587 ± 0.0055
+wave_10_baseMass0_friction1.0:
+  success:
+    Seed_0_BaseMass_0_Friction_1.0: true
+    Seed_1_BaseMass_0_Friction_1.0: true
+    Seed_2_BaseMass_0_Friction_1.0: true
+  terrain_name: wave
+  terrain_level: 10
+  summary:
+    quality_score:
+      mean: 0.5553 ± 0.0078
+      mean@25: 0.1400 ± 0.0151
+      mean@50: 0.3397 ± 0.0138
+    terrain_quality_score:
+      mean: 0.9155 ± 0.0015
+      mean@25: 0.8366 ± 0.0029
+      mean@50: 0.8745 ± 0.0026
+    ang_vel_err:
+      mean: 0.4455 ± 0.0077
+      mean@25: 0.0569 ± 0.0077
+      mean@50: 0.1982 ± 0.0119
+    dof_limits:
+      mean: 0.9455 ± 0.0002
+      mean@25: 0.8990 ± 0.0018
+      mean@50: 0.9172 ± 0.0010
+    dof_power:
+      mean: 0.8133 ± 0.0029
+      mean@25: 0.5941 ± 0.0079
+      mean@50: 0.7000 ± 0.0061
+    friction_margin:
+      mean: 0.4764 ± 0.0074
+      mean@25: 0.1275 ± 0.0095
+      mean@50: 0.2480 ± 0.0068
+    lin_vel_err:
+      mean: 0.7421 ± 0.0060
+      mean@25: 0.4933 ± 0.0106
+      mean@50: 0.6114 ± 0.0099
+    orientation_stability:
+      mean: 0.9228 ± 0.0030
+      mean@25: 0.8273 ± 0.0065
+      mean@50: 0.8711 ± 0.0045
+    torque_smoothness:
+      mean: 0.7782 ± 0.0005
+      mean@25: 0.6474 ± 0.0006
+      mean@50: 0.7005 ± 0.0004
+    zmp_margin:
+      mean: 0.8775 ± 0.0034
+      mean@25: 0.6877 ± 0.0092
+      mean@50: 0.7836 ± 0.0060
+  terrain_weighted_summary:
+    ang_vel_err:
+      mean: 0.8947 ± 0.0077
+      mean@25: 0.8208 ± 0.0077
+      mean@50: 0.8477 ± 0.0119
+    dof_limits:
+      mean: 0.9897 ± 0.0002
+      mean@25: 0.9808 ± 0.0018
+      mean@50: 0.9843 ± 0.0010
+    dof_power:
+      mean: 0.9645 ± 0.0029
+      mean@25: 0.9229 ± 0.0079
+      mean@50: 0.9430 ± 0.0061
+    friction_margin:
+      mean: 0.9005 ± 0.0074
+      mean@25: 0.8342 ± 0.0095
+      mean@50: 0.8571 ± 0.0068
+    lin_vel_err:
+      mean: 0.9510 ± 0.0060
+      mean@25: 0.9037 ± 0.0106
+      mean@50: 0.9262 ± 0.0099
+    orientation_stability:
+      mean: 0.9853 ± 0.0030
+      mean@25: 0.9672 ± 0.0065
+      mean@50: 0.9755 ± 0.0045
+    torque_smoothness:
+      mean: 0.9579 ± 0.0005
+      mean@25: 0.9330 ± 0.0006
+      mean@50: 0.9431 ± 0.0004
+    zmp_margin:
+      mean: 0.9767 ± 0.0034
+      mean@25: 0.9407 ± 0.0092
+      mean@50: 0.9589 ± 0.0060

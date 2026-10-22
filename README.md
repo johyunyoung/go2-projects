@@ -25,6 +25,7 @@ policies/<이름>/exported/policy.onnx    ONNX. 입력 obs [1,450] (= 45 × 히�
 policies/<이름>/params/deploy.yaml      go2_ctrl 이 읽는 설정: 관절 매핑, 게인, 관측 스케일·히스토리 (5-2)
 policies/<이름>/alt/81500/              같은 학습의 대안 체크포인트 (같은 구조: exported/ + params/)
 policies/<이름>/stand/                  Stand 상태용: 같은 ONNX(심링크) + 속도 범위 0 인 deploy.yaml (5-5)
+policies/2026-10-22_moe-cts-sim2real-v1-130000/   실기 로그 기반 설정으로 128.5k 에서 10k 이어 학습한 후보 (sim2real/README.md 4장). current 는 아직 128.5k
 sim2sim/                                계단 코스 씬과 go2-docker 용 compose 오버레이 (7장)
 sim2real/                               실기 로그 분석 도구, 결과(2026-10-21), go2_rl_robotlab 미세조정 패치 (sim2real/README.md)
 jetson/                                 arm64 빌드 패치(go2-policies 와 동일), 저자 제어기용 config.yaml

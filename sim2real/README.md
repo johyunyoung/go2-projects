@@ -74,3 +74,13 @@ Windows 에서는 `current` 심링크가 풀리지 않으니 정책 폴더 경�
 | 계단 | 여러 번 반복, 단 높이·깊이·폭 메모 | MuJoCo 계단 씬과 비교 |
 
 실행 한 번에 시험 하나, 시각·지형·배터리를 메모하세요. 로깅 설정은 `jetson/unitree_cpp_deploy-config.yaml` (500 Hz 시도, 실제 약 370 Hz).
+
+
+## 4. 2026-10-22 미세조정 결과 (학습 PC)
+
+- 실행: 위 1장 그대로, 단 `--max_iterations 10000` + `--robogauge` (서버 30 프로세스). 스모크(64 env, 3 it)로 설정 오류 없음을 확인한 뒤 본 학습.
+  run `logs/rsl_rl/go2_moe_cts/2026-10-21_18-33-12_sim2real_v1`, 128,500 → 138,500, 약 9.8 h.
+- `env.yaml` 확인: `GO2HV_hip_thigh` Y1 20.2 / `GO2HV_calf` Y1 30.3, `leg_disturbance`, `command_range_curriculum: []`, `ranges.lin_vel_x` ±2.0, 질량 (−0.5, 2.0), flat 0.08 / rough_slope 0.12. (`lin_vel_x:` 로 grep 하면 먼저 걸리는 `limit_vel` 의 [−1, 1] 은 명령 범위가 아님.)
+- RoboGauge: 21회 평가 평균 0.688, 최고 **0.696 @ 130,000**, 마지막 138,499 는 0.678. 같은 128.5k 가 이날 0.689 (10-19 에는 0.699) → 재현 편차 ±0.01 안에서 **변화 없음**. 기대대로 — RoboGauge 는 바뀐 액추에이터·외란을 모르는 평가라, 갭이 줄었는지는 실기 로그로 판정.
+- 패키지: `policies/2026-10-22_moe-cts-sim2real-v1-130000` (+ `alt/132500`, `stand/`). `current` 는 아직 128.5k.
+- 다음: 젯슨에서 `policy_dir` 두 줄을 새 폴더로 바꿔 같은 코스를 찍고 `analyze.py` 로 비교. 평지 calm 구간의 종아리 관절속도 p99·파워 p99 가 시뮬 값(10.8 rad/s, 241 W) 쪽으로 내려오고 수풀 rough 구간의 피치 std 가 줄면 성공. 나빠지면 외란을 ±3 N 으로 줄여 재학습.
