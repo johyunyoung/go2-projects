@@ -300,3 +300,39 @@ sudo systemctl start go2-rl
 
 되돌리기: `git apply -R ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-sport-replay.patch` 후 재빌드, `config.yaml.bak-*` 복원, `sudo systemctl restart go2-rl`.
 설정만 예전 FixStand/FixSquat 로 되돌려도 됩니다. 패치는 `taus`, `velocity_ff`, `gain_ramp_s` 가 없으면 예전과 똑같이 동작합니다.
+
+## 12. 원본(wty-yy/unitree_cpp_deploy go2, 4f71bf3)을 기본 제어기로
+
+저자가 배포한 그대로를 쓰는 구성입니다. FSM, Fix 기립·앉기, 정책 5개(`start`+위/아래/왼쪽/오른쪽, `RT` 부스트)가 원본과 같습니다.
+바꾼 것은 두 가지뿐입니다.
+- **자동 기동 패치(`unitree_cpp_deploy-autostart-handover.patch`)만 적용합니다.** 원본은 시작하자마자 스포츠 모드를 해제합니다. 부팅 직후 서 있는 로봇에서 그렇게 하면 주저앉으므로, 엎드림을 확인한 뒤에 해제하도록 합니다.
+- **설정은 `jetson/upstream/config.yaml`을 씁니다.** 원본 config 앞에 handover 블록만 붙인 것입니다.
+
+기존 우리 구성(`~/go2_ws/unitree_cpp_deploy`)은 그대로 두고 별도 폴더 `~/go2_ws/unitree_cpp_deploy_upstream`을 씁니다. 어느 쪽을 쓸지는 `~/go2_ws/go2_ctrl.env`의 `CTRL_DIR` 한 줄로 고릅니다(`run_go2_ctrl.sh`가 이 파일을 읽습니다).
+원본 빌드: `git lfs` 없이 정책은 `media.githubusercontent.com`에서 받고, onnxruntime은 `-DONNXRUNTIME_ROOT=/home/unitree/unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0`를 씁니다(2026-10-22 젯슨에서 빌드·수동 실행 확인).
+
+```bash
+# --- 컨테이너 안 (수동 실행 중이면 Ctrl+C, 로봇은 엎드린 상태) ---
+cd ~/go2_ws/go2-projects && git pull
+cd ~/go2_ws/unitree_cpp_deploy_upstream
+git apply --check ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-autostart-handover.patch && \
+  git apply ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-autostart-handover.patch
+cd deploy/robots/go2 && cmake --build build -j$(nproc)
+cp config/config.yaml config/config.yaml.orig
+cp ~/go2_ws/go2-projects/jetson/upstream/config.yaml config/config.yaml
+echo 'CTRL_DIR=/home/unitree/go2_ws/unitree_cpp_deploy_upstream/deploy/robots/go2' >> ~/go2_ws/go2_ctrl.env
+~/go2_ws/go2-projects/jetson/autostart/run_go2_ctrl.sh --check   # binary 경로가 ..._upstream, handover 1, libs OK
+# Ctrl+P → Ctrl+Q (exec 로 들어왔으면 exit)
+
+# --- 호스트 ---
+sudo systemctl enable --now go2-rl
+docker exec $CONTAINER bash -c 'ls -t ~/go2_ws/logs/autostart_*.log | head -1 | xargs tail -5'   # Velocity_Up..Right 초기화, FSM: Start Passive
+```
+
+조작: `L2+A` 기립 → `start`+방향키 정책 선택 → `L2+A` 앉기(자동 Passive), `L2+B` 비상. 원본에는 Stand(제자리 정책) 상태가 없습니다. 걷다가 `L2+A`를 누르면 바로 앉습니다.
+
+우리 구성으로 되돌리기:
+```bash
+docker exec $CONTAINER sed -i '/^CTRL_DIR=/d' /home/unitree/go2_ws/go2_ctrl.env
+sudo systemctl restart go2-rl
+```
