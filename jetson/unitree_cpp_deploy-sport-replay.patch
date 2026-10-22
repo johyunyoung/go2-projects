@@ -1,5 +1,5 @@
 diff --git a/deploy/include/FSM/State_Fix.h b/deploy/include/FSM/State_Fix.h
-index 0e0d945..0fcd7e9 100644
+index 0e0d945..9a61235 100644
 --- a/deploy/include/FSM/State_Fix.h
 +++ b/deploy/include/FSM/State_Fix.h
 @@ -5,6 +5,7 @@
@@ -39,7 +39,7 @@ index 0e0d945..0fcd7e9 100644
              motor.dq() = motor.tau() = 0;
          }
  
-@@ -71,6 +80,25 @@ public:
+@@ -71,6 +80,26 @@ public:
          for(int i(0); i < q.size(); ++i) {
              lowcmd->msg_.motor_cmd()[i].q() = q[i];
          }
@@ -59,13 +59,14 @@ index 0e0d945..0fcd7e9 100644
 +            int k = 0;   // segment [ts_[k], ts_[k+1]) containing t; zero velocity before the first / after the last keyframe
 +            while (k + 1 < ts_.size() && ts_[k + 1] <= t) ++k;
 +            const bool inside = t >= ts_.front() && k + 1 < ts_.size();
++            const float seg = inside ? ts_[k + 1] - ts_[k] : 0.0f;   // guard: duplicate timestamps in the config
 +            for (int i(0); i < q.size(); ++i)
-+                lowcmd->msg_.motor_cmd()[i].dq() = inside ? (qs_[k + 1][i] - qs_[k][i]) / (ts_[k + 1] - ts_[k]) : 0.0f;
++                lowcmd->msg_.motor_cmd()[i].dq() = seg > 1e-6f ? (qs_[k + 1][i] - qs_[k][i]) / seg : 0.0f;
 +        }
      }
  
  private:
-@@ -79,6 +107,10 @@ private:
+@@ -79,6 +108,10 @@ private:
      std::vector<float> kd_;
      std::vector<float> ts_;
      std::vector<std::vector<float>> qs_;
