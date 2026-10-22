@@ -212,7 +212,10 @@ tail -f ~/go2_ws/logs/autostart_*.log
 startup-blend 를 적용한 적이 없는 깨끗한 소스라면 대신 `unitree_cpp_deploy-controller.patch` (blend + 방위 유지 통합본) 를 적용하세요.
 
 ```bash
+# --- 호스트 (unitree@ubuntu) ---
 sudo systemctl stop go2-rl                                   # 두 제어기가 동시에 돌면 안 됨
+
+# --- 컨테이너 안 (docker attach $CONTAINER) ---
 cd ~/go2_ws/go2-projects && git pull
 cd ~/go2_ws/unitree_cpp_deploy
 grep -c startup_blend_s deploy/include/FSM/State_RLBase.h     # 1 이상 = blend 적용됨 → heading-hold 패치, 0 = controller 패치
@@ -226,11 +229,13 @@ cp ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-config.yaml config/config.yam
 sed -i 's#/ABSOLUTE/PATH/TO/go2-policies-allterrain/current#/home/unitree/go2_ws/go2-projects/current#' config/config.yaml
 # B) 새 sim2real 정책으로 시험 (A 대신):
 # sed -i 's#/ABSOLUTE/PATH/TO/go2-policies-allterrain/current#/home/unitree/go2_ws/go2-projects/policies/2026-10-22_moe-cts-sim2real-v1-130000#' config/config.yaml
-grep -n "policy_dir\|heading_hold" config/config.yaml        # 두 policy_dir(본체, /stand) 와 heading_hold 두 줄 확인
+grep -n "policy_dir\|heading_hold\|handover:" config/config.yaml   # policy_dir 두 줄, heading_hold 두 줄, handover 한 줄
+~/go2_ws/go2-projects/jetson/autostart/run_go2_ctrl.sh --check  # 바이너리·설정·라이브러리 확인
+# Ctrl+P → Ctrl+Q 로 컨테이너에서 빠져나옴
 
-cd ~/go2_ws/go2-projects && ./verify.sh current && ./verify.sh current/stand   # B 면 policies/2026-10-22_.../ 와 .../stand
+# --- 호스트 ---
 sudo systemctl start go2-rl
-ls -t ~/go2_ws/logs/autostart_*.log | head -1 | xargs grep -m2 "Heading hold enabled"   # 두 줄(Velocity, Stand) 나오면 적용됨
+docker exec $CONTAINER bash -c 'ls -t ~/go2_ws/logs/autostart_*.log | head -1 | xargs grep -m2 "Heading hold enabled"'   # 두 줄 나오면 적용됨
 ```
 
 **확인 순서 (실기)**
