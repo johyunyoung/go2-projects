@@ -246,3 +246,57 @@ docker exec $CONTAINER bash -c 'ls -t ~/go2_ws/logs/autostart_*.log | head -1 | 
 5. B 로 바꿨다면 10-21 과 같은 코스(평지 `L2+Y` ×3, 수풀 왕복, 계단)를 찍고 학습 PC 에서 `sim2real/analysis/analyze.py` 로 비교.
 
 되돌리기: `git apply -R <적용한 패치>` 후 재빌드, `config.yaml.bak-*` 복원, `sudo systemctl restart go2-rl`. 방위 유지만 끄려면 설정에서 `enabled: false`.
+
+## 11. 2026-10-22 갱신: 앉기·일어서기를 원래 Go2(스포츠 모드) 동작으로
+
+`L2+A` 기립(FixStand)과 앉기(FixSquat)를 **실기에서 녹화한 스포츠 모드 StandUp / StandDown 궤적의 재생**으로 바꿉니다.
+정책은 예전과 같이 `start` 이후(Velocity)와 `L2+A` 정지 자세(Stand)에서만 씁니다.
+녹화·추출: `jetson/sport_motion_recorder` (README 참고). 자동 녹화 3회 + 리모컨 2회 = 일어서기 6번, 앉기 6번. 사이클 간 차이는 0.019 rad 이하입니다.
+
+| 무엇 | 파일 | 내용 |
+|---|---|---|
+| 패치 | `jetson/unitree_cpp_deploy-sport-replay.patch` | `State_Fix`: 키프레임별 피드포워드 토크(`taus`), 속도 목표(`velocity_ff`), 게인 램프(`gain_ramp_s`). 첫 키프레임은 진입 순간의 명령(q, 토크). `State_RLBase`: 진입 블렌드 동안 이전 상태의 피드포워드 토크를 0 으로 줄임 |
+| 설정 | `jetson/unitree_cpp_deploy-config.yaml` | FixStand / FixSquat 블록만 생성본(`sport_motion_recorder/data/fix_states.yaml`)으로 교체. 나머지(handover, heading_hold, logging …)는 그대로 |
+
+예전 동작의 문제(MuJoCo `sim2sim/sport_replay_check.py`, sim2real 130k 정책, 엎드림→기립→정책 8 s→앉기→Passive):
+
+| | 예전 Fix | 원래 동작 재생 |
+|---|---|---|
+| 앉기 시작 순간 토크 튐 | 12.9 Nm (kp 25→60/80 를 한 번에 + 시작점이 정책 목표) | 0.3 Nm |
+| 앉기 끝 → Passive 낙하 속도 | 0.33 m/s (종아리 −2.65 에서 놓아서 몸통이 떨어짐 = '쿵') | 0.00 m/s (원래처럼 −2.80 까지 내려가 바닥에 닿은 뒤 놓음) |
+| 기립 → 정책 진입 토크 튐 | 0 | 0 (피드포워드 0.5 s 페이드) |
+| 녹화 궤적 대비 추종 오차 (시뮬) | – | 평균 0.06 rad, 최대 0.12 rad |
+| 걸리는 시간 | 기립 2 s, 앉기 3 s | 기립 약 2.1 s, 앉기 약 2.8 s (각각 시작 0.5 s 는 현재 자세에서 녹화 시작 자세로 맞추는 구간) |
+
+적용 순서는 §10(방위 유지)과 같습니다. §10 을 아직 안 했다면 같이 합니다. 이 패치는 세 가지 소스 상태 모두에 적용·빌드 확인했습니다: 자동 기동+옛 blend, 여기에 heading-hold 추가, 자동 기동+controller 통합 패치.
+
+```bash
+# --- 호스트 (unitree@ubuntu) ---
+sudo systemctl stop go2-rl
+
+# --- 컨테이너 안 (docker attach $CONTAINER) ---
+cd ~/go2_ws/go2-projects && git pull
+cd ~/go2_ws/unitree_cpp_deploy
+grep -c heading_hold deploy/include/utils/VelocityCommandDamper.h   # 0 이면 §10 의 heading-hold(또는 controller) 패치부터
+git apply --check ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-sport-replay.patch && \
+  git apply ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-sport-replay.patch
+cd deploy/robots/go2 && cmake --build build -j$(nproc)
+
+cp config/config.yaml config/config.yaml.bak-$(date +%m%d-%H%M)
+cp ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-config.yaml config/config.yaml
+sed -i 's#/ABSOLUTE/PATH/TO/go2-policies-allterrain/current#/home/unitree/go2_ws/go2-projects/current#' config/config.yaml   # 또는 §10 B 의 sim2real 정책
+grep -c "gain_ramp_s" config/config.yaml        # 2
+~/go2_ws/go2-projects/jetson/autostart/run_go2_ctrl.sh --check
+# Ctrl+P → Ctrl+Q
+
+# --- 호스트 ---
+sudo systemctl start go2-rl
+```
+
+**확인 순서 (실기)**: 리모컨을 손에 들고, 문제가 있으면 바로 `L2+B`(Passive, 힘 빼기)를 누를 수 있게 합니다.
+1. 엎드림 → 자동 인수 → `L2+A`. 0.5 s 동안 거의 안 움직이다가 뒷다리를 먼저 모으고 약 1 s 만에 일어서야 합니다. 원래 Go2 기립과 같은 모양·소리인지 확인하세요.
+2. `start` → 걷기 → `L2+A`(Stand, 정책 정지) → `L2+A`(FixSquat). 원래 앉기처럼 2 s 에 걸쳐 내려가고, 바닥에 닿은 뒤 힘이 빠져야 합니다. 마지막에 '쿵' 이 없어야 합니다.
+3. 반복 2–3회. 관절 소리, 머리 박음, 몸 떨림이 보이면 로그 `~/go2_ws/logs/autostart_*.log` 와 함께 알려 주세요.
+
+되돌리기: `git apply -R ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-sport-replay.patch` 후 재빌드, `config.yaml.bak-*` 복원, `sudo systemctl restart go2-rl`.
+설정만 예전 FixStand/FixSquat 로 되돌려도 됩니다. 패치는 `taus`, `velocity_ff`, `gain_ramp_s` 가 없으면 예전과 똑같이 동작합니다.

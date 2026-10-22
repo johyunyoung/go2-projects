@@ -66,9 +66,22 @@ cd ~/go2_ws/go2-projects/jetson/sport_motion_recorder
 | `sport_mode`, `sport_gait`, `sport_progress`, `body_height`, `pos_z` | rt/sportmodestate |
 | `event` | `--auto` 구간 표시 (StandUp_1, StandDown_1, …) |
 
-파일은 컨테이너 안 `~/go2_ws/logs/sport_motion/` 에 생깁니다. 호스트로 꺼낸 뒤(`docker cp $CONTAINER:/home/unitree/go2_ws/logs/sport_motion ~/`) 학습 PC 로 가져와 주시면(`scp go2:~/sport_motion/*.csv .`) 궤적을 추출해 제어기 재생 상태를 만들고
-MuJoCo 에서 확인합니다.
+파일은 컨테이너 안 `~/go2_ws/logs/sport_motion/` 에 생깁니다. 호스트로 꺼낸 뒤(`docker cp $CONTAINER:/home/unitree/go2_ws/logs/sport_motion ~/`) 학습 PC 로 가져옵니다. 학습 PC 가 로봇 네트워크에 없으면 gzip 해서 `data/` 에 커밋·push 합니다.
+
+## 궤적 추출 → 제어기 설정
+
+```bash
+python3 extract_keyframes.py data/*.csv.gz --out data/fix_states.yaml --npz data/sport_motion.npz
+```
+일어서기·앉기 구간을 잘라 종아리가 중간을 지나는 순간으로 맞춰 평균하고, 0.04 s 간격 키프레임(q + 녹화 토크)으로 만듭니다.
+`fix_states.yaml` 의 FixStand / FixSquat 블록이 `jetson/unitree_cpp_deploy-config.yaml` 에 들어가 있습니다. 다시 녹화하면 이 명령으로 만든 블록으로 교체하면 됩니다.
+제어기 쪽은 `jetson/unitree_cpp_deploy-sport-replay.patch` 가 필요합니다. 적용 순서와 시험 결과는 RUNBOOK §11 에 있습니다.
+MuJoCo 확인: `sim2sim/sport_replay_check.py --mode config --config jetson/unitree_cpp_deploy-config.yaml --npz data/sport_motion.npz --policy <policy.pt>`.
 
 ## 시험 기록
 - 2026-10-22 학습 PC(x86)에서 빌드, MuJoCo 시뮬(`rt/lowstate` 송출)에 `-n lo` 로 붙여 기록 확인: 74 열, 약 1 kHz(시뮬), 서기→웅크림 궤적 정상.
   시뮬에는 스포츠 모드가 없어 `--auto` 와 sportmodestate 는 실기에서만 의미가 있습니다.
+- 2026-10-22 실기(젯슨 컨테이너, enP8p1s0): `--auto 3` 14083 행, 리모컨 수동 2회 16104 행, 약 500 Hz. 스포츠 모드 'mcf'.
+  일어서기 약 1.0 s(명령 후 0.3 s 뒤 시작), 앉기 약 2.0 s. 선 자세 thigh 0.66 / calf −1.37, 엎드림 thigh 1.26 / calf −2.78, 뒷다리 hip ±0.39.
+  최대 토크: hip 9.9, thigh 5.5, calf 21.2 Nm(일어서기) / 10.4 Nm(앉기). 사이클 간 차이 0.019 rad(일어서기), 0.006 rad(앉기).
+  `rt/sportmodestate` 의 mode 는 계속 0, body_height 는 0.071(엎드림)–0.328 m(섬).

@@ -1,0 +1,130 @@
+diff --git a/deploy/include/FSM/State_Fix.h b/deploy/include/FSM/State_Fix.h
+index 0e0d945..0fcd7e9 100644
+--- a/deploy/include/FSM/State_Fix.h
++++ b/deploy/include/FSM/State_Fix.h
+@@ -5,6 +5,7 @@
+ 
+ #include "FSMState.h"
+ #include "LinearInterpolator.h"
++#include <algorithm>
+ 
+ class State_Fix : public FSMState
+ {
+@@ -18,6 +19,12 @@ public:
+         ts_ = cfg["ts"].as<std::vector<float>>();
+         qs_ = cfg["qs"].as<std::vector<std::vector<float>>>();
+         assert(ts_.size() == qs_.size());
++        // optional (recorded sport-mode motions): feed-forward torque per keyframe, velocity target = keyframe slope,
++        // and kp/kd ramped from the previous state's gains instead of switched at once
++        if (cfg["taus"]) { taus_ = cfg["taus"].as<std::vector<std::vector<float>>>(); assert(taus_.size() == ts_.size()); }
++        if (cfg["velocity_ff"]) velocity_ff_ = cfg["velocity_ff"].as<bool>();
++        if (cfg["gain_ramp_s"]) gain_ramp_s_ = cfg["gain_ramp_s"].as<float>();
++        for (auto & tau : taus_) if (tau.empty()) tau.assign(kp_.size(), 0.0f);
+ 
+         if(cfg["auto_transition"])
+         {
+@@ -45,11 +52,13 @@ public:
+     void enter()
+     {
+         // set gain
++        kp0_.assign(kp_.size(), 0.0f); kd0_.assign(kd_.size(), 0.0f);
+         for(int i(0); i < kp_.size(); ++i)
+         {
+             auto & motor = lowcmd->msg_.motor_cmd()[i];
+-            motor.kp() = kp_[i];
+-            motor.kd() = kd_[i];
++            kp0_[i] = motor.kp(); kd0_[i] = motor.kd();
++            if (!taus_.empty()) taus_[0][i] = motor.tau();   // keyframe 0 = the torque commanded at entry (like qs_[0] below)
++            if (gain_ramp_s_ <= 0.0f) { motor.kp() = kp_[i]; motor.kd() = kd_[i]; }
+             motor.dq() = motor.tau() = 0;
+         }
+ 
+@@ -71,6 +80,25 @@ public:
+         for(int i(0); i < q.size(); ++i) {
+             lowcmd->msg_.motor_cmd()[i].q() = q[i];
+         }
++
++        if (gain_ramp_s_ > 0.0f) {
++            const float r = std::min(1.0f, t / gain_ramp_s_);
++            for (int i(0); i < kp_.size(); ++i) {
++                lowcmd->msg_.motor_cmd()[i].kp() = kp0_[i] + r * (kp_[i] - kp0_[i]);
++                lowcmd->msg_.motor_cmd()[i].kd() = kd0_[i] + r * (kd_[i] - kd0_[i]);
++            }
++        }
++        if (!taus_.empty()) {
++            auto tau = linear_interpolate(t, ts_, taus_);
++            for (int i(0); i < tau.size(); ++i) lowcmd->msg_.motor_cmd()[i].tau() = tau[i];
++        }
++        if (velocity_ff_) {
++            int k = 0;   // segment [ts_[k], ts_[k+1]) containing t; zero velocity before the first / after the last keyframe
++            while (k + 1 < ts_.size() && ts_[k + 1] <= t) ++k;
++            const bool inside = t >= ts_.front() && k + 1 < ts_.size();
++            for (int i(0); i < q.size(); ++i)
++                lowcmd->msg_.motor_cmd()[i].dq() = inside ? (qs_[k + 1][i] - qs_[k][i]) / (ts_[k + 1] - ts_[k]) : 0.0f;
++        }
+     }
+ 
+ private:
+@@ -79,6 +107,10 @@ private:
+     std::vector<float> kd_;
+     std::vector<float> ts_;
+     std::vector<std::vector<float>> qs_;
++    std::vector<std::vector<float>> taus_;
++    bool velocity_ff_ = false;
++    float gain_ramp_s_ = 0.0f;
++    std::vector<float> kp0_, kd0_;
+ };
+ 
+ REGISTER_FSM(State_Fix)
+diff --git a/deploy/include/FSM/State_RLBase.h b/deploy/include/FSM/State_RLBase.h
+index 639f516..c2ee5e9 100644
+--- a/deploy/include/FSM/State_RLBase.h
++++ b/deploy/include/FSM/State_RLBase.h
+@@ -24,12 +24,13 @@ public:
+         // remember what the previous state was commanding, so run() can blend into the policy
+         enter_time_ = std::chrono::steady_clock::now();
+         const int n = env->robot->data.joint_ids_map.size();
+-        q_enter_.assign(n, 0.0f); kp_enter_.assign(n, 0.0f); kd_enter_.assign(n, 0.0f);
++        q_enter_.assign(n, 0.0f); kp_enter_.assign(n, 0.0f); kd_enter_.assign(n, 0.0f); tau_enter_.assign(n, 0.0f);
+         for (int i = 0; i < n; ++i)
+         {
+             auto & m = lowcmd->msg_.motor_cmd()[i];
+-            q_enter_[i] = m.q(); kp_enter_[i] = m.kp(); kd_enter_[i] = m.kd();
+-            m.dq() = 0; m.tau() = 0;
++            q_enter_[i] = m.q(); kp_enter_[i] = m.kp(); kd_enter_[i] = m.kd(); tau_enter_[i] = m.tau();
++            m.dq() = 0;
++            if (startup_blend_s_ <= 0.0f) m.tau() = 0;   // otherwise faded out in run() (feed-forward of a replayed Fix state)
+             if (startup_blend_s_ <= 0.0f) { m.kp() = env->robot->data.joint_stiffness[i]; m.kd() = env->robot->data.joint_damping[i]; }
+         }
+ 
+@@ -78,10 +79,10 @@ private:
+     bool policy_thread_running = false;
+ 
+     // start-up blend (FSM cfg key startup_blend_s, default 0.5 s): gains and joint targets are
+-    // interpolated from the previous state's command to the policy's over this time
++    // interpolated from the previous state's command to the policy's over this time (feed-forward torque faded to 0)
+     float startup_blend_s_ = 0.5f;
+     std::chrono::steady_clock::time_point enter_time_;
+-    std::vector<float> q_enter_, kp_enter_, kd_enter_;
++    std::vector<float> q_enter_, kp_enter_, kd_enter_, tau_enter_;
+ };
+ 
+ REGISTER_FSM(State_RLBase)
+\ No newline at end of file
+diff --git a/deploy/robots/go2/src/State_RLBase.cpp b/deploy/robots/go2/src/State_RLBase.cpp
+index 196f02f..cebcc68 100644
+--- a/deploy/robots/go2/src/State_RLBase.cpp
++++ b/deploy/robots/go2/src/State_RLBase.cpp
+@@ -178,10 +178,12 @@ void State_RLBase::run()
+             cmd.q()  = (1.0f - alpha) * q_enter_[m]  + alpha * action[i];
+             cmd.kp() = (1.0f - alpha) * kp_enter_[m] + alpha * env->robot->data.joint_stiffness[i];
+             cmd.kd() = (1.0f - alpha) * kd_enter_[m] + alpha * env->robot->data.joint_damping[i];
++            cmd.tau() = (1.0f - alpha) * tau_enter_[m];
+         } else {
+             cmd.q() = action[i];
+             cmd.kp() = env->robot->data.joint_stiffness[i];
+             cmd.kd() = env->robot->data.joint_damping[i];
++            cmd.tau() = 0;
+         }
+     }
+ 
