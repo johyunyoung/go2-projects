@@ -405,6 +405,7 @@ cd ~/go2-policies-allterrain && git pull && ./verify.sh current    # 그리고 g
 | Stand 에서 `L2+A` | — | **FixSquat** — 3 초에 걸쳐 웅크리고 자동 Passive (정상 종료) |
 | Stand 에서 `start` | — | 다시 정책(조이스틱) |
 | 정책 진입 시 움찔거림 | 있음 (가속도 피크 ≈ 17–21 m/s²) | 패치로 제거 (≈ 10 m/s², 정지와 동일) |
+| 전진 시 왼쪽으로 휨 (정책의 요 편향 0.3–1.5°/s) | 사람이 오른쪽 스틱으로 계속 보정 | 패치의 방위 유지: 스틱 중립이면 자동으로 직진 유지 |
 | 넘어짐 판정 → Passive | 기울기 57° | 115° (크게 기울어도 정책이 계속 돎 → 위험하면 `L2+B`) |
 | 종료 | `L2+B` → 주저앉음 → Ctrl+C | **`L2+A`(Stand) → `L2+A`(앉기, 자동 Passive) → Ctrl+C**. `L2+B` 는 비상용 |
 | 로그 | 없음 | Velocity 상태 동안 50 Hz CSV (정책 폴더 `logs/`) |
@@ -432,7 +433,7 @@ cd ~/go2-policies-allterrain && ./verify.sh current && ./verify.sh current/stand
 sudo apt install -y libboost-program-options-dev libyaml-cpp-dev libeigen3-dev libfmt-dev libspdlog-dev   # 대부분 이미 있음
 cd ~ && git clone --branch go2 --single-branch https://github.com/wty-yy/unitree_cpp_deploy.git
 cd unitree_cpp_deploy && git checkout 4f71bf3
-git apply ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-startup-blend.patch     # 부드러운 진입 (5-5 참고)
+git apply ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-controller.patch     # 부드러운 진입 (5-5 참고)
 cd deploy/robots/go2
 cmake -B build -DONNXRUNTIME_ROOT=$HOME/unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0   # go2-policies 때 받아 둔 것
 cmake --build build -j$(nproc)
@@ -482,6 +483,7 @@ cd ~/unitree_cpp_deploy/deploy/robots/go2 && ./build/go2_ctrl -n <인터페이�
 | `L2 + A` | Velocity | **Stand** — 같은 정책, 스틱 무시, 제자리에서 균형 잡고 섬 (진입 0.5 s 보간) |
 | `L2 + A` | Stand (또는 FixStand) | **FixSquat** — 지금 자세에서 3 s 에 걸쳐 웅크림 → 자동 Passive |
 | `L2 + B` | 어디서든 | Passive — **비상용.** 감쇠만 걸려 바로 주저앉음 |
+| 오른쪽 스틱 중립 | Velocity / Stand | **방위 유지** — 스틱을 놓은 순간의 방위를 P 제어로 잡아 줌 (패치 `heading_hold`). 스틱을 밀면 즉시 해제, 놓으면 새 방위에서 다시 유지 |
 
 로그에 `FSM: Change state from ... to ...` 가 찍히므로 어느 상태인지 항상 확인할 수 있습니다.
 
@@ -550,7 +552,31 @@ Stand ──start──▶ Velocity              Stand ──L2+A──▶ FixSq
 계단 단 가장자리·2단 걸침 자세에서 Velocity → Stand(전진 키를 눌러도 안 움직임) → FixSquat → Passive 로 엎드린 자세까지 안정적으로 내려앉는 것을 확인했습니다.
 FixSquat 는 기립 자세를 거치지 않고 지금 자세에서 곧장 웅크림으로 보간합니다.
 
-#### 전환 순간 움찔거림과 그 수정 (패치 `jetson/unitree_cpp_deploy-startup-blend.patch`)
+#### 전진 명령만 주면 왼쪽으로 휘는 문제와 그 수정 (패치 `heading_hold`)
+
+MuJoCo 파이썬 러너로 전진 명령만 주고(조향 없음) 요 각속도를 재니, 체크포인트마다 **고유한 요 편향**이 있었습니다. 로봇을 반대 방향(−x)을 보게 놓고
+시작해도 값이 똑같으므로 시뮬 월드의 비대칭이 아니라 **정책이 학습한 편향**입니다 (`sim2sim/drift_measure.py --mirror`).
+
+| 전진 명령 | 공개 176k | 128.5k (current) | 81.5k | sim2real 130k |
+|---|---|---|---|---|
+| 0.5 m/s | +0.9°/s | +0.3 | −1.3 | +1.2 |
+| 1.0 m/s | +0.3 | +0.9 | −1.0 | +1.5 |
+| 1.5 m/s | +0.1 | +0.4 | −2.2 | +1.3 |
+| 2.0 m/s | −0.8 | +0.5 | −2.2 | +1.0 |
+
+(+ = 왼쪽으로 돎. 옆 미끄럼 속도 vy 는 모두 ±0.03 m/s 이하라 "옆으로 치우침" 은 요 편향이 쌓여 생기는 곡선 주행입니다.)
+공개 모델에도 ±1°/s 가 있고 81.5k 는 오른쪽으로 돌므로, 이 레시피에서 요 편향의 크기·방향은 시드 운에 가깝습니다.
+고정 보정(`wz` 에 상수 −0.02 rad/s)은 속도에 따라 남는 양이 달라 완전하지 않았습니다.
+
+**수정: 제어기에 방위 유지(heading hold)를 넣었습니다.** 오른쪽 스틱이 중립(|rx| < deadzone)이면 그 순간의 IMU 요를 기준으로
+`wz = clip(kp · wrap(yaw_ref − yaw), ±max_rate)` 를 명령에 넣고, 스틱을 밀면 즉시 풀고, 놓으면 새 방위를 기준으로 다시 잡습니다 — 스포츠 모드와 같은 방식.
+설정은 FSM 상태 아래 `heading_hold: {enabled: true, kp: 1.0, max_rate: 0.6, deadzone: 0.05}`, 패치는 `jetson/unitree_cpp_deploy-controller.patch` (전환 보간과 같은 파일).
+
+실기와 같은 제어기 체인(go2-docker 시뮬)에서 130k 정책, 1.0 m/s 직진 9.5 s: 요 변화 **+6.4° → −0.7°**. 스틱으로 0.1 rad/s 회전 뒤 놓으면
+3 초 뒤 요 변화 0.5° 로 새 방위에 고정. 실기 IMU 요는 천천히 드리프트하지만 스틱을 놓고 있는 몇 분 단위에서는 문제가 안 됩니다.
+근본 수정(학습 쪽)은 요 추종 보상 강화나 좌우 대칭 증강이지만, 공개 모델에도 같은 편향이 있어 제어기 쪽 보정이 비용 대비 맞는 길입니다.
+
+#### 전환 순간 움찔거림과 그 수정 (패치 `jetson/unitree_cpp_deploy-controller.patch`)
 
 정책 상태(Velocity, Stand)에 들어갈 때 로봇이 크게 움찔거리는 원인을 sim 로그로 확인했습니다.
 
@@ -573,7 +599,7 @@ FixSquat 는 기립 자세를 거치지 않고 지금 자세에서 곧장 웅크
 
 적용:
 ```bash
-cd ~/unitree_cpp_deploy && git apply ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-startup-blend.patch
+cd ~/unitree_cpp_deploy && git apply ~/go2-policies-allterrain/jetson/unitree_cpp_deploy-controller.patch
 cd deploy/robots/go2 && cmake --build build -j$(nproc)      # 재빌드
 ```
 패치를 안 쓰면 설정의 `startup_blend_s` / `warm_start_actions` 키는 무시되고 원래 동작(즉시 전환)이 됩니다. 0.5 초가 길면 0.3 으로 줄여도 됩니다.
@@ -735,6 +761,7 @@ MuJoCo 창에서 로봇을 더블클릭한 뒤 Ctrl+오른쪽 더블클릭으로
 | 기존 go2_ctrl + 새 deploy.yaml (Docker, x86) | **검증됨** — 기립·정책·보행·정지·Passive 전 과정 (7장) |
 | 저자 제어기 x86 빌드·실행 | **검증됨** (CPU onnxruntime 1.22.0) |
 | 정책 진입 시 움찔거림 (5-5 패치) | **sim 검증됨** — 가속도 피크 16.8/20.9 → 10.6/9.8 m/s² |
+| 전진 시 왼쪽 휨 → 방위 유지 (5-5 패치) | **sim 검증됨** — 1 m/s 직진 요 변화 +6.4° → −0.7°/9.5 s, 회전 후 재고정 |
 | Velocity → Stand(정책, 명령 0 잠금) → FixSquat → Passive (5-5) | **sim 검증됨** — 평지, 계단 단 가장자리·2단 걸침, 제자리 회전 중 모두 안정 착지. 고정 자세로 서는 방식은 계단 가장자리에서 옆으로 넘어져 폐기 |
 | 계단 sim2sim (go2_ctrl 체인) | **부분** — 5·8 cm 세트 통과, 그 뒤 조향 없이 코스 이탈. 사람이 조향하는 시험은 미실시 |
 | 젯슨 실기, 절차 A (기존 go2_ctrl) | **검증됨 (기동·정책 진입)** — 2026-10-19, unitree_rl_lab 4960b84, Jetson Docker 컨테이너. 지형 시험은 미실시 (`field-tests/`) |

@@ -40,10 +40,18 @@ index 2d9ae40..639f516 100644
  REGISTER_FSM(State_RLBase)
 \ No newline at end of file
 diff --git a/deploy/include/isaaclab/envs/manager_based_rl_env.h b/deploy/include/isaaclab/envs/manager_based_rl_env.h
-index 991299a..6f6332c 100644
+index 991299a..aa04843 100644
 --- a/deploy/include/isaaclab/envs/manager_based_rl_env.h
 +++ b/deploy/include/isaaclab/envs/manager_based_rl_env.h
-@@ -59,6 +59,7 @@ public:
+@@ -12,6 +12,7 @@
+ #include "utils/VelocityCommandDamper.h"
+ #include <iostream>
+ #include <map>
++#include <cmath>
+ #include <string>
+ 
+ namespace isaaclab
+@@ -59,6 +60,7 @@ public:
  
          robot->update();
          velocity_command_damper_.configure(this->policy_cfg, fsm_cfg, robot->data.joystick);
@@ -51,9 +59,13 @@ index 991299a..6f6332c 100644
  
          // load managers
          if (policy_cfg["actions"])
-@@ -82,7 +83,12 @@ public:
+@@ -80,9 +82,15 @@ public:
+         velocity_command_damper_.update(
+             step_dt,
              fixed_command_enabled && fixed_command_active,
-             {fixed_lin_vel_x, fixed_lin_vel_y, fixed_ang_vel_z});
+-            {fixed_lin_vel_x, fixed_lin_vel_y, fixed_ang_vel_z});
++            {fixed_lin_vel_x, fixed_lin_vel_y, fixed_ang_vel_z},
++            base_yaw());
          if (action_manager) action_manager->reset();
 -        if (observation_manager) observation_manager->reset();
 +        if (action_manager && warm_start_actions)
@@ -65,7 +77,30 @@ index 991299a..6f6332c 100644
      }
  
      void step()
-@@ -122,6 +128,7 @@ public:
+@@ -92,7 +100,8 @@ public:
+         velocity_command_damper_.update(
+             step_dt,
+             fixed_command_enabled && fixed_command_active,
+-            {fixed_lin_vel_x, fixed_lin_vel_y, fixed_ang_vel_z});
++            {fixed_lin_vel_x, fixed_lin_vel_y, fixed_ang_vel_z},
++            base_yaw());
+         if (!observation_manager || !action_manager || !alg)
+         {
+             throw std::runtime_error("ManagerBasedRLEnv::step requires observation_manager, action_manager and alg");
+@@ -111,6 +120,12 @@ public:
+         action_manager->process_action(action);
+     }
+ 
++    float base_yaw() const
++    {
++        const auto & q = robot->data.root_quat_w;  // Eigen (w,x,y,z accessors)
++        return std::atan2(2.0f * (q.w() * q.z() + q.x() * q.y()), 1.0f - 2.0f * (q.y() * q.y() + q.z() * q.z()));
++    }
++
+     const std::vector<float>& velocity_command() const
+     {
+         return velocity_command_damper_.command();
+@@ -122,6 +137,7 @@ public:
      }
  
      float step_dt;
@@ -130,6 +165,95 @@ index 4c1fe10..6376963 100644
      std::vector<float> processed_actions()
      {
          std::vector<float> actions;
+diff --git a/deploy/include/utils/VelocityCommandDamper.h b/deploy/include/utils/VelocityCommandDamper.h
+index 7db9e83..499c833 100644
+--- a/deploy/include/utils/VelocityCommandDamper.h
++++ b/deploy/include/utils/VelocityCommandDamper.h
+@@ -42,13 +42,17 @@ public:
+         configure_command_ranges(policy_cfg);
+         configure_boost(policy_cfg, fsm_cfg);
+         configure_damping(fsm_cfg);
++        configure_heading_hold(fsm_cfg);
+     }
+ 
++    // yaw: current base yaw [rad] (world), used by heading hold; pass NaN to disable for this call
+     void update(
+         float dt,
+         bool use_fixed_command,
+-        const std::array<float, 3>& fixed_command)
++        const std::array<float, 3>& fixed_command,
++        float yaw = std::numeric_limits<float>::quiet_NaN())
+     {
++        current_yaw_ = yaw;
+         if (!has_command_ranges_) {
+             command_.assign(3, 0.0f);
+             return;
+@@ -70,6 +74,7 @@ public:
+         }
+ 
+         command_[0] = update_vx(command_[0], dt);
++        apply_heading_hold(use_fixed_command);
+     }
+ 
+     void reset()
+@@ -77,8 +82,11 @@ public:
+         vx_ = 0.0f;
+         boost_active_ = false;
+         command_.assign(3, 0.0f);
++        heading_holding_ = false;
+     }
+ 
++    bool heading_holding() const { return heading_holding_; }
++
+     const std::vector<float>& command() const
+     {
+         return command_;
+@@ -92,6 +100,34 @@ public:
+ private:
+     using Range = std::array<float, 2>;
+ 
++    // Heading hold: while the yaw stick is inside the deadzone, command wz = kp * wrap(yaw_ref - yaw)
++    // so a learned yaw bias does not curve the path (sport-mode-like behaviour).
++    void configure_heading_hold(const YAML::Node& fsm_cfg)
++    {
++        heading_hold_enabled_ = false;
++        if (!fsm_cfg || !fsm_cfg["heading_hold"]) return;
++        const auto hh = fsm_cfg["heading_hold"];
++        heading_hold_enabled_ = hh["enabled"].as<bool>(false);
++        heading_kp_ = hh["kp"].as<float>(1.0f);
++        heading_max_rate_ = hh["max_rate"].as<float>(0.6f);
++        heading_deadzone_ = hh["deadzone"].as<float>(0.05f);
++        if (heading_hold_enabled_) {
++            spdlog::info("Heading hold enabled: kp={:.2f} max_rate={:.2f} rad/s deadzone={:.2f}", heading_kp_, heading_max_rate_, heading_deadzone_);
++        }
++    }
++
++    void apply_heading_hold(bool use_fixed_command)
++    {
++        if (!heading_hold_enabled_ || !std::isfinite(current_yaw_)) return;
++        const float stick = (joystick_ != nullptr) ? std::fabs(joystick_->rx()) : 0.0f;
++        const bool turn_requested = use_fixed_command ? (std::fabs(command_[2]) > 1e-6f) : (stick >= heading_deadzone_);
++        if (turn_requested) { heading_holding_ = false; return; }
++        if (!heading_holding_) { heading_yaw_ref_ = current_yaw_; heading_holding_ = true; }
++        float err = heading_yaw_ref_ - current_yaw_;
++        err = std::atan2(std::sin(err), std::cos(err));
++        command_[2] = std::clamp(heading_kp_ * err, -heading_max_rate_, heading_max_rate_);
++    }
++
+     void configure_command_ranges(const YAML::Node& policy_cfg)
+     {
+         has_command_ranges_ = false;
+@@ -305,6 +341,10 @@ private:
+     }
+ 
+     bool enabled_ = false;
++    bool heading_hold_enabled_ = false;
++    bool heading_holding_ = false;
++    float heading_kp_ = 1.0f, heading_max_rate_ = 0.6f, heading_deadzone_ = 0.05f;
++    float heading_yaw_ref_ = 0.0f, current_yaw_ = std::numeric_limits<float>::quiet_NaN();
+     bool has_command_ranges_ = false;
+     bool boost_enabled_ = false;
+     bool boost_active_ = false;
 diff --git a/deploy/robots/go2/src/State_RLBase.cpp b/deploy/robots/go2/src/State_RLBase.cpp
 index 17fc2b4..196f02f 100644
 --- a/deploy/robots/go2/src/State_RLBase.cpp

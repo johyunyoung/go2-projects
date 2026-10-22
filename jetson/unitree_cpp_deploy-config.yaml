@@ -3,22 +3,6 @@
 #   Velocity ──L2+A──▶ Stand  (same policy, commands clamped to 0: balances in place on any terrain)
 #   Stand    ──start──▶ Velocity          Stand ──L2+A──▶ FixSquat (current pose→crouch, 3 s) ──auto──▶ Passive
 #   L2+B from anywhere ──▶ Passive (emergency: damping only)
-# Handover (needs unitree_cpp_deploy-autostart-handover.patch), for boot autostart (jetson/autostart).
-# The controller only listens (no motor command) until: the motion switcher answers; right after boot, sport mode
-# has started and settled (so it is released, not raced); the robot has been lying (all calves < lying_calf_max)
-# for lying_hold_s. Then sport mode is released and the release is confirmed -> Passive.
-# A guard keeps checking every 1 s: if sport mode comes back, force Passive, release it, exit (service restarts).
-# keys "" = automatic; or a combo such as "LB(2s) + RB(2s)" (L1+R1 2 s). enabled: false = old behaviour.
-handover:
-  enabled: true
-  keys: ""
-  lying_calf_max: -2.3
-  lying_hold_s: 1.0
-  boot_window_s: 180    # host uptime below this = just booted: wait for sport mode to appear first
-  sport_settle_s: 5     # after sport mode appears, let it finish (e.g. stand up) before judging the pose
-  auto_lie_down: true   # sport mode holding the robot standing still -> ask it to lie down (StandDown), up to 3 tries
-  still_hold_s: 2.0     # ... only after all joints have been still (|dq| < 0.3 rad/s) this long
-
 FSM:
   _:
     Passive:  {id: 1}
@@ -43,17 +27,17 @@ FSM:
   Velocity:   # policy with joystick commands
     transitions: {Stand: LT + A.on_pressed, Passive: LT + B.on_pressed}
     policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current   # e.g. /home/unitree/go2-policies-allterrain/current
-    startup_blend_s: 0.5      # patch: blend gains/targets from the previous state over 0.5 s (needs unitree_cpp_deploy-startup-blend.patch)
+    startup_blend_s: 0.5      # patch: blend gains/targets from the previous state over 0.5 s (needs unitree_cpp_deploy-controller.patch)
+    heading_hold: {enabled: true, kp: 1.0, max_rate: 0.6, deadzone: 0.05}   # patch: hold yaw while the yaw stick is centred
     warm_start_actions: true  # patch: last_action initialised from the current joint angles
-    logging: {enabled: true, dt: 0.002}   # ~370 Hz in practice (1 kHz FSM loop); 0.02 for long runs if CPU is tight
-    fixed_command: {enabled: true, lin_vel_x: 0.5, lin_vel_y: 0.0, ang_vel_z: 0.0, duration: 10.0}   # L2+Y: repeatable test command
+    logging: {enabled: true, dt: 0.02}
 
   Stand:      # same policy, deploy.yaml with zero command ranges -> stands still, balancing (sticks ignored)
     transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}
     policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current/stand
     startup_blend_s: 0.5
+    heading_hold: {enabled: true, kp: 1.0, max_rate: 0.6, deadzone: 0.05}
     warm_start_actions: true
-    logging: {enabled: true, dt: 0.002}   # CSV in current/stand/logs
 
   FixSquat:   # controlled sit: current pose -> crouch over 3 s, then release to Passive
     transitions: {FixStand: LT + A.on_pressed, Passive: LT + B.on_pressed}
