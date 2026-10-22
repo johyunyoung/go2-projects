@@ -285,7 +285,7 @@ cd deploy/robots/go2 && cmake --build build -j$(nproc)
 cp config/config.yaml config/config.yaml.bak-$(date +%m%d-%H%M)
 cp ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-config.yaml config/config.yaml
 sed -i 's#/ABSOLUTE/PATH/TO/go2-policies-allterrain/current#/home/unitree/go2_ws/go2-projects/current#' config/config.yaml   # 또는 §10 B 의 sim2real 정책
-grep -c "gain_ramp_s" config/config.yaml        # 2
+grep -n "^ *gain_ramp_s" config/config.yaml   # 두 줄 (FixStand, FixSquat). grep -c 는 주석까지 세어 3
 ~/go2_ws/go2-projects/jetson/autostart/run_go2_ctrl.sh --check
 # Ctrl+P → Ctrl+Q
 
