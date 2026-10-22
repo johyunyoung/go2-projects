@@ -197,3 +197,47 @@ tail -f ~/go2_ws/logs/autostart_*.log
 | sport mode | "앱으로 끄지 않으면 멈춘다" (allterrain README 4단계) | 첫 실행에 go2_ctrl이 자동 해제 (`go2-policies` README 3-7과 일치) |
 | SSH 경로 | 언급 없음 | Go2에 장착한 라우터 경유. 충격 시 선 분리 위험 |
 | 컨테이너 출입 | 해당 없음 | `docker attach` / Ctrl+P → Ctrl+Q |
+
+## 10. 2026-10-22 갱신: 방위 유지(왼쪽 휨 보정) + sim2real 미세조정 정책
+
+학습 PC 에서 만든 두 가지를 젯슨에 반영합니다. 자동 기동(9장) 구성을 그대로 둔 채 패치 하나와 설정만 바꿉니다.
+
+| 무엇 | 파일 | 효과 |
+|---|---|---|
+| 방위 유지 패치 | `jetson/unitree_cpp_deploy-heading-hold.patch` | 오른쪽 스틱 중립이면 그 순간 방향 유지. 정책의 요 편향(0.3–1.5°/s 왼쪽)으로 휘는 것 보정. MuJoCo 1 m/s 직진 10 s 요 변화 +6.4° → −0.7° |
+| 설정 | `jetson/unitree_cpp_deploy-config.yaml` | Velocity·Stand 에 `heading_hold` 한 줄 추가. handover·logging·fixed_command 는 그대로 |
+| 새 정책 (선택) | `policies/2026-10-22_moe-cts-sim2real-v1-130000` | 실기 로그 기반 설정(종아리 토크·몸통 질량·다리 외란)으로 128.5k 에서 10k 이어 학습. RoboGauge 0.696 (128.5k 와 오차 범위 안에서 같음). `current` 는 아직 128.5k |
+
+`heading-hold.patch` 는 **자동 기동 패치 + 기존 startup-blend 패치가 적용된 소스** 위에 얹는 증분 패치입니다 (학습 PC 에서 그 조합으로 적용·빌드 확인).
+startup-blend 를 적용한 적이 없는 깨끗한 소스라면 대신 `unitree_cpp_deploy-controller.patch` (blend + 방위 유지 통합본) 를 적용하세요.
+
+```bash
+sudo systemctl stop go2-rl                                   # 두 제어기가 동시에 돌면 안 됨
+cd ~/go2_ws/go2-projects && git pull
+cd ~/go2_ws/unitree_cpp_deploy
+grep -c startup_blend_s deploy/include/FSM/State_RLBase.h     # 1 이상 = blend 적용됨 → heading-hold 패치, 0 = controller 패치
+git apply --check ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-heading-hold.patch && \
+  git apply ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-heading-hold.patch
+cd deploy/robots/go2 && cmake --build build -j$(nproc)
+
+cp config/config.yaml config/config.yaml.bak-$(date +%m%d)
+cp ~/go2_ws/go2-projects/jetson/unitree_cpp_deploy-config.yaml config/config.yaml
+# A) 기존 정책(128.5k) 그대로 + 방위 유지만:
+sed -i 's#/ABSOLUTE/PATH/TO/go2-policies-allterrain/current#/home/unitree/go2_ws/go2-projects/current#' config/config.yaml
+# B) 새 sim2real 정책으로 시험 (A 대신):
+# sed -i 's#/ABSOLUTE/PATH/TO/go2-policies-allterrain/current#/home/unitree/go2_ws/go2-projects/policies/2026-10-22_moe-cts-sim2real-v1-130000#' config/config.yaml
+grep -n "policy_dir\|heading_hold" config/config.yaml        # 두 policy_dir(본체, /stand) 와 heading_hold 두 줄 확인
+
+cd ~/go2_ws/go2-projects && ./verify.sh current && ./verify.sh current/stand   # B 면 policies/2026-10-22_.../ 와 .../stand
+sudo systemctl start go2-rl
+ls -t ~/go2_ws/logs/autostart_*.log | head -1 | xargs grep -m2 "Heading hold enabled"   # 두 줄(Velocity, Stand) 나오면 적용됨
+```
+
+**확인 순서 (실기)**
+1. 평소처럼 엎드림 → 자동 인수 → `L2+A` 기립 → `start`.
+2. 평지에서 왼쪽 스틱만 앞으로 (오른쪽 스틱은 손대지 않음) 10 m 직진. 예전처럼 왼쪽으로 휘지 않는지.
+3. 오른쪽 스틱으로 돌렸다 놓으면 그 방향으로 곧게 가는지.
+4. `L2+Y` (0.5 m/s 10 s 고정 명령) 도 이제 직진해야 함 — 3회 찍어 두면 sim2real 비교용 평지 기준 데이터가 됩니다.
+5. B 로 바꿨다면 10-21 과 같은 코스(평지 `L2+Y` ×3, 수풀 왕복, 계단)를 찍고 학습 PC 에서 `sim2real/analysis/analyze.py` 로 비교.
+
+되돌리기: `git apply -R <적용한 패치>` 후 재빌드, `config.yaml.bak-*` 복원, `sudo systemctl restart go2-rl`. 방위 유지만 끄려면 설정에서 `enabled: false`.
