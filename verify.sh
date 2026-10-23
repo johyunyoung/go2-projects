@@ -13,7 +13,7 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 [ -f "$DIR/params/mujoco_deploy.yaml" ] || fail "$DIR/params/mujoco_deploy.yaml 없음"
 echo "files      OK"
 
-# --- go2_ctrl 쪽: go2-policies 브랜치 verify.sh 와 같은 검사 ---
+# --- go2_ctrl 쪽 검사 ---
 # 제어기가 구현한 관측 항목 (deploy/include/isaaclab/envs/mdp/observations/observations.h, unitree_rl_lab 4960b84 / unitree_cpp_deploy 동일)
 SUPPORTED="base_ang_vel projected_gravity joint_pos joint_pos_rel joint_vel_rel last_action velocity_commands gait_phase"
 python3 - "$DIR" "$SUPPORTED" <<'PY'

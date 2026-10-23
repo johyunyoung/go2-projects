@@ -1,7 +1,7 @@
 # wty-yy/unitree_cpp_deploy go2 branch (4f71bf3) as released: author's FSM, Fix stand/squat and five policies
-# (start + up/down/left/right). Only change: the handover block below, read by unitree_cpp_deploy-autostart-handover.patch,
+# (start + up/down/left/right). Only change: the handover block below, read by jetson/patches/autostart-handover.patch,
 # so boot autostart waits for the robot to lie down before releasing sport mode (upstream alone releases it at once).
-# Handover (needs unitree_cpp_deploy-autostart-handover.patch), for boot autostart (jetson/autostart).
+# Handover (needs jetson/patches/autostart-handover.patch), for boot autostart (jetson/autostart).
 # The controller only listens (no motor command) until: the motion switcher answers; right after boot, sport mode
 # has started and settled (so it is released, not raced); the robot has been lying (all calves < lying_calf_max)
 # for lying_hold_s. Then sport mode is released and the release is confirmed -> Passive.

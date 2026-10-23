@@ -14,7 +14,7 @@ sim2real/
 ## 1. 학습 PC 에서 미세조정
 
 ```bash
-cd <go2-projects 경로> && git pull                      # 이 브랜치 (go2-policies-allterrain)
+cd <go2-projects 경로> && git pull                      # 이 브랜치 (locomotion)
 cd ~/refs/go2_rl_robotlab
 git log --oneline -1                                     # 28b4516 이어야 함
 git apply --check <go2-projects 경로>/sim2real/training/go2_rl_robotlab-sim2real.patch \
@@ -73,7 +73,7 @@ Windows 에서는 `current` 심링크가 풀리지 않으니 정책 폴더 경�
 | 수풀 | 같은 코스를 같은 속도로 왕복, 시각 메모 | 미세조정 전후 비교 |
 | 계단 | 여러 번 반복, 단 높이·깊이·폭 메모 | MuJoCo 계단 씬과 비교 |
 
-실행 한 번에 시험 하나, 시각·지형·배터리를 메모하세요. 로깅 설정은 `jetson/unitree_cpp_deploy-config.yaml` (500 Hz 시도, 실제 약 370 Hz).
+실행 한 번에 시험 하나, 시각·지형·배터리를 메모하세요. 로깅 설정은 `jetson/ours/config.yaml` (00 Hz 시도, 실제 약 370 Hz).
 
 
 ## 4. 2026-10-22 미세조정 결과 (학습 PC)

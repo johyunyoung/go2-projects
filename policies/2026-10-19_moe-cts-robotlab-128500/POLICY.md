@@ -74,10 +74,8 @@ cd ~/refs/RoboGauge && env -u LD_LIBRARY_PATH MUJOCO_GL=egl ./robogauge.sh --tas
 ```
 학습 재개 (필요 시): `~/refs/go2_rl_robotlab`에서 `env -u PYTHONPATH -u LD_LIBRARY_PATH python scripts/rsl_rl/train.py --task=RobotLab-Go2-v0 --headless --num_envs 8192 --resume --load_run 2026-10-12_15-45-02_repro_n8192`
 
-## 배포 (브랜치 README 5·7장)
+## 배포
 
-- 젯슨의 기존 `go2_ctrl`(unitree_rl_lab 4960b84)은 관측 히스토리를 `deploy.yaml` 의 `history_length` 로 이미 처리하므로
-  **제어기 수정 없이** `params/deploy.yaml` + `exported/policy.onnx` 로 실행된다. 2026-10-19 x86 Docker(같은 제어기 이미지)에서
-  기립→정책→평지 보행→정지→Passive 확인.
-- 저자 배포판 unitree_cpp_deploy(go2, 4f71bf3)도 x86 빌드·실행 확인 (CSV 로깅용). 설정: 브랜치 `jetson/unitree_cpp_deploy-config.yaml`.
-- 계단 sim2sim(go2_ctrl 체인, 조향 없음): 5·8 cm 세트 통과 후 코스 이탈. 조향 포함 시험과 실기는 미실시.
+- 대안 구성(`jetson/ours/config.yaml`)의 Velocity / Stand 정책. 설치는 `jetson/RUNBOOK.md` 5-3, 제어기 설명은 `docs/CONTROLLER.md`.
+- 2026-10-21 실기: 기립·정책·Stand·앉기, 계단·수풀 20 분 주행 (`docs/field-tests/`).
+- 계단 sim2sim(go2_ctrl 체인, 조향 없음): 5·8 cm 세트 통과 후 코스 이탈 (실기에서는 조이스틱 조향으로 계단 주행).

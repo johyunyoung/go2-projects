@@ -3,7 +3,7 @@
 Each stand-up / sit-down in the CSVs is cut out (onset: any |dq| > 0.15 rad/s, end: every joint within 0.01 rad of its
 final value), aligned where the calves are half-way, averaged over all cycles, and sampled every --dt seconds.
   python3 extract_keyframes.py data/*.csv.gz [--dt 0.04] [--out fix_states.yaml] [--npz sport_motion.npz]
-fix_states.yaml holds the FixStand / FixSquat blocks for unitree_cpp_deploy-config.yaml."""
+fix_states.yaml holds the FixStand / FixSquat blocks for jetson/ours/config.yaml."""
 import sys
 from argparse import ArgumentParser
 import numpy as np, pandas as pd
@@ -74,7 +74,7 @@ KP = "[60, 80, 80, 60, 80, 80, 60, 80, 80, 60, 80, 80]"; KD = "[5, 4, 4, 5, 4, 4
 
 def block(name, comment, transitions, kind, extra=""):
     """State_Fix block: keyframe 0 = the command at entry ([] -> lowcmd q, zero torque), then a --lead blend onto the
-    recorded start pose, then the recorded motion with its torque as feed-forward (needs unitree_cpp_deploy-sport-replay.patch)"""
+    recorded start pose, then the recorded motion with its torque as feed-forward (needs jetson/patches/sport-replay.patch)"""
     ts, qs = keyframes(out[kind]); _, taus = keyframes(out[kind + "_tau"])
     ts = [0.0] + [round(args.lead + t, 3) for t in ts]; qs = [[]] + qs; taus = [[]] + taus
     if args.tail > 0: ts.append(round(ts[-1] + args.tail, 3)); qs.append(qs[-1]); taus.append(taus[-1])

@@ -9,7 +9,7 @@ StandUp/StandDown 을 요청(리모컨 L2+A 와 같은 것)할 뿐, 모터는 �
 ## 어디서 실행하나
 
 이 로봇은 정책 레포·unitree_sdk2·제어기가 모두 **젯슨의 Docker 컨테이너(`go2:humble`, 이름 `$CONTAINER`) 안**에 있습니다
-(`jetson/RUNBOOK.md` 0–1장). 빌드와 녹화는 컨테이너 안에서, `systemctl`·`reboot` 는 컨테이너 밖(호스트 `unitree@ubuntu`)에서 합니다.
+(`jetson/RUNBOOK.md` 0–1절). 빌드와 녹화는 컨테이너 안에서, `systemctl`·`reboot` 는 컨테이너 밖(호스트 `unitree@ubuntu`)에서 합니다.
 DDS 인터페이스는 `enP8p1s0` 입니다 (`eth0` 아님, `$NET_IF`).
 
 ## 빌드 (1회, 컨테이너 안)
@@ -74,9 +74,9 @@ cd ~/go2_ws/go2-projects/jetson/sport_motion_recorder
 python3 extract_keyframes.py data/*.csv.gz --out data/fix_states.yaml --npz data/sport_motion.npz
 ```
 일어서기·앉기 구간을 잘라 종아리가 중간을 지나는 순간으로 맞춰 평균하고, 0.04 s 간격 키프레임(q + 녹화 토크)으로 만듭니다.
-`fix_states.yaml` 의 FixStand / FixSquat 블록이 `jetson/unitree_cpp_deploy-config.yaml` 에 들어가 있습니다. 다시 녹화하면 이 명령으로 만든 블록으로 교체하면 됩니다.
-제어기 쪽은 `jetson/unitree_cpp_deploy-sport-replay.patch` 가 필요합니다. 적용 순서와 시험 결과는 RUNBOOK §11 에 있습니다.
-MuJoCo 확인: `sim2sim/sport_replay_check.py --mode config --config jetson/unitree_cpp_deploy-config.yaml --npz data/sport_motion.npz --policy <policy.pt>`.
+`fix_states.yaml` 의 FixStand / FixSquat 블록이 `jetson/ours/config.yaml` 에 들어가 있습니다. 다시 녹화하면 이 명령으로 만든 블록으로 교체하면 됩니다.
+제어기 쪽은 `jetson/patches/sport-replay.patch` 가 필요합니다. 설명과 시험 결과는 `docs/CONTROLLER.md` 에 있습니다.
+MuJoCo 확인: `sim2sim/sport_replay_check.py --mode config --config jetson/ours/config.yaml --npz data/sport_motion.npz --policy <policy.pt>`.
 
 ## 시험 기록
 - 2026-10-22 학습 PC(x86)에서 빌드, MuJoCo 시뮬(`rt/lowstate` 송출)에 `-n lo` 로 붙여 기록 확인: 74 열, 약 1 kHz(시뮬), 서기→웅크림 궤적 정상.

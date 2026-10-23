@@ -5,9 +5,9 @@
 | 항목 | 값 |
 |---|---|
 | 정책 | `policies/2026-10-19_moe-cts-robotlab-128500` (`current`), Stand 는 `current/stand` |
-| 제어기 | wty-yy/unitree_cpp_deploy `go2` 4f71bf3 + `jetson/unitree_cpp_deploy-startup-blend.patch` |
+| 제어기 | wty-yy/unitree_cpp_deploy `go2` 4f71bf3 + startup-blend 패치 (현재 `jetson/patches/controller.patch` 에 포함) |
 | 빌드 위치 | 컨테이너 안 `~/go2_ws/unitree_cpp_deploy` (host 공유 폴더). ONNX Runtime 은 `~/unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0` (컨테이너 안에만 있음) |
-| 설정 | `jetson/unitree_cpp_deploy-config.yaml` 과 같음: policy_dir 두 줄, 로깅 dt 0.002 (Velocity·Stand), 고정 명령 0.5 m/s 10 s |
+| 설정 | 당시 `jetson/ours/config.yaml` 과 같음: policy_dir 두 줄, 로깅 dt 0.002 (Velocity·Stand), 고정 명령 0.5 m/s 10 s |
 | 실행 | `./build/go2_ctrl -n enP8p1s0 2>&1 \| tee -a ~/go2_ws/logs/cppdeploy_<시각>.log` |
 | 로그 | 정책 폴더 `logs/`, `stand/logs/` (CSV), `~/go2_ws/logs/` (콘솔) |
 

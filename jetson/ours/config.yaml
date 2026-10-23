@@ -4,8 +4,8 @@
 #   Stand    ──start──▶ Velocity          Stand ──L2+A──▶ FixSquat (original sport-mode sit-down, replayed, 2.8 s) ──auto──▶ Passive
 #   L2+B from anywhere ──▶ Passive (emergency: damping only)
 # FixStand / FixSquat replay the recorded Unitree StandUp / StandDown (jetson/sport_motion_recorder; needs
-# unitree_cpp_deploy-sport-replay.patch for taus / velocity_ff / gain_ramp_s). Regenerate with extract_keyframes.py.
-# Handover (needs unitree_cpp_deploy-autostart-handover.patch), for boot autostart (jetson/autostart).
+# jetson/patches/sport-replay.patch for taus / velocity_ff / gain_ramp_s). Regenerate with extract_keyframes.py.
+# Handover (needs jetson/patches/autostart-handover.patch), for boot autostart (jetson/autostart).
 # The controller only listens (no motor command) until: the motion switcher answers; right after boot, sport mode
 # has started and settled (so it is released, not raced); the robot has been lying (all calves < lying_calf_max)
 # for lying_hold_s. Then sport mode is released and the release is confirmed -> Passive.
@@ -36,8 +36,8 @@ FSM:
 
   Velocity:   # policy with joystick commands
     transitions: {Stand: LT + A.on_pressed, Passive: LT + B.on_pressed}
-    policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current   # e.g. /home/unitree/go2-policies-allterrain/current
-    startup_blend_s: 0.5      # patch: blend gains/targets from the previous state over 0.5 s (needs unitree_cpp_deploy-controller.patch)
+    policy_dir: /home/unitree/go2_ws/go2-projects/current   # this repo on the Jetson; or policies/<name>
+    startup_blend_s: 0.5      # patch: blend gains/targets from the previous state over 0.5 s (needs jetson/patches/controller.patch)
     heading_hold: {enabled: true, kp: 1.0, max_rate: 0.6, deadzone: 0.05}   # patch: hold yaw while the yaw stick is centred (fixes learned yaw bias)
     warm_start_actions: true  # patch: last_action initialised from the current joint angles
     logging: {enabled: true, dt: 0.002}   # ~370 Hz in practice (1 kHz FSM loop); 0.02 for long runs if CPU is tight
@@ -45,7 +45,7 @@ FSM:
 
   Stand:      # same policy, deploy.yaml with zero command ranges -> stands still, balancing (sticks ignored)
     transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}
-    policy_dir: /ABSOLUTE/PATH/TO/go2-policies-allterrain/current/stand
+    policy_dir: /home/unitree/go2_ws/go2-projects/current/stand
     startup_blend_s: 0.5
     heading_hold: {enabled: true, kp: 1.0, max_rate: 0.6, deadzone: 0.05}
     warm_start_actions: true
