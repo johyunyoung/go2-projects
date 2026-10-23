@@ -8,8 +8,9 @@
 | `autostart-handover.patch` | ✔ | ✔ | 부팅 자동 실행 시 로봇이 엎드린 것을 확인한 뒤 sport mode 를 넘겨받고, 이후 감시 |
 | `controller.patch` | | ✔ | 정책 진입 보간(`startup_blend_s`, `warm_start_actions`), 방위 유지(`heading_hold`) |
 | `sport-replay.patch` | | ✔ | Fix 상태에 피드포워드 토크·속도 목표·게인 램프(`taus`, `velocity_ff`, `gain_ramp_s`) → 원래 Go2 기립·앉기 재생 |
+| `ros2-cmdvel.patch` | | ✔ | ROS 2 `/cmd_vel` (geometry_msgs/Twist) 을 DDS 로 직접 구독해 정책 속도 명령으로 사용 (`cmd_vel`). 사용법은 [ros2/README.md](../ros2/README.md) |
 
-적용 순서는 `autostart-handover` → `controller` → `sport-replay` 입니다. 깨끗한 `4f71bf3` 에서 이 순서로 적용·빌드를 확인했습니다.
+적용 순서는 `autostart-handover` → `controller` → `sport-replay` → `ros2-cmdvel` 입니다. 앞의 셋은 깨끗한 `4f71bf3` 에서 이 순서로 적용·빌드를 확인했고, `ros2-cmdvel` 은 `controller.patch` 의 방위 유지 코드 위에 만들어졌으므로 그 뒤에 적용해야 합니다 (2026-10-23 추가, Jetson 빌드·실기 확인).
 
 ## 자동 인계 (`autostart-handover.patch`)
 
@@ -71,6 +72,23 @@ MuJoCo 측정, 진입 후 0.6 초 IMU 가속도 피크 (정지 9.9 m/s²): FixSt
 | 앉기 끝 → Passive 낙하 속도 | 0.33 m/s | 0.00 m/s |
 | 녹화 궤적 대비 추종 오차 | – | 평균 0.06 rad |
 
+## ROS 2 `/cmd_vel` (`ros2-cmdvel.patch`)
+
+ROS 2 (rmw_cyclonedds) 가 `/cmd_vel` 에 `geometry_msgs/Twist` 를 내보내면 DDS 에서는 토픽 `rt/cmd_vel`, 타입 `geometry_msgs::msg::dds_::Twist_` 입니다.
+unitree_sdk2 가 같은 IDL 타입을 갖고 있어 (`unitree/idl/ros2/Twist_.hpp`) 제어기는 `ChannelSubscriber` 로 그대로 구독합니다. rclcpp 를 링크하지 않습니다.
+
+| 키 (`cmd_vel`) | 기본값 | 내용 |
+|---|---|---|
+| `enabled` | false | 없으면 원래 동작 |
+| `topic` | `rt/cmd_vel` | ROS 2 `/cmd_vel` |
+| `timeout_s` | 0.5 | 이보다 오래된 메시지는 무시 → 조이스틱(보통 0) 으로 복귀. 노드가 죽으면 제자리에 섬 |
+| `stick_override` | 0.1 | 스틱 하나라도 이만큼 기울이면 그동안 조이스틱이 우선 |
+
+- `linear.x`, `linear.y`, `angular.z` [m/s, rad/s] 를 정책 명령 범위(`deploy.yaml` `commands.base_velocity.ranges`, `R2` 누르면 boost 범위) 로 클립합니다. Stand 상태는 범위가 0 이라 cmd_vel 로 움직이지 않습니다.
+- 그 뒤의 vx 감쇠, 방위 유지는 조이스틱과 같습니다. 방위 유지는 cmd_vel 의 `angular.z` 가 0 이면 붙잡고, 0 이 아니면 풉니다.
+- FSM 전환(기립, 정책 시작, `L2+B` 비상 정지)은 리모컨 전용입니다. cmd_vel 은 Velocity 상태 안에서만 의미가 있습니다.
+- 로그 CSV 에 `cmd_0..2` (정책이 실제로 본 명령) 와 `cmd_vel_active` 열이 추가됩니다.
+
 ## 검증 기록
 
 | 항목 | 결과 |
@@ -80,3 +98,4 @@ MuJoCo 측정, 진입 후 0.6 초 IMU 가속도 피크 (정지 9.9 m/s²): FixSt
 | 자동 인계 | 2026-10-21 전원 재투입, 리모컨 없이 sport mode 기립 → StandDown → 해제 확인 → Passive |
 | 방위 유지, 기립·앉기 재생 | MuJoCo 검증, Jetson 빌드·기동 확인 (2026-10-22). 실기 주행 비교는 아직 |
 | 정책 재생 일치 | 실기 CSV 로 복원한 관측으로 ONNX 를 돌리면 기록된 행동과 상관 0.9996 |
+| ROS 2 `/cmd_vel` | 2026-10-23 Jetson 빌드, 컨테이너 안 `ros2 topic pub -r 20` 으로 0.3 m/s 전진, 송신 중단 뒤 timeout 으로 정지 확인 |

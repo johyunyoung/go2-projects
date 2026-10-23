@@ -5,6 +5,7 @@
 #   L2+B from anywhere ──▶ Passive (emergency: damping only)
 # FixStand / FixSquat replay the recorded Unitree StandUp / StandDown (jetson/sport_motion_recorder; needs
 # jetson/patches/sport-replay.patch for taus / velocity_ff / gain_ramp_s). Regenerate with extract_keyframes.py.
+# ROS 2: Velocity.cmd_vel below lets a ROS 2 node drive the policy over /cmd_vel (jetson/patches/ros2-cmdvel.patch, ros2/README.md).
 # Handover (needs jetson/patches/autostart-handover.patch), for boot autostart (jetson/autostart).
 # The controller only listens (no motor command) until: the motion switcher answers; right after boot, sport mode
 # has started and settled (so it is released, not raced); the robot has been lying (all calves < lying_calf_max)
@@ -42,6 +43,7 @@ FSM:
     warm_start_actions: true  # patch: last_action initialised from the current joint angles
     logging: {enabled: true, dt: 0.002}   # ~370 Hz in practice (1 kHz FSM loop); 0.02 for long runs if CPU is tight
     fixed_command: {enabled: true, lin_vel_x: 0.5, lin_vel_y: 0.0, ang_vel_z: 0.0, duration: 10.0}   # L2+Y: repeatable test command
+    cmd_vel: {enabled: true, topic: rt/cmd_vel, timeout_s: 0.5, stick_override: 0.1}   # patch: ROS 2 /cmd_vel (geometry_msgs/Twist) drives the policy while messages keep arriving; sticks override (needs jetson/patches/ros2-cmdvel.patch, see ros2/README.md)
 
   Stand:      # same policy, deploy.yaml with zero command ranges -> stands still, balancing (sticks ignored)
     transitions: {Velocity: start.on_pressed, FixSquat: LT + A.on_pressed, Passive: LT + B.on_pressed}

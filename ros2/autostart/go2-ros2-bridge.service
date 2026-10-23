@@ -1,0 +1,20 @@
+# Go2 ROS 2 state bridge autostart (Jetson HOST). Installed by install.sh, which fills in __CONTAINER__.
+# Republishes /lowstate as /joint_states, /imu, /foot_force, /foot_contact, /joint_temperature (ros2/go2_state_bridge.py).
+# Read-only: it never sends commands to the robot, so it is independent of go2-rl.service.
+[Unit]
+Description=Go2 ROS 2 state bridge (go2_state_bridge.py in docker)
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/docker start __CONTAINER__
+ExecStart=/usr/bin/docker exec __CONTAINER__ /home/unitree/go2_ws/go2-projects/ros2/autostart/run_state_bridge.sh
+# docker exec does not forward signals to the process in the container: stop it explicitly
+ExecStop=/usr/bin/docker exec __CONTAINER__ pkill -INT -f go2_state_bridge.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

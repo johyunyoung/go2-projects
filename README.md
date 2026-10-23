@@ -30,6 +30,7 @@
 | `L2 + A` (보행 중) | 앉기 → 끝나면 자동으로 힘 빠짐 |
 | `L2 + B` | 비상 정지 (감쇠만 걸려 주저앉음) |
 | `R2` 누른 채 | 부스트: 최대 속도가 4 m/s 대로 커집니다. **좁은 곳에서는 누르지 마세요** |
+| ROS 2 `/cmd_vel` | 대안 구성에서 보행 중 ROS 2 토픽으로도 속도를 줄 수 있습니다 ([ros2/README.md](ros2/README.md)). 스틱을 움직이면 스틱이 우선 |
 
 - 스틱 끝은 정책의 명령 범위 끝입니다 (전진 약 2 m/s).
 - 지형을 보지 않는 정책입니다. 계단 끝·낭떠러지를 모르므로 좁은 계단에서는 조향으로 가운데를 유지하세요.
@@ -58,7 +59,7 @@
 | 보행 중 `L2 + A` | 바로 앉기 | 제자리 서기(Stand) → 한 번 더 누르면 앉기 |
 | 정책 시작 충격 완화, 직진 방위 유지 | 없음 | 있음 |
 
-전환은 Jetson host 에서 설정 한 줄입니다 ([RUNBOOK §3](jetson/RUNBOOK.md#3-구성-전환)).
+전환은 Jetson host 에서 설정 한 줄입니다 ([RUNBOOK §3](jetson/RUNBOOK.md#3-구성-전환)). 2026-10-23 부터 로봇은 대안 구성으로 부팅합니다 (ROS 2 `/cmd_vel` 이 여기에만 있음).
 대안 구성의 패치와 측정 결과는 [docs/CONTROLLER.md](docs/CONTROLLER.md), 학습 기록은 [docs/TRAINING.md](docs/TRAINING.md) 에 있습니다.
 
 ## 저장소 구조
@@ -68,7 +69,7 @@ jetson/
   RUNBOOK.md            Jetson 운영 절차: 접속, 서비스, 구성 전환, 처음부터 설치, 문제 해결
   upstream/config.yaml  기본 구성 설정 (저자 원본 config + 자동 인계 블록)
   ours/config.yaml      대안 구성 설정
-  patches/              unitree_cpp_deploy 패치 3개 (자동 인계, 진입 보간·방위 유지, 기립·앉기 재생)
+  patches/              unitree_cpp_deploy 패치 4개 (자동 인계, 진입 보간·방위 유지, 기립·앉기 재생, ROS 2 cmd_vel)
   autostart/            systemd 서비스와 실행 스크립트
   sport_motion_recorder/  sport mode 기립·앉기 녹화 도구와 녹화 데이터
 policies/, current      자체 학습 정책 (current → 128.5k)
@@ -76,6 +77,7 @@ verify.sh               정책 폴더 점검
 docs/                   제어기 패치 설명, 학습 기록, 실기 시험 기록
 sim2sim/                MuJoCo 검증 스크립트와 계단 코스
 sim2real/               실기 로그 분석 도구와 sim2real 미세조정 패치
+ros2/                   ROS 2 인터페이스: /cmd_vel 로 명령, /lowstate → 표준 상태 토픽 브리지 (부팅 자동 실행), rosbag
 ```
 
 ## 참고

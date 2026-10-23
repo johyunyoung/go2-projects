@@ -13,7 +13,7 @@
 | 대안 구성 제어기 | 컨테이너 `~/go2_ws/unitree_cpp_deploy/deploy/robots/go2` |
 | ONNX Runtime | 컨테이너 `~/unitree_rl_lab/deploy/thirdparty/onnxruntime-linux-aarch64-1.22.0` (CPU) |
 | DDS 인터페이스 | `enP8p1s0` |
-| 서비스 | host systemd `go2-rl` → `docker exec $C .../jetson/autostart/run_go2_ctrl.sh` |
+| 서비스 | host systemd `go2-rl` → `docker exec $C .../jetson/autostart/run_go2_ctrl.sh`. ROS 2 상태 브리지는 `go2-ros2-bridge` ([ros2/README.md](../ros2/README.md)) |
 | 실행 설정 | 컨테이너 `~/go2_ws/go2_ctrl.env` (`LD_LIBRARY_PATH`, 구성 선택 `CTRL_DIR`) |
 | 콘솔 로그 | 컨테이너 `~/go2_ws/logs/autostart_<시각>.log` |
 
@@ -43,7 +43,7 @@ docker exec -it $C bash                                # 컨테이너 셸. 나�
 
 ## 3. 구성 전환
 
-`run_go2_ctrl.sh` 는 `~/go2_ws/go2_ctrl.env` 의 `CTRL_DIR` 로 어느 제어기를 띄울지 정합니다. 줄이 없으면 대안 구성입니다.
+`run_go2_ctrl.sh` 는 `~/go2_ws/go2_ctrl.env` 의 `CTRL_DIR` 로 어느 제어기를 띄울지 정합니다. 줄이 없으면 대안 구성입니다. 2026-10-23 부터 로봇은 대안 구성입니다 (ROS 2 `/cmd_vel` 은 대안 구성에만 있음).
 
 ```bash
 # host. 기본 구성 (저자 원본)
@@ -103,7 +103,7 @@ cp ~/go2_ws/go2-projects/jetson/upstream/config.yaml config/config.yaml
 ```bash
 cd ~/go2_ws && git clone -b go2 https://github.com/wty-yy/unitree_cpp_deploy unitree_cpp_deploy
 cd unitree_cpp_deploy && git checkout 4f71bf3
-for p in autostart-handover controller sport-replay; do git apply ~/go2_ws/go2-projects/jetson/patches/$p.patch; done
+for p in autostart-handover controller sport-replay ros2-cmdvel; do git apply ~/go2_ws/go2-projects/jetson/patches/$p.patch; done
 cd deploy/robots/go2
 cmake -B build -DONNXRUNTIME_ROOT=$ORT && cmake --build build -j$(nproc)
 cp ~/go2_ws/go2-projects/jetson/ours/config.yaml config/config.yaml      # policy_dir 은 ~/go2_ws/go2-projects/current
@@ -139,6 +139,8 @@ cd ~/go2_ws/unitree_cpp_deploy_upstream/deploy/robots/go2     # 대안 구성은
 |---|---|
 | 제어기 콘솔 | `~/go2_ws/logs/autostart_<시각>.log` |
 | 대안 구성 정책 CSV (관절·토크·IMU·명령, 약 370 Hz) | `~/go2_ws/go2-projects/current/logs/`, `current/stand/logs/` |
+
+ROS 2 로 명령을 주거나 (`/cmd_vel`) 상태를 읽는 방법은 [ros2/README.md](../ros2/README.md) 에 있습니다.
 
 CSV 분석 도구는 `sim2real/analysis/` 에 있습니다. CSV 는 계속 쌓이므로 디스크를 가끔 확인하세요.
 

@@ -1,0 +1,284 @@
+diff --git a/deploy/include/isaaclab/envs/manager_based_rl_env.h b/deploy/include/isaaclab/envs/manager_based_rl_env.h
+index aa04843..cd3ffdb 100644
+--- a/deploy/include/isaaclab/envs/manager_based_rl_env.h
++++ b/deploy/include/isaaclab/envs/manager_based_rl_env.h
+@@ -136,6 +136,11 @@ public:
+         return velocity_command_damper_.boost_active();
+     }
+ 
++    bool cmd_vel_active() const
++    {
++        return velocity_command_damper_.cmd_vel_active();
++    }
++
+     float step_dt;
+     bool warm_start_actions = true;   // FSM cfg key warm_start_actions (default on)
+     
+diff --git a/deploy/include/utils/CmdVelSource.h b/deploy/include/utils/CmdVelSource.h
+new file mode 100644
+index 0000000..0224583
+--- /dev/null
++++ b/deploy/include/utils/CmdVelSource.h
+@@ -0,0 +1,117 @@
++// ROS 2 /cmd_vel source for the velocity command (go2-projects jetson/patches/ros2-cmdvel.patch).
++//
++// A ROS 2 node (rmw_cyclonedds, same DDS domain and network interface as go2_ctrl) publishing
++// geometry_msgs/msg/Twist on /cmd_vel appears on the wire as DDS topic "rt/cmd_vel" with type
++// "geometry_msgs::msg::dds_::Twist_". unitree_sdk2 ships exactly that IDL type, so the controller
++// can subscribe with the plain ChannelSubscriber and no rclcpp is linked into go2_ctrl.
++//
++// Safety: a message is only used while it is younger than the timeout (default 0.5 s), so a
++// stalled or killed ROS 2 node makes the command fall back to the joystick (normally zero -> the
++// policy stops in place). Non-finite values are dropped. FSM transitions (stand up, start,
++// emergency stop) remain remote-controller only.
++
++#pragma once
++
++#include <unitree/robot/channel/channel_subscriber.hpp>
++#include <unitree/idl/ros2/Twist_.hpp>
++#include <spdlog/spdlog.h>
++
++#include <array>
++#include <chrono>
++#include <cmath>
++#include <cstdint>
++#include <memory>
++#include <mutex>
++#include <string>
++
++namespace utils
++{
++
++class CmdVelSource
++{
++public:
++    using Twist = geometry_msgs::msg::dds_::Twist_;
++
++    // One DDS reader per process, shared by every FSM state that enables cmd_vel.
++    static CmdVelSource& instance()
++    {
++        static CmdVelSource s;
++        return s;
++    }
++
++    // Idempotent. ChannelFactory::Init must already have been called (main.cpp does that first).
++    void start(const std::string& topic)
++    {
++        std::lock_guard<std::mutex> lock(mutex_);
++        if (sub_) {
++            if (topic != topic_) {
++                spdlog::warn("cmd_vel: already subscribed to '{}', ignoring request for '{}'", topic_, topic);
++            }
++            return;
++        }
++        topic_ = topic;
++        sub_ = std::make_shared<unitree::robot::ChannelSubscriber<Twist>>(topic_);
++        sub_->InitChannel([this](const void* msg) { on_message(*static_cast<const Twist*>(msg)); });  // same default queue as the SDK wrappers
++        spdlog::info("cmd_vel: subscribed to DDS topic '{}' (ROS 2 geometry_msgs/Twist)", topic_);
++    }
++
++    bool started() const
++    {
++        std::lock_guard<std::mutex> lock(mutex_);
++        return static_cast<bool>(sub_);
++    }
++
++    // Latest (vx, vy, wz) if a message arrived within max_age_s; false otherwise.
++    bool get(std::array<float, 3>& cmd, float max_age_s) const
++    {
++        std::lock_guard<std::mutex> lock(mutex_);
++        if (!has_msg_) return false;
++        const float age = std::chrono::duration<float>(std::chrono::steady_clock::now() - last_rx_).count();
++        if (age > max_age_s) return false;
++        cmd = cmd_;
++        return true;
++    }
++
++    uint64_t count() const
++    {
++        std::lock_guard<std::mutex> lock(mutex_);
++        return count_;
++    }
++
++private:
++    CmdVelSource() = default;
++
++    void on_message(const Twist& t)
++    {
++        const std::array<float, 3> v{
++            static_cast<float>(t.linear().x()),
++            static_cast<float>(t.linear().y()),
++            static_cast<float>(t.angular().z())};
++        for (float x : v) {
++            if (!std::isfinite(x)) {
++                std::lock_guard<std::mutex> lock(mutex_);
++                ++dropped_;
++                if (dropped_ == 1 || dropped_ % 100 == 0) {
++                    spdlog::warn("cmd_vel: dropped {} message(s) with non-finite values", dropped_);
++                }
++                return;
++            }
++        }
++        std::lock_guard<std::mutex> lock(mutex_);
++        cmd_ = v;
++        last_rx_ = std::chrono::steady_clock::now();
++        has_msg_ = true;
++        ++count_;
++    }
++
++    mutable std::mutex mutex_;
++    std::string topic_;
++    std::shared_ptr<unitree::robot::ChannelSubscriber<Twist>> sub_;
++    std::array<float, 3> cmd_{0.0f, 0.0f, 0.0f};
++    std::chrono::steady_clock::time_point last_rx_;
++    bool has_msg_ = false;
++    uint64_t count_ = 0;
++    uint64_t dropped_ = 0;
++};
++
++} // namespace utils
+diff --git a/deploy/include/utils/VelocityCommandDamper.h b/deploy/include/utils/VelocityCommandDamper.h
+index 499c833..2ad41bb 100644
+--- a/deploy/include/utils/VelocityCommandDamper.h
++++ b/deploy/include/utils/VelocityCommandDamper.h
+@@ -17,6 +17,7 @@
+ #include <yaml-cpp/yaml.h>
+ 
+ #include "unitree_joystick_dsl.hpp"
++#include "utils/CmdVelSource.h"
+ 
+ #include <algorithm>
+ #include <array>
+@@ -43,6 +44,7 @@ public:
+         configure_boost(policy_cfg, fsm_cfg);
+         configure_damping(fsm_cfg);
+         configure_heading_hold(fsm_cfg);
++        configure_cmd_vel(fsm_cfg);
+     }
+ 
+     // yaw: current base yaw [rad] (world), used by heading hold; pass NaN to disable for this call
+@@ -68,13 +70,24 @@ public:
+ 
+             boost_active_ = boost_enabled_ && boost_button_ != nullptr && boost_button_->pressed;
+             const auto& ranges = boost_active_ ? boost_command_ranges_ : command_ranges_;
+-            command_[0] = scale_command(joystick_->ly(), ranges[0]);
+-            command_[1] = scale_command(-joystick_->lx(), ranges[1]);
+-            command_[2] = scale_command(-joystick_->rx(), ranges[2]);
++            std::array<float, 3> external{};
++            cmd_vel_active_ = cmd_vel_enabled_
++                && !joystick_deflected()
++                && CmdVelSource::instance().get(external, cmd_vel_timeout_s_);
++            if (cmd_vel_active_) {
++                // ROS 2 /cmd_vel in m/s, rad/s: clipped to the policy's command ranges (Stand: [0, 0])
++                for (int i = 0; i < 3; ++i) {
++                    command_[i] = std::clamp(external[i], ranges[i][0], ranges[i][1]);
++                }
++            } else {
++                command_[0] = scale_command(joystick_->ly(), ranges[0]);
++                command_[1] = scale_command(-joystick_->lx(), ranges[1]);
++                command_[2] = scale_command(-joystick_->rx(), ranges[2]);
++            }
+         }
+ 
+         command_[0] = update_vx(command_[0], dt);
+-        apply_heading_hold(use_fixed_command);
++        apply_heading_hold(use_fixed_command || cmd_vel_active_);
+     }
+ 
+     void reset()
+@@ -83,10 +96,15 @@ public:
+         boost_active_ = false;
+         command_.assign(3, 0.0f);
+         heading_holding_ = false;
++        cmd_vel_active_ = false;
+     }
+ 
+     bool heading_holding() const { return heading_holding_; }
+ 
++    // true while the last update() took its command from ROS 2 /cmd_vel instead of the sticks
++    bool cmd_vel_active() const { return cmd_vel_active_; }
++    bool cmd_vel_enabled() const { return cmd_vel_enabled_; }
++
+     const std::vector<float>& command() const
+     {
+         return command_;
+@@ -116,11 +134,47 @@ private:
+         }
+     }
+ 
+-    void apply_heading_hold(bool use_fixed_command)
++    // ROS 2 /cmd_vel (FSM cfg key cmd_vel): used instead of the sticks while messages keep arriving.
++    //   enabled: false          default: off, original behaviour
++    //   topic: rt/cmd_vel       DDS topic name; ROS 2 topic /cmd_vel maps to rt/cmd_vel
++    //   timeout_s: 0.5          a message older than this is ignored -> joystick (normally zero) again
++    //   stick_override: 0.1     any stick deflected beyond this -> joystick wins while deflected
++    void configure_cmd_vel(const YAML::Node& fsm_cfg)
++    {
++        cmd_vel_enabled_ = false;
++        cmd_vel_active_ = false;
++        if (!fsm_cfg || !fsm_cfg["cmd_vel"]) return;
++        const auto cv = fsm_cfg["cmd_vel"];
++        cmd_vel_enabled_ = cv["enabled"].as<bool>(false);
++        if (!cmd_vel_enabled_) return;
++        const std::string topic = cv["topic"].as<std::string>("rt/cmd_vel");
++        cmd_vel_timeout_s_ = cv["timeout_s"].as<float>(0.5f);
++        cmd_vel_stick_override_ = cv["stick_override"].as<float>(0.1f);
++        if (!std::isfinite(cmd_vel_timeout_s_) || cmd_vel_timeout_s_ <= 0.0f) {
++            throw std::invalid_argument("cmd_vel.timeout_s must be finite and positive");
++        }
++        if (joystick_ == nullptr) {
++            throw std::invalid_argument("cmd_vel requires a joystick (stick override)");
++        }
++        CmdVelSource::instance().start(topic);
++        spdlog::info("cmd_vel enabled: topic '{}' timeout {:.2f} s, stick override {:.2f}; commands clipped to the policy ranges",
++            topic, cmd_vel_timeout_s_, cmd_vel_stick_override_);
++    }
++
++    bool joystick_deflected() const
++    {
++        if (joystick_ == nullptr) return false;
++        return std::fabs(joystick_->lx()) >= cmd_vel_stick_override_
++            || std::fabs(joystick_->ly()) >= cmd_vel_stick_override_
++            || std::fabs(joystick_->rx()) >= cmd_vel_stick_override_;
++    }
++
++    // external_command: fixed command or cmd_vel -> a turn is requested iff wz != 0 (sticks are not the source)
++    void apply_heading_hold(bool external_command)
+     {
+         if (!heading_hold_enabled_ || !std::isfinite(current_yaw_)) return;
+         const float stick = (joystick_ != nullptr) ? std::fabs(joystick_->rx()) : 0.0f;
+-        const bool turn_requested = use_fixed_command ? (std::fabs(command_[2]) > 1e-6f) : (stick >= heading_deadzone_);
++        const bool turn_requested = external_command ? (std::fabs(command_[2]) > 1e-6f) : (stick >= heading_deadzone_);
+         if (turn_requested) { heading_holding_ = false; return; }
+         if (!heading_holding_) { heading_yaw_ref_ = current_yaw_; heading_holding_ = true; }
+         float err = heading_yaw_ref_ - current_yaw_;
+@@ -341,6 +395,10 @@ private:
+     }
+ 
+     bool enabled_ = false;
++    bool cmd_vel_enabled_ = false;
++    bool cmd_vel_active_ = false;
++    float cmd_vel_timeout_s_ = 0.5f;
++    float cmd_vel_stick_override_ = 0.1f;
+     bool heading_hold_enabled_ = false;
+     bool heading_holding_ = false;
+     float heading_kp_ = 1.0f, heading_max_rate_ = 0.6f, heading_deadzone_ = 0.05f;
+diff --git a/deploy/robots/go2/src/State_RLBase.cpp b/deploy/robots/go2/src/State_RLBase.cpp
+index cebcc68..7047408 100644
+--- a/deploy/robots/go2/src/State_RLBase.cpp
++++ b/deploy/robots/go2/src/State_RLBase.cpp
+@@ -287,6 +287,14 @@ void State_RLBase::run()
+             logger->add("cmd_fixed_1", fixed_1);
+             logger->add("cmd_fixed_2", fixed_2);
+ 
++            // Velocity command the policy actually sees (after source selection, clipping, damping, heading hold)
++            // and whether it came from ROS 2 /cmd_vel
++            const auto & vc = env->velocity_command();
++            logger->add("cmd_0", vc.size() > 0 ? vc[0] : 0.0f);
++            logger->add("cmd_1", vc.size() > 1 ? vc[1] : 0.0f);
++            logger->add("cmd_2", vc.size() > 2 ? vc[2] : 0.0f);
++            logger->add("cmd_vel_active", env->cmd_vel_active() ? 1.0f : 0.0f);
++
+             logger->write();
+         }
+     }
